@@ -1,0 +1,10 @@
+#
+# @(#)openwin-menu-programs	1.17 93/01/11 openwin-menu-programs 
+#
+#	OpenWindows default root menu file - Programs submenu
+#
+
+"OWacomp" TITLE PIN
+
+"OWacomp" exec zenity --error --text "OWacomp not installed\nPlease obtain it from http://freshmeat.net/projects/OWacomp\n"
+

@@ -1,0 +1,51 @@
+diff -rcb xview-3.2p1.4.orig/Build-LinuxXView.bash xview-3.2p1.4/Build-LinuxXView.bash
+*** xview-3.2p1.4.orig/Build-LinuxXView.bash	2010-04-21 12:09:34.000000000 +0200
+--- xview-3.2p1.4/Build-LinuxXView.bash	2010-04-21 12:14:18.000000000 +0200
+***************
+*** 39,45 ****
+    INCLUDES      := -I`pwd`/build/include $IMAKE_EXTRA_INCLUDES -I$OWDEST/include \$(INCLUDES)
+    LOCAL_LDFLAGS := -L`pwd`/lib/libolgx -L`pwd`/lib/libxview $IMAKE_EXTRA_LOCAL_LDFLAGS -L$OWDEST/lib \$(LOCAL_LDFLAGS)
+    MAKEOVERRIDES  =
+!   CFLAGS        += \$(EXTRA_CFLAGS)
+  # End of variable-definitions appended by imake-wrapper
+  
+  EOF
+--- 39,45 ----
+    INCLUDES      := -I`pwd`/build/include $IMAKE_EXTRA_INCLUDES -I$OWDEST/include \$(INCLUDES)
+    LOCAL_LDFLAGS := -L`pwd`/lib/libolgx -L`pwd`/lib/libxview $IMAKE_EXTRA_LOCAL_LDFLAGS -L$OWDEST/lib \$(LOCAL_LDFLAGS)
+    MAKEOVERRIDES  =
+!   CFLAGS        += -g \$(EXTRA_CFLAGS)
+  # End of variable-definitions appended by imake-wrapper
+  
+  EOF
+diff -rcb xview-3.2p1.4.orig/imake xview-3.2p1.4/imake
+*** xview-3.2p1.4.orig/imake	2010-04-21 12:09:34.000000000 +0200
+--- xview-3.2p1.4/imake	2010-04-21 12:13:57.000000000 +0200
+***************
+*** 1,9 ****
+! #!/bin/sh
+  
+  set -e
+  
+  echo "imake-wrapper: running imake $* in directory `pwd`"
+! /usr/bin/X11/imake "$@"
+  if [ -f "$IMAKEAPPEND" ]; then
+    cat "$IMAKEAPPEND" >> Makefile
+  fi
+--- 1,16 ----
+! #!/bin/bash
+  
+  set -e
+  
+  echo "imake-wrapper: running imake $* in directory `pwd`"
+! for cmd in /usr/bin/X11/imake /usr/bin/imake
+! do
+! 	if [ -x ${cmd} ]; then
+! 		IMAKE_CMD=${cmd}
+! 	fi
+! done
+! 
+! ${IMAKE_CMD} "$@"
+  if [ -f "$IMAKEAPPEND" ]; then
+    cat "$IMAKEAPPEND" >> Makefile
+  fi

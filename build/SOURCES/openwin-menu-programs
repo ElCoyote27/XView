@@ -1,0 +1,16 @@
+#
+# @(#)openwin-menu-programs	1.17 93/01/11 openwin-menu-programs 
+#
+#	OpenWindows default root menu file - Programs submenu
+#
+
+"Programs" TITLE PIN
+
+"cmdtool (CONSOLE)..." 		exec $OPENWINHOME/bin/cmdtool -C
+"cmdtool..."			exec $OPENWINHOME/bin/cmdtool
+"shelltool..."			exec $OPENWINHOME/bin/shelltool
+
+"Textedit..."			exec $OPENWINHOME/bin/textedit
+
+"Properties..."			exec $OPENWINHOME/bin/props
+"Clock..."			exec $OPENWINHOME/bin/clock

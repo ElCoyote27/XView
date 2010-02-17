@@ -1,0 +1,43 @@
+diff -rcpN xview-3.2p1.4/lib/libxview/frame/frame_init.c xview-3.2p1.4-24.5.SCC/lib/libxview/frame/frame_init.c
+*** xview-3.2p1.4/lib/libxview/frame/frame_init.c	1993-06-28 22:16:16.000000000 -0700
+--- xview-3.2p1.4-24.5.SCC/lib/libxview/frame/frame_init.c	2010-02-23 10:28:17.000000000 -0800
+*************** frame_init(owner, frame_public, avlist)
+*** 275,281 ****
+      /* Set cached version of rect */
+      (void) win_getsize(frame_public, &frame->rectcache);
+  
+!     if (!is_subframe) {
+  	int             frame_count;
+  
+  	frame_count = (int) xv_get(xv_server(info), XV_KEY_DATA, FRAME_COUNT);
+--- 275,284 ----
+      /* Set cached version of rect */
+      (void) win_getsize(frame_public, &frame->rectcache);
+  
+!     if (is_subframe)
+!     	XSetTransientForHint(xv_display(info), xv_xid(info),
+! 			     frame->wmhints.window_group);
+!     else {
+  	int             frame_count;
+  
+  	frame_count = (int) xv_get(xv_server(info), XV_KEY_DATA, FRAME_COUNT);
+diff -rcpN xview-3.2p1.4/lib/libxview/ttysw/termsw.c xview-3.2p1.4-24.5.SCC/lib/libxview/ttysw/termsw.c
+*** xview-3.2p1.4/lib/libxview/ttysw/termsw.c	2010-02-23 10:31:51.000000000 -0800
+--- xview-3.2p1.4-24.5.SCC/lib/libxview/ttysw/termsw.c	2010-02-23 10:14:14.000000000 -0800
+*************** termsw_folio_init_internal(parent, terms
+*** 257,263 ****
+  
+      /* Generate a new temporary file name and open the file up. */
+      (void) strcpy(tmpfile_name, "/tmp/tty.txt.XXXXXX");
+!     (void) mktemp(tmpfile_name);
+      if ((fd = open(tmpfile_name, O_CREAT | O_RDWR | O_EXCL, 0600)) < 0) {
+  	return (XV_ERROR);
+      }
+--- 257,263 ----
+  
+      /* Generate a new temporary file name and open the file up. */
+      (void) strcpy(tmpfile_name, "/tmp/tty.txt.XXXXXX");
+!     (void) mktemp(tmpfile_name); /* don't use mkstemp here */
+      if ((fd = open(tmpfile_name, O_CREAT | O_RDWR | O_EXCL, 0600)) < 0) {
+  	return (XV_ERROR);
+      }

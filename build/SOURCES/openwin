@@ -1,0 +1,104 @@
+#!/bin/sh
+# Start "OpenWindows", i.e. Xfree and ol[v]wm, by K.Osterberg, 1993
+
+export XAPPLRESDIR HELPPATH OPENWINHOME WINDOWMANAGER X11HOME
+
+printerr () {
+        echo "`basename $0`: $@" 1>&2
+        exit 1
+}
+
+printhelp() {
+	echo "You can run openwin with the following options:"
+	echo "-display	:	Specify display to run on"
+	echo "-wm [name]:	Specify window manager to use"
+	echo "		Default is olvwm, sane alternative is olwm"
+	echo "-help	:	This message"
+	echo "All other arguments will be passed to the server"
+}
+
+# X11 legacy compat
+if [ "X${PATH_SOCKET}" = "X" ]; then
+        PATH_SOCKET="/tmp/.X11-unix"
+fi
+
+if [ "X${X11_PIPES}" = "X" ]; then
+        X11_PIPES="/tmp/.X11-pipe"
+fi
+export PATH_SOCKET X11_PIPES
+
+OPENWINHOME="${OPENWINHOME-/usr/openwin}"
+if [ ! -d "$OPENWINHOME" ]; then
+	printerr "$OPENWINHOME does not exist - cannot run"
+fi
+
+X11HOME="${X11HOME-/usr/X11R6}"
+if [ ! -d "$X11HOME" ]; then
+	printerr "${X11HOME} does not exist - cannot run"
+fi
+
+if [ -z `echo "$PATH" | grep openwin` ]; then
+	PATH=${OPENWINHOME}/bin:$PATH
+fi
+
+if [ -z "$HELPPATH" ]; then
+	HELPPATH=${OPENWINHOME}/lib/help
+else
+	HELPPATH=${HELPPATH}:${OPENWINHOME}/lib/help
+fi
+
+if [ -z "$XAPPLRESDIR" ]; then
+	XAPPLRESDIR=${X11HOME}/lib/app-defaults:${OPENWINHOME}/lib/app-defaults
+else
+	XAPPLRESDIR=${XAPPLRESDIR}:${X11HOME}/lib/app-defaults:${OPENWINHOME}/lib/app-defaults
+fi
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-display)
+		DISPLAY=":0.0"
+		;;
+	-wm)
+		if [ $# -lt 2 ]; then
+			printerr "$1 option requires a window manager command"
+		fi
+		shift
+		WINDOWMANAGER="$1"
+		;;
+	-help)
+		printhelp
+		exit 1
+		;;
+	*)
+		GIVETOSERVER="$GIVETOSERVER $1"
+	esac
+	shift
+done
+
+if [ -z "$WINDOWMANAGER" ]; then
+	WINDOWMANAGER=${OPENWINHOME}/bin/olvwm
+fi
+
+export DISPLAY WINDOWMANAGER
+
+if [ "x${DISPLAY}" != "x" ]; then
+	# Sanity Check, if there's a missing .0 at the end of the DISPLAY line, add it.
+	BASE_DISPLAY=$(echo $DISPLAY|sed -e 's@^.*:[0-9]*@@')
+	if [ "x${BASE_DISPLAY}" = "x" ]; then
+		BASE_DISPLAY="${DISPLAY}.0"
+		export DISPLAY=${BASE_DISPLAY}
+	fi
+fi
+
+if [ "x${XDM}" = "xrunning" -o "x${DISPLAY}" != "x" ]; then
+    # X is already running (e.g. this file was called from xdm
+    # or they want us to run openwin on another display)
+    # so just run openwin's Xinitrc
+    exec ${OPENWINHOME}/lib/Xinitrc
+else
+    if [ -x ${X11HOME}/bin/startx.openwin ]; then
+	exec ${X11HOME}/bin/startx.openwin ${OPENWINHOME}/lib/Xinitrc -- ${GIVETOSERVER}
+    else
+	printerr "Couldn't run ${X11HOME}/bin/startx.openwin"
+    fi
+fi

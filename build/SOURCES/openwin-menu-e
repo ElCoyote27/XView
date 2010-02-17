@@ -1,0 +1,4 @@
+"Editors" TITLE PIN
+
+"Textedit (OpenWindows Text Editor)" DEFAULT	exec $OPENWINHOME/bin/textedit
+"Xemacs" 					exec /usr/X11R6/bin/xemacs

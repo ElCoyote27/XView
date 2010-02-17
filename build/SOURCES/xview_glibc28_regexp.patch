@@ -1,0 +1,64 @@
+diff -rc xview-3.2p1.4.orig/lib/libxview/file_chooser/file_list.c xview-3.2p1.4/lib/libxview/file_chooser/file_list.c
+*** xview-3.2p1.4.orig/lib/libxview/file_chooser/file_list.c	Fri May 28 15:26:07 2010
+--- xview-3.2p1.4/lib/libxview/file_chooser/file_list.c	Fri May 28 15:28:54 2010
+***************
+*** 527,534 ****
+  	xv_free_ref( private->directory );
+  	xv_free_ref( private->regex_pattern );
+  #ifdef __linux__
+! 	if (private->regex_compile != NULL && private->regex_compile->allocated)
+! 		xv_free_ref( private->regex_compile->buffer);
+  #endif
+  	xv_free_ref( private->regex_compile );
+  	xv_free_ref( private->dotdot_string );
+--- 527,534 ----
+  	xv_free_ref( private->directory );
+  	xv_free_ref( private->regex_pattern );
+  #ifdef __linux__
+! 	if (private->regex_compile != NULL && private->regex_compile->__REPB_PREFIX(allocated))
+! 		xv_free_ref( private->regex_compile->__REPB_PREFIX(buffer));
+  #endif
+  	xv_free_ref( private->regex_compile );
+  	xv_free_ref( private->dotdot_string );
+***************
+*** 1230,1240 ****
+  
+      if (private->regex_compile == NULL) {
+          private->regex_compile = xv_alloc_n(regex_t, 1);
+!         private->regex_compile->translate = NULL;
+      }
+!     if (private->regex_compile->allocated == 0) {
+!         private->regex_compile->buffer = xv_alloc_n(char, MAXPATHLEN + 1);
+!         private->regex_compile->allocated = MAXPATHLEN + 1;
+      }
+      re_compile_pattern(private->regex_pattern, strlen(private->regex_pattern),
+  			private->regex_compile);
+--- 1230,1240 ----
+  
+      if (private->regex_compile == NULL) {
+          private->regex_compile = xv_alloc_n(regex_t, 1);
+!         private->regex_compile->__REPB_PREFIX(translate) = NULL;
+      }
+!     if (private->regex_compile->__REPB_PREFIX(allocated) == 0) {
+!         private->regex_compile->__REPB_PREFIX(buffer) = xv_alloc_n(char, MAXPATHLEN + 1);
+!         private->regex_compile->__REPB_PREFIX(allocated) = MAXPATHLEN + 1;
+      }
+      re_compile_pattern(private->regex_pattern, strlen(private->regex_pattern),
+  			private->regex_compile);
+***************
+*** 1245,1251 ****
+       char *s;
+       File_list_private *private;
+  {
+!     if (private->regex_compile == NULL || private->regex_compile->allocated == 0)
+          return 0;
+      return (re_match(private->regex_compile, s, strlen(s), 0, NULL) != -1);
+  }
+--- 1245,1251 ----
+       char *s;
+       File_list_private *private;
+  {
+!     if (private->regex_compile == NULL || private->regex_compile->__REPB_PREFIX(allocated) == 0)
+          return 0;
+      return (re_match(private->regex_compile, s, strlen(s), 0, NULL) != -1);
+  }

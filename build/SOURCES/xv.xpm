@@ -1,0 +1,30 @@
+/* XPM */
+static char * fish_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"20 17 7 1",
+/* colors */
+" 	c #00000000BABA",
+".	c gray80",
+"X	c #0098FE",
+"o	c #0066FE",
+"O	c #0000EF",
+"+	c #000089",
+"@	c #000077",
+/* pixels */
+"                    ",
+" .................. ",
+" .........XXoX..... ",
+" .......XXoO ...... ",
+" .....XXoOXO.....X. ",
+" ...XXooOXO ...X  . ",
+" ..XXOoOOoooOOX O . ",
+" .Xo++oOooooOoOOo . ",
+" . o++OOOooOOOooO . ",
+" .@+OOO OOO     O . ",
+" ..@+   OO +@@@+  . ",
+" ...@@@+  +@...@@ . ",
+" .....@@@+ @.....@. ",
+" ........@+@....... ",
+" .........@@@...... ",
+" .................. ",
+"                    "};

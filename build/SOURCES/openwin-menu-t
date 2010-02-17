@@ -1,0 +1,7 @@
+"Tools" TITLE PIN
+
+"xvfilemgr (File Manager)"		exec xvfilemgr
+
+SEPARATOR
+
+"Clocks" MENU				$OPENWINHOME/lib/openwin-menu-clocks

@@ -1,0 +1,56 @@
+! @(#)Xdefaults	35.1 94/09/01	OpenWindows Default X Resources
+!
+OpenWindows.WindowColor:			#cccccc
+OpenWindows.WindowForeground:			#000000
+OpenWindows.DataForeground:			#000000
+OpenWindows.DataBackground:			#ffffff
+OpenWindows.PaintWorkspace:			True
+OpenWindows.WorkspaceStyle:			paintcolor
+OpenWindows.WorkspaceColor:			#40a0c0
+OpenWindows.WorkspaceBitmapFile:		gray
+OpenWindows.WorkspaceBitmapFg:			#000000
+OpenWindows.WorkspaceBitmapBg:			#ffffff
+!
+OpenWindows.Scale:				medium
+!
+OpenWindows.ScreenSaver.OnOff:			off
+OpenWindows.ScreenSaver.IdleTime:		10
+OpenWindows.Beep:				never
+OpenWindows.BeepDuration:			100
+OpenWindows.ScrollbarPlacement:			right
+OpenWindows.IconLocation:			bottom
+OpenWindows.SetInput:				followmouse
+!
+OpenWindows.ScrollbarJumpCursor:		True
+Scrollbar.JumpCursor:				True
+OpenWindows.PopupJumpCursor:			True
+OpenWindows.MultiClickTimeout:			4
+OpenWindows.MouseAcceleration:			2
+OpenWindows.MouseThreshold:			15
+OpenWindows.PointerMapping:			right
+!
+OpenWindows.KeyboardCommands:			Basic
+OpenWindows.KeyClick:				False
+OpenWindows.KeyRepeat:				True
+!
+OpenWindows.DragRightDistance:			100
+OpenWindows.SelectDisplaysMenu:			True
+OpenWindows.MenuAccelerators:			True
+OpenWindows.WindowMenuAccelerators:		True
+OpenWindows.SelectDisplaysMenu:			False
+OpenWindows.SnapToGrid:				True
+OpenWindows.AutoReReadMenuFile:			True
+OpenWindows.DragWindow:				True
+OpenWindows.ShowMoveGeometry:			True
+OpenWindows.ShowResizeGeometry:			True
+OpenWindows.FocusLenience:			True
+OpenWindows.KeyboardCommands:			Full
+OpenWindows.Use3DFrames:			True
+OpenWindows.SnapToGrid:				True
+OpenWindows.EdgeMoveThreshold:			50
+olvwm.VirtualBackgroundMap:			/usr/openwin/share/include/images/VirtualDesktop
+olvwm.VirtualDesktop:				3x2
+olvwm.UseImages:				UseAll
+olvwm.ServerGrabs:				False
+olvwm.GrabVirtualKeys:				False
+olvwm.VirtualSticky:				audiocontrol

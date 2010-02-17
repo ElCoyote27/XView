@@ -1,0 +1,162 @@
+! @(#)Xdefaults	35.1 94/09/01	OpenWindows Default X Resources
+!
+OpenWindows.WindowColor:			#cccccc
+OpenWindows.WindowForeground:			#000000
+OpenWindows.DataForeground:			#000000
+OpenWindows.DataBackground:			#ffffff
+OpenWindows.PaintWorkspace:			True
+OpenWindows.WorkspaceStyle:			paintcolor
+OpenWindows.WorkspaceColor:			#264cbf
+OpenWindows.WorkspaceBitmapFile:		gray
+OpenWindows.WorkspaceBitmapFg:			#000000
+OpenWindows.WorkspaceBitmapBg:			#ffffff
+OpenWindows.Use3DFrames:			True
+OpenWindows.DragWindow:				True
+!
+OpenWindows.Scale:				medium
+!
+OpenWindows.ScreenSaver.OnOff:			Auto
+OpenWindows.ScreenSaver.IdleTime:		30
+OpenWindows.Beep:				never
+OpenWindows.BeepDuration:			100
+OpenWindows.SetInput:   			followmouse
+OpenWindows.ScrollbarPlacement:			right
+OpenWindows.IconLocation:			bottom
+!
+OpenWindows.ScrollbarJumpCursor:		True
+Scrollbar.JumpCursor:				True
+OpenWindows.PopupJumpCursor:			True
+OpenWindows.MultiClickTimeout:			4
+OpenWindows.MouseAcceleration:			4
+OpenWindows.MouseThreshold:			15
+OpenWindows.PointerMapping:			right
+!
+OpenWindows.KeyboardCommands:			Full
+OpenWindows.KeyClick:				False
+OpenWindows.KeyRepeat:				True
+!
+OpenWindows.DragRightDistance:			100
+OpenWindows.SelectDisplaysMenu:			False
+OpenWindows.MenuAccelerators:			True
+OpenWindows.WindowMenuAccelerators:		True
+!
+olvwm.AllowArrowInRoot:				True
+olvwm.ServerGrabs:				False
+olvwm.UseImages:				UseAll
+olvwm.VirtualBackgroundMap:			/usr/openwin/share/include/images/VirtualDesktop
+olvwm.VirtualGridColor:				blue
+olvwm.VirtualGrid:				visible
+olvwm.GrabVirtualKeys:				False
+olvwm.VirtualSticky:				perfmeter clock audiocontrol
+text.maxDocumentSize:				500000
+!
+! MOTIF RESOURCES SPECIFICATIONS
+!
+*XmScrollBar*ShadowThickness: 1
+!*XmScrollBar*HighlightThickness: 1
+*XmSeparator*ShadowThickness: 1
+!*XmSeparator*HighlightThickness: 1
+*XmLGrid*ShadowThickness: 1
+!*XmLGrid*HighlightThickness: 1
+*XmList*ShadowThickness: 1
+!*XmList*HighlightThickness: 1
+*XmText*ShadowThickness: 1
+!*XmText*HighlightThickness: 1
+!*XmTextField*ShadowThickness: 1
+!*XmTextField*HighlightThickness: 1
+*XmPushButton*ShadowThickness: 1
+*XmPushButton*HighlightThickness: 1
+*XmPushButtonGadget*ShadowThickness: 1
+*XmPushButtonGadget*HighlightThickness: 1
+*XmCascadeButton*ShadowThickness: 1
+*XmCascadeButton*HighlightThickness: 1
+*XmCascadeButtonGadget*ShadowThickness: 1
+*XmCascadeButtonGadget*HighlightThickness: 1
+*XmDrawnButton*shadowThickness: 1
+*XmToggleButton*ShadowThickness: 1
+*XmToggleButton*HighlightThickness: 1
+*XmToggleButtonGadget*ShadowThickness: 1
+!*XmToggleButtonGadget*HighlightThickness: 1
+*XmArrowButton*ShadowThickness: 1
+!*XmArrowButton*HighlightThickness: 1
+*XmArrowButtonGadget*ShadowThickness: 1
+!*XmArrowButtonGadget*HighlightThickness: 1
+*XmTearOffButton*ShadowThickness: 1
+!*XmTearOffButton*HighlightThickness: 1
+*XmScrolledWindow*ShadowThickness: 1
+*XmScrolledWindow*HighlightThickness: 1
+!*XmForm.ShadowThickness: 1
+!*XmForm.HighlightThickness: 1
+!*XmFrame*ShadowThickness: 1
+!*XmFrame*HighlightThickness: 1
+*XmLabel*ShadowThickness: 1
+!*XmLabel*HighlightThickness: 1
+*XmLabelGadget*ShadowThickness: 1
+!*XmLabelGadget*HighlightThickness: 1
+!*XmDialogShell*ShadowThickness: 1
+!*XmDialogShell*HighlightThickness: 1
+*enableButtonTab:       True
+*enableDefaultButton:   True
+*enableEtchedInMenu:    True
+*enableMenuInCascade:   True
+*enableMultiKeyBindings:        True
+*enableToggleColor:     True
+*enableToggleVisual:    True
+*DtMenuButton*shadowThickness:  1
+*XmSpinBox*ShadowThickness: 1
+*XmComboBox*ShadowThickness: 1
+!
+!  END OF RESOURCE SPECIFICATIONS
+!
+color_xterm*font:                       fixed
+color_xterm.vt100.Geometry:             80x35
+color_xterm.vt100.background:           gray92
+color_xterm.vt100.foreground:           black
+color_xterm*ScrollBar:                  True
+color_xterm*SaveLines:                  500
+color_xterm.mainMenu*background:        #cccccc
+color_xterm.fontMenu*background:        #cccccc
+color_xterm.vtMenu*background:          #cccccc
+color_xterm.mainMenu*Foreground:        Black
+color_xterm.fontMenu*Foreground:        Black
+color_xterm.vtMenu*Foreground:          Black
+color_xterm.vt100.translations: #override\n\
+        ~Ctrl ~Meta<Btn2Up>: insert-selection(PRIMARY,CUT_BUFFER0)\n\
+        ~Ctrl ~Meta<BtnUp>: select-end(PRIMARY,CUT_BUFFER0,CLIPBOARD)\n\
+        <KeyPress>L8: insert-selection(CLIPBOARD)
+xterm*font:                       fixed
+xterm.vt100.Geometry:             80x35
+xterm.vt100.background:           gray92
+xterm.vt100.foreground:           black
+xterm*ScrollBar:                  True
+xterm*SaveLines:                  500
+xterm.mainMenu*background:        #cccccc
+xterm.fontMenu*background:        #cccccc
+xterm.vtMenu*background:          #cccccc
+xterm.mainMenu*Foreground:        Black
+xterm.fontMenu*Foreground:        Black
+xterm.vtMenu*Foreground:          Black
+xterm.vt100.translations: #override\n\
+        ~Ctrl ~Meta<Btn2Up>: insert-selection(PRIMARY,CUT_BUFFER0)\n\
+        ~Ctrl ~Meta<BtnUp>: select-end(PRIMARY,CUT_BUFFER0,CLIPBOARD)\n\
+        <KeyPress>L8: insert-selection(CLIPBOARD)
+xfontsel*background: #cccccc
+editres*background: #cccccc
+*Scrollbar*thickness:   18
+*Scrollbar.background:  #cccccc
+*Scrollbar.AlwaysVisible:       True
+*BeNiceToColormap:      false
+!*topShadowContrast:    50
+!*bottomShadowContrast: 70
+*Toggle.ToggleStyle: check
+!*Toggle.ToggleStyle: radio
+*shadowWidth:   2
+*ScrollBar:     True
+*basicLocale:   C
+*ShapeStyle:    Rectangle
+
+! Added for SoftWindows
+olwm.WindowCacheSize: 0
+Dtwm*sOftWindows*windowMenu:  NoAcceleratorWindowMenu
+Dtwm*keyBindings:          SoftWindowsKeys
+

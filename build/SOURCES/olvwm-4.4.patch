@@ -1,0 +1,2322 @@
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/client.c xview-3.2p1.4/clients/olvwm-4.4.2/client.c
+*** xview-3.2p1.4/clients/olvwm-4.4/client.c	2000-03-02 16:35:14.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/client.c	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 8,14 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)client.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)client.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/cursors.c xview-3.2p1.4/clients/olvwm-4.4.2/cursors.c
+*** xview-3.2p1.4/clients/olvwm-4.4/cursors.c	1999-04-28 17:22:43.000000000 -0400
+--- xview-3.2p1.4/clients/olvwm-4.4.2/cursors.c	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 278,284 ****
+--- 278,288 ----
+  	    if (our_copy[0] == 'X')
+  		font_file = "cursor";
+  	    else if (our_copy[0] == 'O')
++ #if defined(SYSV) || defined(__linux)
++ 		font_file = "olcursor";
++ #else
+  		font_file = "-sun-open look cursor-----12-120-75-75-p-455-sunolcursor-1";
++ #endif
+  	    createCursor(dpy, cmap, pointer, cursor_id, font_file, end, ptr);
+  	}
+  	else {
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/cursors.h xview-3.2p1.4/clients/olvwm-4.4.2/cursors.h
+*** xview-3.2p1.4/clients/olvwm-4.4/cursors.h	1998-01-13 16:01:02.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/cursors.h	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 2,8 ****
+  #define _OLWM_LBL_CURSORS_H
+  
+  #ifdef IDENT
+! #ident "@(#)cursors.h	1.2 olvwm version 11/25/92"
+  #endif
+  
+  extern void InitCursors( /* Display *,  ScreenInfo * */ );
+--- 2,8 ----
+  #define _OLWM_LBL_CURSORS_H
+  
+  #ifdef IDENT
+! #ident "@(#)cursors.h	1.2 olvwm version 25 Nov 1992"
+  #endif
+  
+  extern void InitCursors( /* Display *,  ScreenInfo * */ );
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/defaults.c xview-3.2p1.4/clients/olvwm-4.4.2/defaults.c
+*** xview-3.2p1.4/clients/olvwm-4.4/defaults.c	2000-03-02 16:44:29.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/defaults.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 90,97 ****
+--- 90,101 ----
+  #ifdef SVR4
+  	    if (sysinfo(SI_HOSTNAME, hostname, sizeof(hostname)) != -1) {
+  #else
++ #ifdef __linux__
++ 	    if (0 == gethostname(hostname, sizeof(hostname))) {
++ #else
+  	    if (0 == gethostname(hostname, sizeof(hostname), &namelen)) {
+  #endif
++ #endif
+  		(void) strcat(filename, hostname);
+  		fileDB = XrmGetFileDatabase(filename);
+  	    }
+***************
+*** 133,148 ****
+--- 137,165 ----
+  
+  #ifdef OW_I18N_L3
+      char *locale;
++ #endif
++ 
++ #ifdef OPENWINHOME_DEFAULT
++     /* martin-2.buck@student.uni-ulm.de */
++     if (!openwinhome) {
++ 	openwinhome = OPENWINHOME_DEFAULT;
++     }
++ #endif
+  
++ #ifdef OW_I18N_L3
+      locale = GRV.lc_basic.locale;
+      if (locale != NULL) {
++ #ifndef OPENWINHOME_DEFAULT
+  	if (openwinhome != NULL) {
++ #endif
+  	    (void) sprintf(filename, "%s/lib/locale/%s/app-defaults/Olwm",
+  			   openwinhome, locale);
+  	    appDB = XrmGetFileDatabase(filename);
+  	    if (appDB != NULL)
+  		return appDB;
++ #ifndef OPENWINHOME_DEFAULT
+  	}
++ #endif
+  
+  	(void) sprintf(filename, "/usr/lib/X11/app-defaults/%s/Olwm", locale);
+  	appDB = XrmGetFileDatabase(filename);
+***************
+*** 151,163 ****
+--- 168,184 ----
+      }
+  #endif
+  
++ #ifndef OPENWINHOME_DEFAULT
+      if (openwinhome != NULL) {
++ #endif
+  	(void) strcpy(filename, openwinhome);
+  	(void) strcat(filename, "/lib/app-defaults/Olwm");
+  	appDB = XrmGetFileDatabase(filename);
+  	if (appDB != NULL)
+  	    return appDB;
++ #ifndef OPENWINHOME_DEFAULT
+      }
++ #endif
+  
+      appDB = XrmGetFileDatabase("/usr/lib/X11/app-defaults/Olwm");
+      return appDB;
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/environ.c xview-3.2p1.4/clients/olvwm-4.4.2/environ.c
+*** xview-3.2p1.4/clients/olvwm-4.4/environ.c	1998-01-13 16:01:04.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/environ.c	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)environ.c	1.3 olvwm version 12/07/92"
+  #endif
+  
+  #include <stdio.h>
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)environ.c	1.3 olvwm version 07 Dec 1992"
+  #endif
+  
+  #include <stdio.h>
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/error.c xview-3.2p1.4/clients/olvwm-4.4.2/error.c
+*** xview-3.2p1.4/clients/olvwm-4.4/error.c	1998-01-13 16:35:04.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/error.c	1997-04-28 08:45:32.000000000 -0400
+***************
+*** 232,237 ****
+--- 232,239 ----
+  	err->resourceid);
+      FPRINTF(stderr, GetString("  serial number of failed request:  %d\n"),
+  	err->serial);
++ /*    FPRINTF(stderr, GetString("  current request serial number:  %d\n"),
++ 	dpy->request);*/
+  }
+  
+  
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/events.c xview-3.2p1.4/clients/olvwm-4.4.2/events.c
+*** xview-3.2p1.4/clients/olvwm-4.4/events.c	1998-01-13 16:00:52.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/events.c	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident "@(#)events.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident "@(#)events.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/events.h xview-3.2p1.4/clients/olvwm-4.4.2/events.h
+*** xview-3.2p1.4/clients/olvwm-4.4/events.h	1998-01-13 16:00:52.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/events.h	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 8,14 ****
+  #define _OLWM_EVENT_H
+  
+  #ifdef IDENT
+! #ident  "@(#)events.h	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+  #define _OLWM_EVENT_H
+  
+  #ifdef IDENT
+! #ident  "@(#)events.h	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/fontset.c xview-3.2p1.4/clients/olvwm-4.4.2/fontset.c
+*** xview-3.2p1.4/clients/olvwm-4.4/fontset.c	1998-01-13 16:00:51.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/fontset.c	1997-04-29 14:26:55.000000000 -0400
+***************
+*** 195,202 ****
+--- 195,209 ----
+  	Bool		notFound = False;
+  
+          /* look for application default file */
++ #ifdef OPENWINHOME_DEFAULT
++ 	/* martin-2.buck@student.uni-ulm.de */
++ 	if (!(openWinPath = getenv("OPENWINHOME"))) {
++ 	    openWinPath = OPENWINHOME_DEFAULT;
++ 	}
++ #else
+  	if ((openWinPath = getenv("OPENWINHOME")) != NULL)
+  	{
++ #endif
+  		(void) sprintf(filename, "%s/lib/locale/%s/OW_FONT_SETS/%s",
+  			openWinPath, locale, FONT_SETS);
+  #ifdef DEBUG
+***************
+*** 204,212 ****
+--- 211,221 ----
+  #endif
+  		if (access(filename, R_OK) != 0)
+  			notFound = True;
++ #ifndef OPENWINHOME_DEFAULT
+  	}
+          else
+  		notFound = True;
++ #endif
+  
+  	if (notFound)
+  	{
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/globals.h xview-3.2p1.4/clients/olvwm-4.4.2/globals.h
+*** xview-3.2p1.4/clients/olvwm-4.4/globals.h	1998-01-13 16:01:04.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/globals.h	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 7,13 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)globals.h	1.6 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 7,13 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)globals.h	1.6 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/i18n.c xview-3.2p1.4/clients/olvwm-4.4.2/i18n.c
+*** xview-3.2p1.4/clients/olvwm-4.4/i18n.c	1998-01-13 16:00:52.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/i18n.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 209,214 ****
+  		s++;
+  	}
+  }
+! #endif DEBUG
+  
+! #endif OW_I18N_L4
+--- 209,214 ----
+  		s++;
+  	}
+  }
+! #endif /* DEBUG */
+  
+! #endif /* OW_I18N_L4 */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/images.c xview-3.2p1.4/clients/olvwm-4.4.2/images.c
+*** xview-3.2p1.4/clients/olvwm-4.4/images.c	1998-01-13 16:00:49.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/images.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 4,10 ****
+   */
+  
+  #ifdef IDENT
+! #ident "@(#)images.c	1.6 olvwm version 02/09/94"
+  #endif
+  
+  /* Use small images */
+--- 4,10 ----
+   */
+  
+  #ifdef IDENT
+! #ident "@(#)images.c	1.6 olvwm version 09 Feb 1994"
+  #endif
+  
+  /* Use small images */
+***************
+*** 465,471 ****
+     0x01, 0x00, 0xaa, 0x00,
+  };
+  
+! #else SMALL_IMAGES
+  
+  #define Back_width 32
+  #define Back_height 32
+--- 465,471 ----
+     0x01, 0x00, 0xaa, 0x00,
+  };
+  
+! #else /* SMALL_IMAGES */
+  
+  #define Back_width 32
+  #define Back_height 32
+***************
+*** 658,664 ****
+     0x98, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
+     0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  };
+! #endif SMALL_IMAGES
+  
+  /*
+   *	Images for Virtual Window Menu
+--- 658,664 ----
+     0x98, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
+     0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  };
+! #endif /* SMALL_IMAGES */
+  
+  /*
+   *	Images for Virtual Window Menu
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/Imakefile xview-3.2p1.4/clients/olvwm-4.4.2/Imakefile
+*** xview-3.2p1.4/clients/olvwm-4.4/Imakefile	1998-01-13 16:23:54.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/Imakefile	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 4,10 ****
+  /**/# If you haven't installed olwm from xview3 or from Sun's OpenWindows,
+  /**/# and you want to install the olwm man page (which discusses most of the
+  /**/# window operations), defind NeedOlwmManPage to YES
+! #define NeedOlwmManPage	NO
+  
+  /**/#
+  /**/# Set MORECCFLAGS to any options you want to pass to the compiler.  These
+--- 4,10 ----
+  /**/# If you haven't installed olwm from xview3 or from Sun's OpenWindows,
+  /**/# and you want to install the olwm man page (which discusses most of the
+  /**/# window operations), defind NeedOlwmManPage to YES
+! #define NeedOlwmManPage	YES
+  
+  /**/#
+  /**/# Set MORECCFLAGS to any options you want to pass to the compiler.  These
+***************
+*** 48,54 ****
+  /**/#MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DIDENT
+  
+  /**/# For a generic Solaris 2.x system, I'd suggest
+! MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DSVR4 -DSYSV -DIDENT -x O4
+  
+  /**/#
+  /**/# Set MORELDFLAGS to any link options you want.  Be sure to add -lxpm if you
+--- 48,60 ----
+  /**/#MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DIDENT
+  
+  /**/# For a generic Solaris 2.x system, I'd suggest
+! /**/#MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DSVR4 -DSYSV -DIDENT -x O4
+! 
+! /**/# Linux/ELF
+! /**/# libc 5
+! /**/#MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DXPM -DXVIEW32 -DMAXPID=32768 -I/usr/include/bsd -include /usr/include/bsd/bsd.h -I$(INCROOT)/X11
+! /**/# GNU libc2
+! MORECCFLAGS=-DOW_I18N_L3 -DIDENT -DXPM -DSHAPE -DXVIEW32 -DMAXPID=32768 -I$(INCROOT)/X11
+  
+  /**/#
+  /**/# Set MORELDFLAGS to any link options you want.  Be sure to add -lxpm if you
+***************
+*** 57,75 ****
+  /**/#MORELDFLAGS=-L${OPENWINHOME}/lib
+  /**/#
+  /**/# For Solaris 2.x, I'd suggest
+! MORELDFLAGS=-L${OPENWINHOME}/lib -R ${OPENWINHOME}/lib -lintl
+  
+  
+  /**/# No more changes needed
+  
+  #include <XView.tmpl>
+  
+  /**/#########################################################################
+  /**/# @(#)Imakefile	1.5 10/4/91 SMI
+  /**/# Imakefile for olwm release 3.0.
+  
+  DEFINES =  $(MORECCFLAGS)
+- SYS_LIBRARIES = -ll -lm
+  INCLUDES = -I$(HEADER_DEST) -I$(TOP) $(XPMINCDIR) 
+  DEPLIBS = 
+  LOCAL_LIBRARIES = $(MORELDFLAGS) $(OLGXLIB) $(XLIB)
+--- 63,91 ----
+  /**/#MORELDFLAGS=-L${OPENWINHOME}/lib
+  /**/#
+  /**/# For Solaris 2.x, I'd suggest
+! /**/#MORELDFLAGS=-L${OPENWINHOME}/lib -R ${OPENWINHOME}/lib -lintl
+! /**/#SYS_LIBRARIES = -ll -lm
+  
++ /**/# Linux/ELF
++ /**/# libc 5
++ /**/#MORELDFLAGS=-lbsd -lXpm
++ /**/#SYS_LIBRARIES = -lfl -lm
++ /**/# GNU libc2
++ MORELDFLAGS=-L${OPENWINHOME}/lib -lXpm
++ SYS_LIBRARIES = -lfl -lm
+  
+  /**/# No more changes needed
+  
+  #include <XView.tmpl>
+  
++ /**/# Link libolgx static
++ OLGXLIB = -Wl,-Bstatic -lolgx -Wl,-Bdynamic
++ 
+  /**/#########################################################################
+  /**/# @(#)Imakefile	1.5 10/4/91 SMI
+  /**/# Imakefile for olwm release 3.0.
+  
+  DEFINES =  $(MORECCFLAGS)
+  INCLUDES = -I$(HEADER_DEST) -I$(TOP) $(XPMINCDIR) 
+  DEPLIBS = 
+  LOCAL_LIBRARIES = $(MORELDFLAGS) $(OLGXLIB) $(XLIB)
+***************
+*** 115,138 ****
+  	${HEADERS} ${BITMAPS} ${SRCS} \
+  	${MISC} ${INFOFILES} ${MANPAGES} ${SCRIPTS}
+  
+! ComplexProgramTarget(olvwm)
+! 
+! #if NeedMenuFile
+! InstallNonExecList($(MISC),$(LIBRARY_DEST))
+! #endif
+! 
+! parse.c: parse.l
+! 	lex -t parse.l > parse.c
+  
+! olvwmrc.c: olvwmrc.y
+! 	yacc olvwmrc.y
+! 	mv y.tab.c olvwmrc.c
+  
+  olvwmrc.o: parse.c olvwmrc.c
+  
+  version.c: ${SRCS} ${HEADERS}
+  	@echo '#ident "@(#)olvwm version compiled '`date`'"' > version.c
+  
+  clean::
+  	/bin/rm -f parse.c olvwmrc.c version.c
+  
+--- 131,151 ----
+  	${HEADERS} ${BITMAPS} ${SRCS} \
+  	${MISC} ${INFOFILES} ${MANPAGES} ${SCRIPTS}
+  
+! LexFile(parse)
+  
+! YaccFileNoFlags(olvwmrc)
+  
+  olvwmrc.o: parse.c olvwmrc.c
+  
+  version.c: ${SRCS} ${HEADERS}
+  	@echo '#ident "@(#)olvwm version compiled '`date`'"' > version.c
+  
++ ComplexProgramTarget(olvwm)
++ 
++ #if NeedMenuFile
++ InstallNonExecList($(MISC),$(LIBRARY_DEST))
++ #endif
++ 
+  clean::
+  	/bin/rm -f parse.c olvwmrc.c version.c
+  
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/kbdfuncs.c xview-3.2p1.4/clients/olvwm-4.4.2/kbdfuncs.c
+*** xview-3.2p1.4/clients/olvwm-4.4/kbdfuncs.c	1998-01-13 16:00:53.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/kbdfuncs.c	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)kbdfuncs.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)kbdfuncs.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/kbdfuncs.h xview-3.2p1.4/clients/olvwm-4.4.2/kbdfuncs.h
+*** xview-3.2p1.4/clients/olvwm-4.4/kbdfuncs.h	1998-01-13 16:00:53.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/kbdfuncs.h	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 8,14 ****
+  #define _OLWM_KBDFUNCS_H
+  
+  #ifdef IDENT
+! #ident	"@(#)kbdfuncs.h	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+  #define _OLWM_KBDFUNCS_H
+  
+  #ifdef IDENT
+! #ident	"@(#)kbdfuncs.h	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/list.c xview-3.2p1.4/clients/olvwm-4.4.2/list.c
+*** xview-3.2p1.4/clients/olvwm-4.4/list.c	1998-01-13 16:00:53.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/list.c	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)list.c	1.2 olvwm version 11/25/92"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)list.c	1.2 olvwm version 25 Nov 1992"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/Makefile.sunpro xview-3.2p1.4/clients/olvwm-4.4.2/Makefile.sunpro
+*** xview-3.2p1.4/clients/olvwm-4.4/Makefile.sunpro	1998-01-13 16:01:03.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/Makefile.sunpro	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 70,76 ****
+  #MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DIDENT
+  
+  # For a generic Solaris 2.x system, I'd suggest
+! MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DSVR4 -DSYSV -DIDENT -x O4
+  
+  #
+  # Set LDFLAGS to any link options you want.  For a generic Solaris 1.x
+--- 70,77 ----
+  #MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DIDENT
+  
+  # For a generic Solaris 2.x system, I'd suggest
+! MORECCFLAGS=-DOW_I18N_L3 -DSHAPE -DSVR4 -DSYSV -DIDENT -x O4 \
+!     -DOWTOOLKIT_WARNING_DISABLED
+  
+  #
+  # Set LDFLAGS to any link options you want.  For a generic Solaris 1.x
+***************
+*** 89,94 ****
+--- 90,99 ----
+  
+  INC = -I${OPENWINHOME}/include
+  CFLAGS = ${INC} ${MORECCFLAGS}
++ # mike_s@Sun.COM 8/31/1999
++ # I hate to do this, but it _isn't_ our code.
++ CFLAGS += -errtags=yes -erroff=E_END_OF_LOOP_CODE_NOT_REACHED \
++     -erroff=E_EMPTY_TRANSLATION_UNIT -erroff=E_INIT_DOES_NOT_FIT
+  
+  HEADERS = cmdstream.h cursors.h debug.h defaults.h dsdm.h environ.h error.h \
+  	  events.h gettext.h globals.h group.h helpcmd.h i18n.h iconimage.h \
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/mem.h xview-3.2p1.4/clients/olvwm-4.4.2/mem.h
+*** xview-3.2p1.4/clients/olvwm-4.4/mem.h	1998-01-13 16:00:53.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/mem.h	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 39,45 ****
+  #else
+  #define MemNew(t) ((t *)MemAlloc((unsigned int)sizeof(t)))
+  #define MemNewString(s) (strcpy((char *)MemAlloc(strlen(s)+1),s))
+! #endif MEMDEBUG
+  
+  #ifdef OW_I18N_L4
+  
+--- 39,45 ----
+  #else
+  #define MemNew(t) ((t *)MemAlloc((unsigned int)sizeof(t)))
+  #define MemNewString(s) (strcpy((char *)MemAlloc(strlen(s)+1),s))
+! #endif /* MEMDEBUG */
+  
+  #ifdef OW_I18N_L4
+  
+***************
+*** 49,54 ****
+  
+  #define MemNewText(s)	MemNewString((char *)s)
+  
+! #endif OW_I18N_L4
+  
+! #endif _OLWM_MEM_H
+--- 49,54 ----
+  
+  #define MemNewText(s)	MemNewString((char *)s)
+  
+! #endif /* OW_I18N_L4 */
+  
+! #endif /* _OLWM_MEM_H */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/menu.c xview-3.2p1.4/clients/olvwm-4.4.2/menu.c
+*** xview-3.2p1.4/clients/olvwm-4.4/menu.c	2000-03-02 16:36:39.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/menu.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 1095,1101 ****
+--- 1095,1106 ----
+      ButtonInfo *bInfo;
+      KeyBinding *binding;
+  
++ #if 1
++     /* Avoid alloc'ing 0 bytes (this might confuse malloc() badly) */
++     buttonInfo = MemAlloc(1 + buttonCount * sizeof(ButtonInfo));
++ #else
+      buttonInfo = MemAlloc(buttonCount * sizeof(ButtonInfo));
++ #endif
+  
+      /* Init each ButtonInfo for each button */
+      for (bindex = 0; bindex < buttonCount; bindex++) {
+***************
+*** 1277,1283 ****
+  		offset = BUTT_IMGVSPACE;
+  		menuInfo->hasImages = True;
+  		break;
+! #endif OLGX_LABEL_IS_COMB
+  	}
+  	menu->maxLabWidth = MAX(menu->maxLabWidth, labelWidth);
+  	menu->maxLabHeight = MAX(menu->maxLabHeight, labelHeight);
+--- 1282,1288 ----
+  		offset = BUTT_IMGVSPACE;
+  		menuInfo->hasImages = True;
+  		break;
+! #endif /* OLGX_LABEL_IS_COMB */
+  	}
+  	menu->maxLabWidth = MAX(menu->maxLabWidth, labelWidth);
+  	menu->maxLabHeight = MAX(menu->maxLabHeight, labelHeight);
+***************
+*** 1303,1309 ****
+  
+      /* Make space for the menu mark (for submenus) or for accelerators. */
+       
+! #ifdef SVR4
+      if (menuInfo->hasAccelerators) {
+  	menuInfo->labelPos =
+  	     MainLabel_Pos(gisButton, LOC_CURSOR_SIZE + BUTT_HSPACE);
+--- 1308,1314 ----
+  
+      /* Make space for the menu mark (for submenus) or for accelerators. */
+       
+! #if defined(SVR4) || defined(XVIEW32)
+      if (menuInfo->hasAccelerators) {
+  	menuInfo->labelPos =
+  	     MainLabel_Pos(gisButton, LOC_CURSOR_SIZE + BUTT_HSPACE);
+***************
+*** 1428,1434 ****
+  		    case ImageLabel:
+  #ifdef OLGX_LABEL_IS_COMB
+  		    case ComboLabel:
+! #endif OLGX_LABEL_IS_COMB
+  			tempheight += pb->label[pb->which].pixlabel->height +
+  				      BUTT_IMGVSPACE * 2;
+  			break;
+--- 1433,1439 ----
+  		    case ImageLabel:
+  #ifdef OLGX_LABEL_IS_COMB
+  		    case ComboLabel:
+! #endif /* OLGX_LABEL_IS_COMB */
+  			tempheight += pb->label[pb->which].pixlabel->height +
+  				      BUTT_IMGVSPACE * 2;
+  			break;
+***************
+*** 3168,3174 ****
+      }
+      else return;	/* kind == NoKind, e.g. a separator */
+  
+! #ifdef SVR4
+      if (menuInfo->hasAccelerators) {
+  	if (pb->has_submenu)
+  	    marktype = OLGX_HORIZ_MENU_MARK;
+--- 3173,3179 ----
+      }
+      else return;	/* kind == NoKind, e.g. a separator */
+  
+! #if defined(SVR4) || defined(XVIEW32)
+      if (menuInfo->hasAccelerators) {
+  	if (pb->has_submenu)
+  	    marktype = OLGX_HORIZ_MENU_MARK;
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/menu.h xview-3.2p1.4/clients/olvwm-4.4.2/menu.h
+*** xview-3.2p1.4/clients/olvwm-4.4/menu.h	1998-01-13 16:00:53.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/menu.h	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 8,14 ****
+  #define _OLWM_MENU_H
+  
+  #ifdef IDENT
+! #ident "@(#)menu.h	1.5 olvwm version 02/09/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+  #define _OLWM_MENU_H
+  
+  #ifdef IDENT
+! #ident "@(#)menu.h	1.5 olvwm version 09 Feb 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/ol_button.413.c xview-3.2p1.4/clients/olvwm-4.4.2/ol_button.413.c
+*** xview-3.2p1.4/clients/olvwm-4.4/ol_button.413.c	1998-01-13 16:00:49.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/ol_button.413.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 1,5 ****
+  #ifdef IDENT
+! #ident "@(#)ol_button.413.c	1.1 olvwm version 01/13/94"
+  #endif
+  
+  /*
+--- 1,5 ----
+  #ifdef IDENT
+! #ident "@(#)ol_button.413.c	1.1 olvwm version 13 Jan 1994"
+  #endif
+  
+  /*
+***************
+*** 8,14 ****
+   * a version of olgx 3.2 (from the xview 3.2 release) and don't want to
+   * use this file, change the define here
+   */
+! #ifndef SVR4
+  
+  /*
+   * Based on
+--- 8,14 ----
+   * a version of olgx 3.2 (from the xview 3.2 release) and don't want to
+   * use this file, change the define here
+   */
+! #if !defined(SVR4) && !defined(XVIEW32)
+  
+  /*
+   * Based on
+***************
+*** 723,729 ****
+      else
+        XwcDrawString(info->dpy, win, info->textfontset,
+        		    info->gc_rec[OLGX_TEXTGC]->gc, x, y, string, len);
+! #else OW_I18N
+        XDrawString(info->dpy, win, info->gc_rec[OLGX_TEXTGC_REV]->gc, x, y, 
+                    string, len);
+      else
+--- 723,729 ----
+      else
+        XwcDrawString(info->dpy, win, info->textfontset,
+        		    info->gc_rec[OLGX_TEXTGC]->gc, x, y, string, len);
+! #else /* OW_I18N */
+        XDrawString(info->dpy, win, info->gc_rec[OLGX_TEXTGC_REV]->gc, x, y, 
+                    string, len);
+      else
+***************
+*** 975,978 ****
+  			  TextScrollButton_Width(info) - 2,
+  			  NumScrollButton_Height(info));
+  }
+! #endif SVR4
+--- 975,978 ----
+  			  TextScrollButton_Width(info) - 2,
+  			  NumScrollButton_Height(info));
+  }
+! #endif /* SVR4 */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/ol_button.c xview-3.2p1.4/clients/olvwm-4.4.2/ol_button.c
+*** xview-3.2p1.4/clients/olvwm-4.4/ol_button.c	1998-01-13 16:00:55.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/ol_button.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 1,13 ****
+  #ifdef IDENT
+! #ident "@(#)ol_button.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+   * Based on
+  #ident "@(#)ol_button.c	1.62 93/06/28 SMI"
+   *
+   */
+  
+  /*
+   * Copyright 1989-1990 Sun Microsystems  See LEGAL_NOTICE for terms of
+   * disclosure.
+--- 1,19 ----
+  #ifdef IDENT
+! #ident "%W% olvwm version %G%"
+  #endif
+  
+  /*
+   * Based on
+  #ident "@(#)ol_button.c	1.62 93/06/28 SMI"
++ 
++  This file comes from the xview 3.2 release and must be used in conjuction
++  with xview 3.2 olgx, which is the version of olgx which ships with
++  Solaris 2.3.
+   *
+   */
+  
++ #if defined(SVR4) || defined(XVIEW32)
++ 
+  /*
+   * Copyright 1989-1990 Sun Microsystems  See LEGAL_NOTICE for terms of
+   * disclosure.
+***************
+*** 1786,1788 ****
+--- 1792,1796 ----
+  	olgx_stipple_rect(info, win, x, y, width, height);
+      }
+  }
++ 
++ #endif /* SVR4 */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/ol_button.svr4.c xview-3.2p1.4/clients/olvwm-4.4.2/ol_button.svr4.c
+*** xview-3.2p1.4/clients/olvwm-4.4/ol_button.svr4.c	2000-03-02 16:37:10.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/ol_button.svr4.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 1,5 ****
+  #ifdef IDENT
+! #ident "@(#)ol_button.svr4.c	1.1 olvwm version 02/22/94"
+  #endif
+  
+  /*
+--- 1,5 ----
+  #ifdef IDENT
+! #ident "%W% olvwm version %G%"
+  #endif
+  
+  /*
+***************
+*** 12,18 ****
+   *
+   */
+  
+! #ifdef SVR4
+  
+  /*
+   * Copyright 1989-1990 Sun Microsystems  See LEGAL_NOTICE for terms of
+--- 12,18 ----
+   *
+   */
+  
+! #if defined(SVR4) || defined(XVIEW32)
+  
+  /*
+   * Copyright 1989-1990 Sun Microsystems  See LEGAL_NOTICE for terms of
+***************
+*** 1793,1796 ****
+      }
+  }
+  
+! #endif SVR4
+--- 1793,1796 ----
+      }
+  }
+  
+! #endif /* SVR4 */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/olgx_impl.h xview-3.2p1.4/clients/olvwm-4.4.2/olgx_impl.h
+*** xview-3.2p1.4/clients/olvwm-4.4/olgx_impl.h	1998-01-13 16:00:54.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/olgx_impl.h	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 114,120 ****
+  void               xcolor_to_hsv();
+  void               olgx_hsv_to_3D();
+  
+! #endif	!OL_PRIVATE_DEFINED
+  
+  
+  
+--- 114,120 ----
+  void               xcolor_to_hsv();
+  void               olgx_hsv_to_3D();
+  
+! #endif	/* !OL_PRIVATE_DEFINED */
+  
+  
+  
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/olvwm.info xview-3.2p1.4/clients/olvwm-4.4.2/olvwm.info
+*** xview-3.2p1.4/clients/olvwm-4.4/olvwm.info	1998-01-13 16:00:55.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/olvwm.info	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 3,9 ****
+  #
+  #	OpenWindows Version 3
+  # -----------------------------------------------
+! #	@(#)olvwm.info	1.2 11/25/92
+  ##########################50######################
+  :VDM:
+  Virtual Desktop Manager
+--- 3,9 ----
+  #
+  #	OpenWindows Version 3
+  # -----------------------------------------------
+! #	@(#)olvwm.info	1.2 25 Nov 1992
+  ##########################50######################
+  :VDM:
+  Virtual Desktop Manager
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/olvwm.man xview-3.2p1.4/clients/olvwm-4.4.2/olvwm.man
+*** xview-3.2p1.4/clients/olvwm-4.4/olvwm.man	1998-01-13 16:00:55.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/olvwm.man	2004-06-08 17:51:39.000000000 -0400
+***************
+*** 1,4 ****
+! .\" @(#)olvwm.man	1.5 olvwm version 01/07/94
+  .TH OLVWM 1 "30 November 1992"
+  .SH NAME
+  olvwm \- OPEN LOOK virtual window manager for X11 and OpenWindows
+--- 1,4 ----
+! .\" @(#)olvwm.man	1.5 olvwm version 07 Jan 1994
+  .TH OLVWM 1 "30 November 1992"
+  .SH NAME
+  olvwm \- OPEN LOOK virtual window manager for X11 and OpenWindows
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/olvwmrc.man xview-3.2p1.4/clients/olvwm-4.4.2/olvwmrc.man
+*** xview-3.2p1.4/clients/olvwm-4.4/olvwmrc.man	1998-01-13 16:00:55.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/olvwmrc.man	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 1,4 ****
+! .\" @(#)olvwmrc.man	1.3 olvwm version 11/25/92
+  .TH OLVWMRC 5 "30 November 1992"
+  .SH NAME
+  olvwmrc \- Resource file for the OPEN LOOK Virtual Window Manager
+--- 1,4 ----
+! .\" @(#)olvwmrc.man	1.3 olvwm version 25 Nov 1992
+  .TH OLVWMRC 5 "30 November 1992"
+  .SH NAME
+  olvwmrc \- Resource file for the OPEN LOOK Virtual Window Manager
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/olvwmrc.y xview-3.2p1.4/clients/olvwm-4.4.2/olvwmrc.y
+*** xview-3.2p1.4/clients/olvwm-4.4/olvwmrc.y	2000-03-02 16:39:55.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/olvwmrc.y	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 156,161 ****
+--- 156,162 ----
+  	|	file WinMenuProg
+  	|	file Assignment
+  	|	error CLOSEBRACE
++ ;
+  
+  Assignment	:	WORD EQUALS String
+  		{
+***************
+*** 174,179 ****
+--- 175,181 ----
+  		        VariableList = ListCons(v, VariableList);
+  		    }
+  		}
++ ;
+  
+  KeyProg	:	KeySpec OPENBRACE Actions CLOSEBRACE
+  		{
+***************
+*** 192,197 ****
+--- 194,200 ----
+  		    AddKeyBinding(p->keycode, p->modmask, d);
+  		    ProgKeyList = ListCons($1, ProgKeyList);
+  		}
++ ;
+  
+  ScreenProg :	ScreenStart List CLOSEBRACE
+  		{
+***************
+*** 202,207 ****
+--- 205,211 ----
+  		    p->target = $2;
+  		    ProgScreenList = ListCons(p, ProgScreenList);
+  		}
++ ;
+  
+  WinMenuProg :	WINMENU OPENBRACE WinMenuActions CLOSEBRACE
+  		{
+***************
+*** 213,218 ****
+--- 217,223 ----
+  		    }
+  		    WinMenuActionsList = $3;
+  		}
++ ;
+  
+  WinMenuActions : /* empty */
+  		{ $$ = NULL; }
+***************
+*** 225,230 ****
+--- 230,236 ----
+  		    p->actions = $4;
+  		    $$ = ListCons(p, $1);
+  		}
++ ;
+  
+  Actions :	/* empty */
+  		{ $$ = NULL; }
+***************
+*** 258,263 ****
+--- 264,270 ----
+  		{ $$ = ListCons($2, $1); }
+  	|	Actions IfElseAction
+  		{ $$ = ListCons($2, $1); }
++ ;
+  
+  WarpAction :	WARP COLON String
+  			{ 
+***************
+*** 268,273 ****
+--- 275,281 ----
+  			    p->parameter = strdup($3);
+  			    $$ = p;
+  			}
++ ;
+  	
+  CloseAction:	CLOSE COLON List
+  			{ 
+***************
+*** 278,283 ****
+--- 286,292 ----
+  			    p->parameter = $3;
+  			    $$ = p;
+  			}
++ ;
+  	
+  QuitAction:	QUIT COLON List
+  			{ 
+***************
+*** 288,293 ****
+--- 297,303 ----
+  			    p->parameter = $3;
+  			    $$ = p;
+  			}
++ ;
+  
+  OpenAction:	OPEN COLON List
+  			{ 
+***************
+*** 298,303 ****
+--- 308,314 ----
+  			    p->parameter = $3;
+  			    $$ = p;
+  			}
++ ;
+  			
+  RaiseLowerAction:	RAISELOWER COLON List
+  			{ 
+***************
+*** 308,313 ****
+--- 319,325 ----
+  			    p->parameter = $3;
+  			    $$ = p;
+  			}
++ ;
+  			
+  LowerAction:	LOWER COLON List
+  			{ 
+***************
+*** 318,323 ****
+--- 330,336 ----
+  			    p->parameter = $3;
+  			    $$ = p;
+  			}
++ ;
+  			
+  RaiseAction:	RAISE COLON List
+  			{ 
+***************
+*** 328,333 ****
+--- 341,347 ----
+  			    p->parameter = $3;
+  			    $$ = p;
+  			}
++ ;
+  			
+  ExecuteAction:	EXECUTE COLON List
+  			{ 
+***************
+*** 338,343 ****
+--- 352,358 ----
+  			    p->parameter = $3;
+  			    $$ = p;
+  			}
++ ;
+  
+  GotoAction:	GOTO COLON String
+  			{
+***************
+*** 359,365 ****
+  			    p->parameter = strdup(s);
+  			    $$ = p;
+  			}
+! 
+  
+  GeometryAction :	GEOMETRY COLON String
+  			{ 
+--- 374,380 ----
+  			    p->parameter = strdup(s);
+  			    $$ = p;
+  			}
+! ;
+  
+  GeometryAction :	GEOMETRY COLON String
+  			{ 
+***************
+*** 370,375 ****
+--- 385,391 ----
+  			    p->parameter = strdup($3);
+  			    $$ = p;
+  			}
++ ;
+  
+  RebindAction :	REBIND COLON
+  			{ 
+***************
+*** 389,394 ****
+--- 405,411 ----
+  			    p->parameter = strdup($3);
+  			    $$ = p;
+  			}
++ ;
+  
+  StickAction :	STICK COLON String
+  			{ 
+***************
+*** 399,404 ****
+--- 416,422 ----
+  			    p->parameter = strdup($3);
+  			    $$ = p;
+  			}
++ ;
+  
+  SetSizeAction : SETSIZE COLON String
+  			{ 
+***************
+*** 409,414 ****
+--- 427,433 ----
+  			    p->parameter = strdup($3);
+  			    $$ = p;
+  			}
++ ;
+  
+  FocusAction : FOCUS COLON String
+  			{ 
+***************
+*** 419,424 ****
+--- 438,444 ----
+  			    p->parameter = strdup($3);
+  			    $$ = p;
+  			}
++ ;
+  
+  IfElseAction: IFELSE COLON String OPENBRACE Actions CLOSEBRACE
+  				      OPENBRACE Actions CLOSEBRACE
+***************
+*** 437,442 ****
+--- 457,463 ----
+  
+  			    $$ = p;
+  			}
++ ;
+  
+  KeySpec : 	Key Modifier
+  			{ 
+***************
+*** 468,476 ****
+--- 489,499 ----
+  			    $$ = p;
+  			    free($1);
+  			}
++ ;
+  
+  Key	:	String
+  		{ $$ = strdup($1); }
++ ;
+  
+  Modifier :	/* empty */
+  			{ $$ = 0; }
+***************
+*** 493,498 ****
+--- 516,522 ----
+  			    }
+  			    $$ |= FindModifierMask(kc);
+  			}
++ ;
+  
+  List	:	String
+  			{ $$ = $1; }
+***************
+*** 506,516 ****
+--- 530,542 ----
+  			    free($3);
+  			    $$ = s;
+  			}
++ ;
+  
+  ScreenStart :	SCREEN INT OPENBRACE
+  		{
+  		    $$ = $2;
+  		}
++ ;
+  
+  String :    WORD
+  	    {
+***************
+*** 525,530 ****
+--- 551,557 ----
+  		$$ = strexpand(t);
+  		free($1);
+  	    }
++ ;
+  %%
+  /* Programs */
+  #define YYDEBUG 1
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/olwm.c xview-3.2p1.4/clients/olvwm-4.4.2/olwm.c
+*** xview-3.2p1.4/clients/olvwm-4.4/olwm.c	2000-03-02 16:43:52.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/olwm.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 1,5 ****
+  #ifdef IDENT
+! #ident "@(#)olwm.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 1,5 ----
+  #ifdef IDENT
+! #ident "@(#)olwm.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+***************
+*** 237,243 ****
+--- 237,248 ----
+  	if ((OpenWinHome = getenv("OPENWINHOME")) != 0)
+  		(void)strcpy(locale_dir,OpenWinHome);
+  	else
++ #ifdef OPENWINHOME_DEFAULT
++ 		/* martin-2.buck@student.uni-ulm.de */
++ 		(void)strcpy(locale_dir,OPENWINHOME_DEFAULT);
++ #else
+  		(void)strcpy(locale_dir,"/usr");
++ #endif
+  	(void)strcat(locale_dir,"/lib/locale");
+  #ifdef SVR4
+  	bindtextdomain("olwm_messages",locale_dir);
+***************
+*** 657,667 ****
+--- 662,684 ----
+  static void
+  handleChildSignal()
+  {
++ #if 1
++ /* Some versions of glibc2 seem to need the extra signal(), some don't.
++  * So let's play safe and always include it under Linux (shouldn't hurt
++  * even if it's not required).
++  *
++  * mbuck@debian.org
++  */
++ #if (defined(SYSV) && !defined(SVR4)) || defined(__linux__)
++ 	signal(SIGCHLD, handleChildSignal);
++ #endif
++ #else
+  #ifdef SYSV
+  #ifndef SVR4
+  	signal(SIGCHLD, handleChildSignal);
+  #endif
+  #endif
++ #endif
+  	deadChildren = True;
+  }
+  
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/olwm.h xview-3.2p1.4/clients/olvwm-4.4.2/olwm.h
+*** xview-3.2p1.4/clients/olvwm-4.4/olwm.h	1998-01-13 16:00:56.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/olwm.h	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 8,14 ****
+  #define _OLWM_OLWM_H
+  
+  #ifdef IDENT
+! #ident "@(#)olwm.h	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+  #define _OLWM_OLWM_H
+  
+  #ifdef IDENT
+! #ident "@(#)olwm.h	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/parse.l xview-3.2p1.4/clients/olvwm-4.4.2/parse.l
+*** xview-3.2p1.4/clients/olvwm-4.4/parse.l	1998-01-13 16:00:56.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/parse.l	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident  "@(#)parse.l	1.5 olvwm version 01/07/94"
+  #endif
+  %}
+  %%
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident  "@(#)parse.l	1.5 olvwm version 07 Jan 1994"
+  #endif
+  %}
+  %%
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/pixmap.c xview-3.2p1.4/clients/olvwm-4.4.2/pixmap.c
+*** xview-3.2p1.4/clients/olvwm-4.4/pixmap.c	2000-03-02 16:40:12.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/pixmap.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 33,39 ****
+  typedef unsigned long   Pixel;      /* Index into colormap              */
+  #endif  /* NO_PIXEL_FIX */
+  #include <X11/xpm.h>
+! #endif XPM
+  
+  #include "i18n.h"
+  #include <olgx/olgx.h>
+--- 33,39 ----
+  typedef unsigned long   Pixel;      /* Index into colormap              */
+  #endif  /* NO_PIXEL_FIX */
+  #include <X11/xpm.h>
+! #endif /* XPM */
+  
+  #include "i18n.h"
+  #include <olgx/olgx.h>
+***************
+*** 415,421 ****
+          return False;
+      return True;
+  }
+! #endif SUNICON
+  
+  #ifdef NOT
+  /*
+--- 415,421 ----
+          return False;
+      return True;
+  }
+! #endif /* SUNICON */
+  
+  #ifdef NOT
+  /*
+***************
+*** 516,522 ****
+--- 516,527 ----
+          int     i = 0;;
+  
+          if ((owHome = getenv("OPENWINHOME")) == NULL)
++ #ifdef OPENWINHOME_DEFAULT
++ 		/* martin-2.buck@student.uni-ulm.de */
++                 owHome = OPENWINHOME_DEFAULT;
++ #else
+                  owHome = "/usr/openwin";
++ #endif
+  
+          bitmapSearchPath = (char **)MemAlloc(4 * sizeof(char *));
+  
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/resources.c xview-3.2p1.4/clients/olvwm-4.4.2/resources.c
+*** xview-3.2p1.4/clients/olvwm-4.4/resources.c	2000-03-02 16:49:29.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/resources.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 1135,1142 ****
+--- 1135,1156 ----
+      
+      info = XLoadQueryFont(dpy, string);
+  
++ #if 0
+      if (info == NULL)
+  	return False;
++ #else
++     if (info == NULL) {
++        /* ++roman: Unfortunately olvwm crashes if it has NULL pointers to
++         * fonts :-( So try to load a default font if the requested failed. */
++        fprintf( stderr, "failed to load font `%s' -- using `fixed' instead\n",
++                 string );
++        info = XLoadQueryFont(dpy, "fixed" );
++        if (!info) {
++            fprintf( stderr, "failed to load `fixed' too -- expect a crash\n" );
++            return False;
++        }
++     }
++ #endif
+  
+      *dest = info;
+      return True;
+***************
+*** 1996,2002 ****
+      for (item = table; !(item->flags & RI_LAST_ITEM); ++item) {
+  
+  	/* never update an immutable item */
+! 	if (item->flags & RI_IMMUTABLE)
+  	    continue;
+  
+  	classes[1] = item->classQ;
+--- 2010,2016 ----
+      for (item = table; !(item->flags & RI_LAST_ITEM); ++item) {
+  
+  	/* never update an immutable item */
+! 	if ((item->flags & RI_IMMUTABLE) && (flags & SR_UPDATING))
+  	    continue;
+  
+  	classes[1] = item->classQ;
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/resources.h xview-3.2p1.4/clients/olvwm-4.4.2/resources.h
+*** xview-3.2p1.4/clients/olvwm-4.4/resources.h	1998-01-13 16:00:57.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/resources.h	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident  "@(#)resources.h	1.3 olvwm version 11/25/92"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident  "@(#)resources.h	1.3 olvwm version 25 Nov 1992"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/screen.c xview-3.2p1.4/clients/olvwm-4.4.2/screen.c
+*** xview-3.2p1.4/clients/olvwm-4.4/screen.c	2000-03-02 16:43:02.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/screen.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 282,288 ****
+  		     	case PseudoColor:
+  			case GrayScale:
+  		     	case DirectColor:
+! 			case TrueColor:
+  		    		return True;
+  				/*NOTREACHED*/
+  		    		break;
+--- 282,288 ----
+  		     	case PseudoColor:
+  			case GrayScale:
+  		     	case DirectColor:
+! 		    	case TrueColor:
+  		    		return True;
+  				/*NOTREACHED*/
+  		    		break;
+***************
+*** 537,543 ****
+--- 537,548 ----
+  	int     i = 0;;
+  
+  	if ((owHome = getenv("OPENWINHOME")) == NULL)
++ #ifdef OPENWINHOME_DEFAULT
++ 		/* martin-2.buck@student.uni-ulm.de */
++ 		owHome = OPENWINHOME_DEFAULT;
++ #else
+  		owHome = "/usr/openwin";
++ #endif
+  
+  	bitmapSearchPath = (char **)MemAlloc(4 * sizeof(char *));
+  
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/screen.h xview-3.2p1.4/clients/olvwm-4.4.2/screen.h
+*** xview-3.2p1.4/clients/olvwm-4.4/screen.h	1998-01-13 16:00:57.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/screen.h	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)screen.h	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)screen.h	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/services.c xview-3.2p1.4/clients/olvwm-4.4.2/services.c
+*** xview-3.2p1.4/clients/olvwm-4.4/services.c	2000-03-02 16:40:30.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/services.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)services.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)services.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+***************
+*** 82,88 ****
+  	return 1;
+      } else if (pid == 0) {
+  	/* child */
+! #ifdef SYSV
+  	setpgrp();
+  #else
+  	setpgrp(0, getpid());
+--- 82,88 ----
+  	return 1;
+      } else if (pid == 0) {
+  	/* child */
+! #if defined(SYSV) || defined(__linux__)
+  	setpgrp();
+  #else
+  	setpgrp(0, getpid());
+***************
+*** 200,206 ****
+--- 200,215 ----
+  	char	**env = winInfo->core.client->scrInfo->environment;
+  
+  	if ( (dir = getenv( "OPENWINHOME" )) == NULL )
++ #ifdef OPENWINHOME_DEFAULT
++ 	{
++ 		/* martin-2.buck@student.uni-ulm.de */
++ 		strcpy( pshPath, OPENWINHOME_DEFAULT ); 
++ 		strcat( pshPath, "/bin/psh" );
++ 		commArgv[0] = pshPath;
++ 	}
++ #else
+  		commArgv[0] = "/usr/bin/psh";
++ #endif
+  	else
+  	{
+  		strcpy( pshPath, dir ); 
+***************
+*** 231,237 ****
+  		close( pshPipe[1] );
+  		close( 1 );		/* close stdout */
+  		dup( 2 );		/* make olwm stderr = psh stdout */
+! #ifdef SYSV
+  		setpgrp();
+  #else
+  		setpgrp(0, getpid());
+--- 240,246 ----
+  		close( pshPipe[1] );
+  		close( 1 );		/* close stdout */
+  		dup( 2 );		/* make olwm stderr = psh stdout */
+! #if defined(SYSV) || defined(__linux__)
+  		setpgrp();
+  #else
+  		setpgrp(0, getpid());
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/slave.c xview-3.2p1.4/clients/olvwm-4.4.2/slave.c
+*** xview-3.2p1.4/clients/olvwm-4.4/slave.c	1998-01-13 16:00:58.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/slave.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 8,14 ****
+   * ---------------------------------------------------------------------*/
+  
+  #ifdef IDENT
+! #ident "@(#)slave.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+   * ---------------------------------------------------------------------*/
+  
+  #ifdef IDENT
+! #ident "@(#)slave.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/slots.c xview-3.2p1.4/clients/olvwm-4.4.2/slots.c
+*** xview-3.2p1.4/clients/olvwm-4.4/slots.c	1998-01-13 16:00:58.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/slots.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)slots.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)slots.c	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/states.c xview-3.2p1.4/clients/olvwm-4.4.2/states.c
+*** xview-3.2p1.4/clients/olvwm-4.4/states.c	1998-01-13 16:00:57.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/states.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 8,14 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)states.c	1.7 olvwm version 02/09/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)states.c	1.7 olvwm version 09 Feb 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/st.c xview-3.2p1.4/clients/olvwm-4.4.2/st.c
+*** xview-3.2p1.4/clients/olvwm-4.4/st.c	2000-03-02 16:40:47.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/st.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 1,7 ****
+  /* This is a general purpose hash table package written by Peter Moore @ UCB. */
+  
+  #ifdef IDENT
+! #ident "@(#)st.c	1.2 olvwm version 11/25/92"
+  #endif
+  
+  /*
+--- 1,7 ----
+  /* This is a general purpose hash table package written by Peter Moore @ UCB. */
+  
+  #ifdef IDENT
+! #ident "@(#)st.c	1.2 olvwm version 25 Nov 1992"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/st.h xview-3.2p1.4/clients/olvwm-4.4.2/st.h
+*** xview-3.2p1.4/clients/olvwm-4.4/st.h	1998-01-13 16:00:58.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/st.h	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 2,8 ****
+  /* This is a general purpose hash table package written by Peter Moore @ UCB. */
+  
+  #ifdef IDENT
+! #ident "@(#)st.h	1.2 olvwm version 11/25/92"
+  #endif
+  
+  /*
+--- 2,8 ----
+  /* This is a general purpose hash table package written by Peter Moore @ UCB. */
+  
+  #ifdef IDENT
+! #ident "@(#)st.h	1.2 olvwm version 25 Nov 1992"
+  #endif
+  
+  /*
+***************
+*** 64,67 ****
+  
+  int st_strhash();
+  
+! #endif ST_INCLUDED
+--- 64,67 ----
+  
+  int st_strhash();
+  
+! #endif /* ST_INCLUDED */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/usermenu.c xview-3.2p1.4/clients/olvwm-4.4.2/usermenu.c
+*** xview-3.2p1.4/clients/olvwm-4.4/usermenu.c	2000-03-02 16:41:31.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/usermenu.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 123,129 ****
+  typedef unsigned long	Pixel;	    /* Index into colormap		*/
+  #endif	/* NO_PIXEL_FIX */
+  #include <X11/xpm.h>
+! #endif XPM
+  
+  #include <assert.h>
+  #include <string.h>
+--- 123,129 ----
+  typedef unsigned long	Pixel;	    /* Index into colormap		*/
+  #endif	/* NO_PIXEL_FIX */
+  #include <X11/xpm.h>
+! #endif /* XPM */
+  
+  #include <assert.h>
+  #include <string.h>
+***************
+*** 466,472 ****
+--- 466,479 ----
+  {
+      Button *b =	 (Button *) MemNew(Button);
+  
++ #if 1
++     /* martin-2.buck@student.uni-ulm.de */
++     b->label[0].kind   =       label0 ? StringLabel : NoType;
++ #endif
+      b->label[0].string =       label0;
++ #if 1
++     b->label[1].kind   =       label1 ? StringLabel : NoType;
++ #endif
+      b->label[1].string =       label1;
+      b->helpstring[0] =  helpstr0;
+      b->helpstring[1] =  helpstr1;
+***************
+*** 822,827 ****
+--- 829,839 ----
+  		}
+  	    }
+  	    penv = getenv(envbuff);
++ #ifdef OPENWINHOME_DEFAULT
++ 	    if (!penv && !strcmp(envbuff, "OPENWINHOME")) {
++ 		penv = OPENWINHOME_DEFAULT;
++ 	    }
++ #endif
+  	    if (penv) {
+  		int tmp = strlen(penv);
+  		if (haveslash && *penv == '/') {
+***************
+*** 866,872 ****
+  /*
+   * Menu Search Path
+   */
+! #define NUM_SEARCH_PATH	 7
+  static  char    **menuSearchPath;
+  
+  /*
+--- 878,884 ----
+  /*
+   * Menu Search Path
+   */
+! #define NUM_SEARCH_PATH	 8
+  static  char    **menuSearchPath;
+  
+  /*
+***************
+*** 884,890 ****
+--- 896,906 ----
+  		home = ".";
+   
+  	if ((owHome = getenv("OPENWINHOME")) == NULL)
++ #ifdef OPENWINHOME_DEFAULT
++ 		owHome = OPENWINHOME_DEFAULT;
++ #else
+  		owHome = "/usr/openwin";
++ #endif
+   
+  	menuSearchPath = (char **)MemAlloc(NUM_SEARCH_PATH*sizeof(char *));
+   
+***************
+*** 899,904 ****
+--- 915,925 ----
+  	/* $HOME/.<menufile> */
+  	sprintf(buf, "%s/.%%s", home);
+  	menuSearchPath[i++] = MemNewString(buf);
++ 	
++ #ifdef __linux__
++ 	/* ++roman: /etc/X11/olvwm/<menufile> */
++ 	menuSearchPath[i++] = MemNewString("/etc/X11/olvwm/%s");
++ #endif
+  
+  #ifdef OW_I18N_L3
+  	/* $OPENWINHOME/share/locale/<locale>/olwm/<menufile> */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/usleep.c xview-3.2p1.4/clients/olvwm-4.4.2/usleep.c
+*** xview-3.2p1.4/clients/olvwm-4.4/usleep.c	1998-01-13 16:00:58.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/usleep.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident "@(#)usleep.c	1.2 olvwm version 11/25/92"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident "@(#)usleep.c	1.2 olvwm version 25 Nov 1992"
+  #endif
+  
+  /*
+***************
+*** 76,82 ****
+  	setitimer(ITIMER_REAL, &old, (struct itimerval *)0);
+  	return 0;
+  
+! #else SYSV
+  
+  	return usleep(usec);
+  
+--- 76,82 ----
+  	setitimer(ITIMER_REAL, &old, (struct itimerval *)0);
+  	return 0;
+  
+! #else /* SYSV */
+  
+  	return usleep(usec);
+  
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/vdm.icon xview-3.2p1.4/clients/olvwm-4.4.2/vdm.icon
+*** xview-3.2p1.4/clients/olvwm-4.4/vdm.icon	1998-01-13 16:00:58.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/vdm.icon	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 1,5 ****
+  #ifdef IDENT
+! #ident	"@(#)vdm.icon	1.2 olvwm version 11/25/92"
+  #endif
+  
+  #define vdm_width 64
+--- 1,5 ----
+  #ifdef IDENT
+! #ident	"@(#)vdm.icon	1.2 olvwm version 25 Nov 1992"
+  #endif
+  
+  #define vdm_width 64
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/vdm.mask xview-3.2p1.4/clients/olvwm-4.4.2/vdm.mask
+*** xview-3.2p1.4/clients/olvwm-4.4/vdm.mask	1998-01-13 16:00:58.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/vdm.mask	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 1,5 ****
+  #ifdef IDENT
+! #ident	"@(#)vdm.mask	1.2 olvwm version 11/25/92"
+  #endif
+  
+  #define vdmmask_width 64
+--- 1,5 ----
+  #ifdef IDENT
+! #ident	"@(#)vdm.mask	1.2 olvwm version 25 Nov 1992"
+  #endif
+  
+  #define vdmmask_width 64
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/virtual.c xview-3.2p1.4/clients/olvwm-4.4.2/virtual.c
+*** xview-3.2p1.4/clients/olvwm-4.4/virtual.c	2000-03-02 16:41:11.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/virtual.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 7,12 ****
+--- 7,13 ----
+  #include <stdio.h>
+  #include <string.h>
+  #include <dirent.h>
++ #include <math.h>
+  #include <sys/param.h>
+  #include <X11/Xos.h>
+  #include <X11/Xlib.h>
+***************
+*** 23,36 ****
+  #include "globals.h"
+  #include "win.h"
+  #include "menu.h"
+- #include "math.h"
+  #include "virtual.h"
+  #include "patchlevel.h"
+  
+  #include "vdm.icon"
+  #include "vdm.mask"
+  
+  #define INIT   register char *sp = instring;
+  #define GETC() (*sp++)
+  #define PEEKC()     (*sp)
+  #define UNGETC(c)   (--sp)
+--- 24,54 ----
+  #include "globals.h"
+  #include "win.h"
+  #include "menu.h"
+  #include "virtual.h"
+  #include "patchlevel.h"
+  
+  #include "vdm.icon"
+  #include "vdm.mask"
+  
++ #if defined(__linux__) && defined(__GLIBC__) && 0
++ /* GNU libc doesn't use INIT, so we have to define sp ourselves. We have to
++  * initialize it as well before we call compile(). Maybe this is a bug in
++  * GNU libc, but I couldn't care less...
++  *
++  * NEWS: As of glibc 2.0.5c, GNU libc does use INIT, but it calls the first
++  * argument of compile __instring instead of instring. Sigh. Whoever designed
++  * this regexp API deserves to be shot immediately, if you ask me.
++  *
++  * MORE NEWS: glibc 2.0.6 seems to do this right, so I added a && 0
++  * above to disable my patches. Remove it if you have an older glibc.
++  *
++  * martin.buck@bigfoot.com
++  */
++ /*char *sp;*/
++ #define INIT   register char *sp = __instring;
++ #else
+  #define INIT   register char *sp = instring;
++ #endif
+  #define GETC() (*sp++)
+  #define PEEKC()     (*sp)
+  #define UNGETC(c)   (--sp)
+***************
+*** 45,51 ****
+  #endif
+  
+  #ifdef IDENT
+! #ident "@(#)virtual.c	1.6 olvwm version 01/07/94"
+  #endif
+  
+  /* Class Function Vector; a virtual pane is the VDM window in which all
+--- 63,69 ----
+  #endif
+  
+  #ifdef IDENT
+! #ident "@(#)virtual.c	1.6 olvwm version 07 Jan 1994"
+  #endif
+  
+  /* Class Function Vector; a virtual pane is the VDM window in which all
+***************
+*** 2154,2159 ****
+--- 2172,2184 ----
+  #ifdef REGEXP
+      expbuf = regcomp(newPattern);
+  #else
++ #if defined(__linux__) && defined(__GLIBC__)
++     /* See comment above.
++      *
++      * martin.buck@bigfoot.com
++      */
++ /*    sp = newPattern;*/
++ #endif
+      compile(newPattern, expbuf, &expbuf[256], '\0');
+  #endif
+  }
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/virtual.h xview-3.2p1.4/clients/olvwm-4.4.2/virtual.h
+*** xview-3.2p1.4/clients/olvwm-4.4/virtual.h	1998-01-13 16:00:59.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/virtual.h	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 4,10 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)virtual.h	1.3 olvwm version 01/07/94"
+  #endif
+  
+  #ifndef _OLWM_VIRTUAL_H
+--- 4,10 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)virtual.h	1.3 olvwm version 07 Jan 1994"
+  #endif
+  
+  #ifndef _OLWM_VIRTUAL_H
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winbusy.c xview-3.2p1.4/clients/olvwm-4.4.2/winbusy.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winbusy.c	1998-01-13 16:01:00.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winbusy.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winbusy.c	1.3 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winbusy.c	1.3 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winbutton.c xview-3.2p1.4/clients/olvwm-4.4.2/winbutton.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winbutton.c	1998-01-13 16:01:00.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winbutton.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winbutton.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winbutton.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/win.c xview-3.2p1.4/clients/olvwm-4.4.2/win.c
+*** xview-3.2p1.4/clients/olvwm-4.4/win.c	1998-01-13 16:00:59.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/win.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)win.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)win.c	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winframe.c xview-3.2p1.4/clients/olvwm-4.4.2/winframe.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winframe.c	2000-03-02 16:41:53.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winframe.c	2004-06-08 17:51:36.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winframe.c	1.6 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winframe.c	1.6 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+***************
+*** 1048,1054 ****
+  			   OLGX_NORMAL | TextOLGX);
+  	}
+  }
+! #endif OW_I18N_L4
+  
+  
+  
+--- 1048,1054 ----
+  			   OLGX_NORMAL | TextOLGX);
+  	}
+  }
+! #endif /* OW_I18N_L4 */
+  
+  
+  
+***************
+*** 1908,1914 ****
+          /* set up the status */
+          if (cli->wmDecors->flags & WMDecorationIMStatus)
+                  setIMStatusText(dpy,w,panewin);
+! #endif OW_I18N_L4
+  
+          /* Determine which menu should come up when menus are requested
+           * for this frame. */
+--- 1908,1914 ----
+          /* set up the status */
+          if (cli->wmDecors->flags & WMDecorationIMStatus)
+                  setIMStatusText(dpy,w,panewin);
+! #endif /* OW_I18N_L4 */
+  
+          /* Determine which menu should come up when menus are requested
+           * for this frame. */
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/wingframe.c xview-3.2p1.4/clients/olvwm-4.4.2/wingframe.c
+*** xview-3.2p1.4/clients/olvwm-4.4/wingframe.c	1998-01-13 16:01:00.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/wingframe.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 9,15 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)wingframe.c	1.3 olvwm version 12/07/92"
+  #endif
+  
+  /*
+--- 9,15 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)wingframe.c	1.3 olvwm version 12/7/92"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/win.h xview-3.2p1.4/clients/olvwm-4.4.2/win.h
+*** xview-3.2p1.4/clients/olvwm-4.4/win.h	1998-01-13 16:00:59.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/win.h	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 8,14 ****
+  #define _OLWM_WIN_H
+  
+  #ifdef IDENT
+! #ident  "@(#)win.h	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 8,14 ----
+  #define _OLWM_WIN_H
+  
+  #ifdef IDENT
+! #ident  "@(#)win.h	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winicon.c xview-3.2p1.4/clients/olvwm-4.4.2/winicon.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winicon.c	2000-03-02 16:42:07.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winicon.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winicon.c	1.5 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winicon.c	1.5 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winipane.c xview-3.2p1.4/clients/olvwm-4.4.2/winipane.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winipane.c	1998-01-13 16:01:01.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winipane.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winipane.c	1.6 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winipane.c	1.6 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+***************
+*** 118,123 ****
+--- 118,156 ----
+  		0, 0, winInfo->core.width, winInfo->core.height,
+  		0, 0, (unsigned long)1L);
+  #else
++ #if 1
++     /* The original code has problems displaying icons for screen depths
++      * != 1 and != 8. The new logic here is: If either the icon pixmap or
++      * the icon window are 1 plane deep, use XCopyPlane() to get a B&W icon.
++      * If the depths of the pixmap and the window are the same (but != 1),
++      * use XCopyArea() to get a color icon. If they don't match, complain.
++      *
++      * <mbuck@debian.org>
++      */
++     if (winInfo->iconDepth == 1) {
++ 	XCopyPlane(dpy, winInfo->iconPixmap, pane, gc,
++ 	    0, 0, winInfo->core.width, winInfo->core.height,
++ 	    0, 0, (unsigned long)1L);
++     } else {
++ 	XWindowAttributes attr;
++ 	
++ 	if (XGetWindowAttributes(dpy, pane, &attr)) {
++ 	    if (attr.depth == 1) {
++ 		XCopyPlane(dpy, winInfo->iconPixmap, pane, gc,
++ 		    0, 0, winInfo->core.width, winInfo->core.height,
++ 		    0, 0, (unsigned long)1L);
++ 	    } else if (winInfo->iconDepth == attr.depth) {
++ 		XCopyArea(dpy, winInfo->iconPixmap, pane, gc,
++ 		    0, 0, winInfo->core.width, winInfo->core.height,
++ 		    0, 0);
++ 	    } else {
++ 		ErrorWarning(GetString("Unsupported icon pixmap depth"));
++ 	    }
++ 	} else {
++ 	    ErrorWarning(GetString("Huh? Can't get attributes of my icon window."));
++ 	}
++     }
++ #else
+      switch(winInfo->iconDepth) {
+  	case 8:
+  	    XCopyArea(dpy, winInfo->iconPixmap, pane, gc,
+***************
+*** 134,139 ****
+--- 167,173 ----
+  	    break;
+      }
+  #endif
++ #endif
+  
+      if (winInfo->iconMask != None) {
+  	XSetClipMask(dpy, gc, None);
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winmenu.c xview-3.2p1.4/clients/olvwm-4.4.2/winmenu.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winmenu.c	1998-01-13 16:01:00.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winmenu.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winmenu.c	1.4 olvwm version 12/07/92"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winmenu.c	1.4 olvwm version 12/7/92"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winnofoc.c xview-3.2p1.4/clients/olvwm-4.4.2/winnofoc.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winnofoc.c	2000-03-02 16:42:22.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winnofoc.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winnofoc.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winnofoc.c	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winpane.c xview-3.2p1.4/clients/olvwm-4.4.2/winpane.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winpane.c	1998-01-13 16:01:01.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winpane.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winpane.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winpane.c	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winpinmenu.c xview-3.2p1.4/clients/olvwm-4.4.2/winpinmenu.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winpinmenu.c	1998-01-13 16:01:01.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winpinmenu.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winpinmenu.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winpinmenu.c	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winpush.c xview-3.2p1.4/clients/olvwm-4.4.2/winpush.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winpush.c	1998-01-13 16:01:01.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winpush.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winpush.c	1.3 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winpush.c	1.3 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winresize.c xview-3.2p1.4/clients/olvwm-4.4.2/winresize.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winresize.c	1998-01-13 16:01:02.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winresize.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winresize.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winresize.c	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*
+diff -rc xview-3.2p1.4/clients/olvwm-4.4/winroot.c xview-3.2p1.4/clients/olvwm-4.4.2/winroot.c
+*** xview-3.2p1.4/clients/olvwm-4.4/winroot.c	2000-03-02 16:42:43.000000000 -0500
+--- xview-3.2p1.4/clients/olvwm-4.4.2/winroot.c	2004-06-08 17:51:40.000000000 -0400
+***************
+*** 5,11 ****
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winroot.c	1.4 olvwm version 01/07/94"
+  #endif
+  
+  /*
+--- 5,11 ----
+   */
+  
+  #ifdef IDENT
+! #ident	"@(#)winroot.c	1.4 olvwm version 07 Jan 1994"
+  #endif
+  
+  /*

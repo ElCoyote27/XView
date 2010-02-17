@@ -1,0 +1,196 @@
+diff -brc xview-3.2p1.4.orig/lib/libxview/canvas/cnvs_input.c xview-3.2p1.4/lib/libxview/canvas/cnvs_input.c
+*** xview-3.2p1.4.orig/lib/libxview/canvas/cnvs_input.c	Tue Jun 29 07:14:46 1993
+--- xview-3.2p1.4/lib/libxview/canvas/cnvs_input.c	Tue Apr 20 13:18:07 2010
+***************
+*** 261,266 ****
+--- 261,301 ----
+  	}
+  	break;
+  
++       /* USE_SCROLL_WHEEL */
++       case ACTION_SCROLL_UP:
++       case ACTION_SCROLL_DOWN:
++ 	view = CANVAS_VIEW_PUBLIC((Canvas_view_info *) xv_get(window_public,
++ 	    XV_KEY_DATA, canvas_view_context_key));
++ 	sb = xv_get(canvas_public, OPENWIN_VERTICAL_SCROLLBAR, view);
++ 	if (sb) {
++ 	    Event	    sb_event;
++ 	    int offset, length, view_length, pixels_per, scroll_unit;
++ 
++ 	    pixels_per = (int) xv_get(sb, SCROLLBAR_PIXELS_PER_UNIT);
++ 	    if (pixels_per <= 1) {
++ 		scroll_unit = 2;
++ 	    } else {
++ 		scroll_unit = 1;
++ 	    }
++ 	    offset = (int) xv_get(sb, SCROLLBAR_VIEW_START);
++ 	    length = (int) xv_get(sb, SCROLLBAR_OBJECT_LENGTH);
++ 	    view_length = (int) xv_get(sb, SCROLLBAR_VIEW_LENGTH);
++ 
++ 	    if (event_action(event) == ACTION_SCROLL_UP) {
++ 		if ( offset >= scroll_unit ) {
++ 		    xv_set(sb, SCROLLBAR_VIEW_START, offset - scroll_unit, NULL);
++ 		} else {
++ 		    xv_set(sb, SCROLLBAR_VIEW_START, 0, NULL);
++ 		}
++ 	    } else { /* ACTION_SCROLL_DOWN */
++ 		if ( offset < ((length - view_length)+scroll_unit) ) {
++ 		    xv_set(sb, SCROLLBAR_VIEW_START, offset + scroll_unit, NULL);
++ 		}
++ 	    }
++ 	    /* printf("ScrollUp/Down, View:%i-%i/%i (%i)\n",offset,view_length,length,scroll_unit); */
++ 	}
++ 	break;
++ 
+        case ACTION_VERTICAL_SCROLLBAR_MENU:
+        case ACTION_HORIZONTAL_SCROLLBAR_MENU:
+  	view = CANVAS_VIEW_PUBLIC((Canvas_view_info *) xv_get(window_public,
+diff -brc xview-3.2p1.4.orig/lib/libxview/menu/om_render.c xview-3.2p1.4/lib/libxview/menu/om_render.c
+*** xview-3.2p1.4.orig/lib/libxview/menu/om_render.c	Fri May  2 16:39:00 1997
+--- xview-3.2p1.4/lib/libxview/menu/om_render.c	Tue Apr 20 12:46:47 2010
+***************
+*** 2595,2600 ****
+--- 2595,2602 ----
+  	if (action_select_is_down(event))
+  	    /* BUG ALERT: The following is not remappable */
+  	    event_set_shiftmask(event, MS_RIGHT_MASK);
++ 	    event_set_shiftmask(event, MS_SCROLLUP_MASK);
++ 	    event_set_shiftmask(event, MS_SCROLLDOWN_MASK);
+      }
+  
+      /* Translate unmodified ISO (ASCII) Mouseless Keyboard Commands
+diff -brc xview-3.2p1.4.orig/lib/libxview/scrollbar/sb_event.c xview-3.2p1.4/lib/libxview/scrollbar/sb_event.c
+*** xview-3.2p1.4.orig/lib/libxview/scrollbar/sb_event.c	Tue Jun 29 07:17:09 1993
+--- xview-3.2p1.4/lib/libxview/scrollbar/sb_event.c	Tue Apr 20 13:09:43 2010
+***************
+*** 361,372 ****
+--- 361,374 ----
+  	break;
+  
+        case ACTION_UP:
++       case ACTION_SCROLL_UP:
+  	if (event_is_up(event) || !SB_VERTICAL(sb))
+  	    break;
+  	scrollbar_scroll(sb, 0, SCROLLBAR_LINE_BACKWARD);
+  	break;
+  
+        case ACTION_DOWN:
++       case ACTION_SCROLL_DOWN:
+  	if (event_is_up(event) || !SB_VERTICAL(sb))
+  	    break;
+  	scrollbar_scroll(sb, 0, SCROLLBAR_LINE_FORWARD);
+diff -brc xview-3.2p1.4.orig/lib/libxview/win/win_event.h xview-3.2p1.4/lib/libxview/win/win_event.h
+*** xview-3.2p1.4.orig/lib/libxview/win/win_event.h	Tue Jun 29 07:15:38 1993
+--- xview-3.2p1.4/lib/libxview/win/win_event.h	Tue Apr 20 12:46:47 2010
+***************
+*** 259,264 ****
+--- 259,267 ----
+  #define	MS_LEFT		BUT(1)					/* 32563 */
+  #define	MS_MIDDLE	BUT(2)					/* 32564 */
+  #define	MS_RIGHT	BUT(3)					/* 32565 */
++ /* USE_SCROLL_WHEEL */
++ #define	MS_SCROLLUP	BUT(4)					/* 32565 */
++ #define	MS_SCROLLDOWN	BUT(5)					/* 32565 */
+  
+  /*
+   * A firm_event structure is encoded in the byte stream of a device
+diff -brc xview-3.2p1.4.orig/lib/libxview/win/win_input.c xview-3.2p1.4/lib/libxview/win/win_input.c
+*** xview-3.2p1.4.orig/lib/libxview/win/win_input.c	Tue Apr 20 12:43:00 2010
+--- xview-3.2p1.4/lib/libxview/win/win_input.c	Tue Apr 20 12:46:47 2010
+***************
+*** 441,446 ****
+--- 441,447 ----
+      xv_set_no_focus(info, state);
+  }
+  
++ /* USE_SCROLL_WHEEL */
+  #define	SET_SHIFTS(e, state, metamask, altmask)	\
+  	event_set_shiftmask(e, \
+  	    (((state) & ShiftMask) ? SHIFTMASK : 0) | \
+***************
+*** 449,455 ****
+  	    (((state) & altmask) ? ALTMASK : 0) | \
+  	    (((state) & Button1Mask) ? MS_LEFT_MASK : 0) | \
+  	    (((state) & Button2Mask) ? MS_MIDDLE_MASK : 0) | \
+! 	    (((state) & Button3Mask) ? MS_RIGHT_MASK : 0))
+  
+  Xv_private_data Event xv_last_event;
+  Xv_private_data XEvent xv_last_x_event;
+--- 450,458 ----
+  	    (((state) & altmask) ? ALTMASK : 0) | \
+  	    (((state) & Button1Mask) ? MS_LEFT_MASK : 0) | \
+  	    (((state) & Button2Mask) ? MS_MIDDLE_MASK : 0) | \
+! 	    (((state) & Button3Mask) ? MS_RIGHT_MASK : 0) | \
+! 	    (((state) & Button4Mask) ? MS_SCROLLUP_MASK : 0) | \
+! 	    (((state) & Button5Mask) ? MS_SCROLLDOWN_MASK : 0))
+  
+  Xv_private_data Event xv_last_event;
+  Xv_private_data XEvent xv_last_x_event;
+***************
+*** 1229,1234 ****
+--- 1232,1248 ----
+  	    event_set_y(event, e->y);
+  
+  	    switch (e->button) {
++ 	        /* USE_SCROLL_WHEEL */
++ 	      case Button5:
++ 		button = MS_SCROLLDOWN;
++ 		/* action = ACTION_SCROLL_PARAGRAPH_DOWN; */
++ 		action = ACTION_SCROLL_DOWN;
++ 		break;
++ 	      case Button4:
++ 		button = MS_SCROLLUP;
++ 		/* action = ACTION_SCROLL_PARAGRAPH_UP; */
++ 		action = ACTION_SCROLL_UP;
++ 		break;
+  	      case Button3:
+  		button = MS_RIGHT;
+  		action = ACTION_MENU;
+diff -brc xview-3.2p1.4.orig/lib/libxview/win/win_input.h xview-3.2p1.4/lib/libxview/win/win_input.h
+*** xview-3.2p1.4.orig/lib/libxview/win/win_input.h	Mon Apr 28 14:45:39 1997
+--- xview-3.2p1.4/lib/libxview/win/win_input.h	Tue Apr 20 12:46:47 2010
+***************
+*** 414,420 ****
+  #define	MS_LEFT_MASK	0x0080
+  #define	MS_MIDDLE_MASK	0x0100
+  #define	MS_RIGHT_MASK	0x0200
+! #define	MS_BUTTON_MASK	(MS_LEFT_MASK | MS_MIDDLE_MASK | MS_RIGHT_MASK)
+  #define ALTMASK		0x0400
+  
+  
+--- 414,424 ----
+  #define	MS_LEFT_MASK	0x0080
+  #define	MS_MIDDLE_MASK	0x0100
+  #define	MS_RIGHT_MASK	0x0200
+! /* USE_SCROLL_WHEEL */
+! /* button 4 and mouse button 5 (scroll wheel up and scroll wheel down), */
+! #define	MS_SCROLLUP_MASK	0x0400
+! #define	MS_SCROLLDOWN_MASK	0x0800
+! #define	MS_BUTTON_MASK	(MS_LEFT_MASK | MS_MIDDLE_MASK | MS_RIGHT_MASK | MS_SCROLLUP_MASK | MS_SCROLLDOWN_MASK)
+  #define ALTMASK		0x0400
+  
+  
+***************
+*** 460,465 ****
+--- 464,472 ----
+  #define	event_middle_is_down(event)	(event_shiftmask(event)&MS_MIDDLE_MASK)
+  #define	event_right_is_down(event)	(event_shiftmask(event)&MS_RIGHT_MASK)
+  #define	event_button_is_down(event)	(event_shiftmask(event)&MS_BUTTON_MASK)
++ /* USE_SCROLL_WHEEL */
++ #define	event_is_scrollup(event)	(event_shiftmask(event)&MS_SCROLLUP_MASK)
++ #define	event_is_scrolldown(event)	(event_shiftmask(event)&MS_SCROLLDOWN_MASK)
+  #define event_is_string(event)          (event_string(event)!=NULL)
+  /*
+   * BUG: The following three macros should change when we have remappable
+***************
+*** 468,473 ****
+--- 475,483 ----
+  #define action_select_is_down(event) 	event_left_is_down(event)
+  #define action_adjust_is_down(event) 	event_middle_is_down(event)
+  #define action_menu_is_down(event)   	event_right_is_down(event)
++ /* USE_SCROLL_WHEEL */
++ #define action_scrollup(event)          event_is_scrollup(event)
++ #define action_scrolldown(event)        event_is_scrolldown(event)
+  
+  #define	event_set_action(event, code)	(event)->action = (code)
+  

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=XSession
+Exec=/usr/openwin/bin/openwin
+TryExec=/usr/openwin/bin/openwin
+Name=OpenWindows
+Comment=The OpenWindows Desktop

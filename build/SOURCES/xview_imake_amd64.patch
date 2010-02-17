@@ -1,0 +1,20 @@
+diff -rc xview-3.2p1.4.orig/config/XView.cf xview-3.2p1.4/config/XView.cf
+*** xview-3.2p1.4.orig/config/XView.cf	Thu Jan  3 11:06:00 2013
+--- xview-3.2p1.4/config/XView.cf	Thu Jan  3 11:17:57 2013
+***************
+*** 54,60 ****
+  #undef __linux__
+  #define __linux__ 1
+  #endif
+! #if defined(i386Architecture) || defined(i386)
+  #undef __i386
+  #define __i386 1
+  #endif
+--- 54,60 ----
+  #undef __linux__
+  #define __linux__ 1
+  #endif
+! #if defined(i386Architecture) || defined(i386) || defined(AMD64Architecture)
+  #undef __i386
+  #define __i386 1
+  #endif
