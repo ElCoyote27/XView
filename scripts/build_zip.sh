@@ -15,5 +15,5 @@ ZIP_NAME="${HOME}/OpenWindows-${CUR_VERSION}-${CUR_DATE}.zip"
 echo "Building ${ZIP_NAME} from ${BASE_DIR}/${SRC_DIR}.."
 cd ${BASE_DIR}
 #zip -9qr ${ZIP_NAME} ${SRC_DIR} -x */i386-Linux/*
-zip -9qr ${ZIP_NAME} ${SRC_DIR}
+zip -9r ${ZIP_NAME} ${SRC_DIR} -x *.o
 
