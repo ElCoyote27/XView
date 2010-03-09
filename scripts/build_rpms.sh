@@ -4,7 +4,7 @@ TMP_DIR=$(cd `dirname $0`;pwd)
 SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
 SPEC_FILE=${BASE_DIR}/${SRC_DIR}/OpenWindows.spec
-RPM_BASE_DIR=${BASE_DIR}/rpms
+RPM_BASE_DIR=${BASE_DIR}/build
 
 # Get version from library
 if [ -f ${BASE_DIR}/libdeskset/ds_relname.h ]; then
