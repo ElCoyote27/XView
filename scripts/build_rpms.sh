@@ -33,17 +33,23 @@ if [ ! -f ${TMP_REL} ]; then
 	echo "Missing zip file: ${TMP_REL}!" ; exit 1
 fi
 BASE_RELEASE=`basename $TMP_REL .zip|sed -e "s/OpenWindows-${CUR_VERSION}-//"`
-# In case we missed it:
+
+# In case we missed them:
 grep -q "^Version: ${CUR_VERSION}\$" ${SPEC_FILE}
 if [ $? -eq 1 ]; then
 	echo "Versions mismatch! Editing ${SPEC_FILE}..."
 	perl -pi -e "s@^Version: .*\$@Version: ${CUR_VERSION}@" ${SPEC_FILE}
 fi
 
+grep -q "^%define BaseRelease ${BASE_RELEASE}\$" ${SPEC_FILE}
+if [ $? -eq 1 ]; then
+	echo "Versions mismatch! Editing ${SPEC_FILE}..."
+	perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${BASE_RELEASE}@" ${SPEC_FILE}
+fi
+
 # perform build with hard-coded dist define...
 /usr/bin/rpmbuild -ba \
 	--define "dist .el5" \
-	--define "BaseRelease ${BASE_RELEASE}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
 	${SPEC_FILE}
