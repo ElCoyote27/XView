@@ -22,7 +22,7 @@ done
 # perform build with hard-coded dist define...
 /usr/bin/rpmbuild -ba \
 	--define "dist .el5" \
-	--define "%_topdir ${RPM_BASE_DIR}" \
-	--define "%_tmppath ${RPM_BASE_DIR}/tmp" \
+	--define "_topdir ${RPM_BASE_DIR}" \
+	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
 	${SPEC_FILE}
 
