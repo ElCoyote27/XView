@@ -11,9 +11,13 @@ else
 	CUR_VERSION="ALPHA"
 fi
 
-ZIP_NAME="${BASE_DIR}/${SRC_DIR}/build/SOURCES/OpenWindows-${CUR_VERSION}-${CUR_DATE}.zip"
+ZIP_NAME="${BASE_DIR}/${SRC_DIR}/build/SOURCES/OWacomp-${CUR_VERSION}-${CUR_DATE}.zip"
 
 echo "Building ${ZIP_NAME} from ${BASE_DIR}/${SRC_DIR}.."
+OUT_DIR=`dirname ${ZIP_NAME}`
+if [ ! -d ${OUT_DIR} ]; then
+	mkdir -p ${OUT_DIR}
+fi
 cd ${BASE_DIR}
 # zip -9qr ${ZIP_NAME} ${SRC_DIR} -x */i386-Linux/* -x */sparc-SunOS/*
 zip -9qr ${ZIP_NAME} ${SRC_DIR} -x '*.o' -x 'core' -x "${SRC_DIR}/build/*"

@@ -3,7 +3,7 @@ CUR_DATE=`date '+%Y%m%d'`
 TMP_DIR=$(cd `dirname $0`;pwd)
 SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
-SPEC_FILE=${BASE_DIR}/${SRC_DIR}/OpenWindows.spec
+SPEC_FILE=${BASE_DIR}/${SRC_DIR}/OWacomp.spec
 RPM_BASE_DIR=${BASE_DIR}/build
 
 # Get version from library
@@ -27,27 +27,26 @@ do
 done
 
 #
-TMP_REL=`echo ${RPM_BASE_DIR}/SOURCES/OpenWindows-${CUR_VERSION}-*.zip|xargs -n1|tail -1`
+TMP_REL=`echo ${RPM_BASE_DIR}/SOURCES/OWacomp-${CUR_VERSION}-*.zip|xargs -n1|tail -1`
 # Sanity check
 if [ ! -f ${TMP_REL} ]; then
 	echo "Missing zip file: ${TMP_REL}!" ; exit 1
 fi
-BASE_RELEASE=`basename $TMP_REL .zip|sed -e "s/OpenWindows-${CUR_VERSION}-//"`
+BASE_RELEASE=`basename $TMP_REL .zip|sed -e "s/OWacomp-${CUR_VERSION}-//"`
 
 # In case we missed them:
 grep -q "^Version: ${CUR_VERSION}\$" ${SPEC_FILE}
 if [ $? -eq 1 ]; then
-	echo "Versions mismatch! Editing ${SPEC_FILE}..."
+	echo "Version mismatch! Editing ${SPEC_FILE} with \"Version: ${CUR_VERSION}\"..."
 	perl -pi -e "s@^Version: .*\$@Version: ${CUR_VERSION}@" ${SPEC_FILE}
 fi
 
 grep -q "^%define BaseRelease ${BASE_RELEASE}\$" ${SPEC_FILE}
 if [ $? -eq 1 ]; then
-	echo "Versions mismatch! Editing ${SPEC_FILE}..."
+	echo "BaseRelease mismatch! Editing ${SPEC_FILE} with \"BaseRelease: ${BASE_RELEASE}\"..."
 	perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${BASE_RELEASE}@" ${SPEC_FILE}
 fi
 
-# perform build with hard-coded dist define...
 /usr/bin/rpmbuild -ba \
 	--define "dist .el5" \
 	--define "_topdir ${RPM_BASE_DIR}" \
