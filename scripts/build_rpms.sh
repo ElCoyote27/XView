@@ -5,6 +5,7 @@ SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
 SPEC_FILE=${BASE_DIR}/${SRC_DIR}/OWacomp.spec
 RPM_BASE_DIR=${BASE_DIR}/build
+rpmextras=""
 
 # Get version from library
 if [ -f ${BASE_DIR}/libdeskset/ds_relname.h ]; then
@@ -47,7 +48,22 @@ if [ $? -eq 1 ]; then
 	perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${BASE_RELEASE}@" ${SPEC_FILE}
 fi
 
+# Checks for libhal
+if [ -x /usr/bin/pkg-config ]; then
+	/usr/bin/pkg-config  --silence-errors hal
+	libhal=$?
+	/usr/bin/pkg-config  --silence-errors dbus-glib-1
+	dbus=$?
+	if [ $dbus -eq 0 -a $libhal -eq 0 ]; then
+		echo 'Using hal and dbus/dbus-glibc-1 for xvfilemgr..'
+		rpmextras="--with libhal"
+	else
+		echo 'Unable to use hal and/or dbus-glibc-1'
+	fi
+fi
+
 /usr/bin/rpmbuild -ba \
+	${rpmextras} \
 	--define "dist .el5" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
