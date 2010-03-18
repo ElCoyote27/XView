@@ -65,7 +65,6 @@ fi
 /usr/bin/rpmbuild -ba \
 	${rpmextras} \
 	--define "dist .el5" \
-	--target=i386 \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
 	${SPEC_FILE}
