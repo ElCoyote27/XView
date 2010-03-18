@@ -58,13 +58,14 @@ if [ -x /usr/bin/pkg-config ]; then
 		echo 'Using hal and dbus/dbus-glibc-1 for xvfilemgr..'
 		rpmextras="--with libhal"
 	else
-		echo 'Unable to use hal and/or dbus-glibc-1'
+		echo 'Unable to use hal and/or dbus-glibc-1 for xvfilemgr, Skipping...'
 	fi
 fi
 
 /usr/bin/rpmbuild -ba \
 	${rpmextras} \
 	--define "dist .el5" \
+	--target=i386 \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
 	${SPEC_FILE}
