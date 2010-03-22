@@ -18,7 +18,16 @@ OUT_DIR=`dirname ${ZIP_NAME}`
 if [ ! -d ${OUT_DIR} ]; then
 	mkdir -p ${OUT_DIR}
 fi
-cd ${BASE_DIR}
-# zip -9qr ${ZIP_NAME} ${SRC_DIR} -x */i386-Linux/* -x */sparc-SunOS/*
-zip -9qr ${ZIP_NAME} ${SRC_DIR} -x '*.o' -x 'core' -x "${SRC_DIR}/build/*"
+
+if [ -x /usr/bin/rcsclean ]; then
+	/usr/bin/rcsclean ${BASE_DIR}/${SRC_DIR}/{ce,devguide/libguide,devguide/libguidexv,filemgr,libdeskset,mailtool}/*.{c,h,sh} \
+	${BASE_DIR}/${SRC_DIR}/{ce,devguide/libguide,devguide/libguidexv,filemgr,libdeskset,mailtool}/Makefile \
+	${BASE_DIR}/${SRC_DIR}/Makefile.include
+fi
+
+if [ -x /usr/bin/zip ]; then
+	cd ${BASE_DIR}
+	# /usr/bin/zip -9qr ${ZIP_NAME} ${SRC_DIR} -x */i386-Linux/* -x */sparc-SunOS/*
+	/usr/bin/zip -9qr ${ZIP_NAME} ${SRC_DIR} -x '*.o' -x 'core' -x "${SRC_DIR}/build/*"
+fi
 
