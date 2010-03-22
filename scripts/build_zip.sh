@@ -20,7 +20,7 @@ if [ ! -d ${OUT_DIR} ]; then
 fi
 
 if [ -x /usr/bin/rcsclean ]; then
-	/usr/bin/rcsclean ${BASE_DIR}/${SRC_DIR}/{ce,devguide/libguide,devguide/libguidexv,filemgr,libdeskset,mailtool}/*.{c,h,sh} \
+	/usr/bin/rcsclean -n ${BASE_DIR}/${SRC_DIR}/{ce,devguide/libguide,devguide/libguidexv,filemgr,libdeskset,mailtool}/*.{c,h,sh} \
 	${BASE_DIR}/${SRC_DIR}/{ce,devguide/libguide,devguide/libguidexv,filemgr,libdeskset,mailtool}/Makefile \
 	${BASE_DIR}/${SRC_DIR}/Makefile.include
 fi
