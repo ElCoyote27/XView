@@ -173,8 +173,8 @@ programming are included in this package.
 Also includes documents on the XView API (Application Programming Interface).
 
 %prep
-%setup -q -D -T -a 1 -c -n olvwm-4.5
-%setup -q -D -T -a 2 -c -n xtoolplaces-1.7.1-1
+%setup -q -T -a 1 -c -n olvwm-4.5
+%setup -q -T -a 2 -c -n xtoolplaces-1.7.1-1
 %setup -q -T -b 0 -n %{name}-%{version}
 # perl -pi -e 's@/usr/bin/X11/imake@/usr/bin/imake@g' $RPM_BUILD_DIR/%{name}-%{version}/imake
 mv $RPM_BUILD_DIR/olvwm-4.5 $RPM_BUILD_DIR/%{name}-%{version}/clients/olvwm-4.5
