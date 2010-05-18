@@ -3,16 +3,9 @@ CUR_DATE=`date '+%Y%m%d'`
 TMP_DIR=$(cd `dirname $0`;pwd)
 SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
-SPEC_FILE=${BASE_DIR}/${SRC_DIR}/OWacomp.spec
+SPEC_FILE=${BASE_DIR}/${SRC_DIR}/XView.spec
 RPM_BASE_DIR=${BASE_DIR}/build
 rpmextras=""
-
-# Get version from library
-if [ -f ${BASE_DIR}/libdeskset/ds_relname.h ]; then
-        CUR_VERSION=`awk '{if ($2 ~ /_RELEASE/ ) print $3}' ${BASE_DIR}/libdeskset/ds_relname.h|sed -e 's/"//g' -e 's/v//'`
-else
-        echo "Unable to find version in ${BASE_DIR}/libdeskset/ds_relname.h!" ; exit 1
-fi
 
 # Find spec file...
 if [ ! -f ${SPEC_FILE} ]; then
@@ -28,39 +21,25 @@ do
 done
 
 #
-TMP_REL=`echo ${RPM_BASE_DIR}/SOURCES/OWacomp-${CUR_VERSION}-*.zip|xargs -n1|tail -1`
-# Sanity check
-if [ ! -f ${TMP_REL} ]; then
-	echo "Missing zip file: ${TMP_REL}!" ; exit 1
-fi
-BASE_RELEASE=`basename $TMP_REL .zip|sed -e "s/OWacomp-${CUR_VERSION}-//"`
-
-# In case we missed them:
-grep -q "^Version: ${CUR_VERSION}\$" ${SPEC_FILE}
-if [ $? -eq 1 ]; then
-	echo "Version mismatch! Editing ${SPEC_FILE} with \"Version: ${CUR_VERSION}\"..."
-	perl -pi -e "s@^Version: .*\$@Version: ${CUR_VERSION}@" ${SPEC_FILE}
-fi
-
-grep -q "^%define BaseRelease ${BASE_RELEASE}\$" ${SPEC_FILE}
-if [ $? -eq 1 ]; then
-	echo "BaseRelease mismatch! Editing ${SPEC_FILE} with \"BaseRelease: ${BASE_RELEASE}\"..."
-	perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${BASE_RELEASE}@" ${SPEC_FILE}
-fi
+#grep -q "^%define BaseRelease ${BASE_RELEASE}\$" ${SPEC_FILE}
+#if [ $? -eq 1 ]; then
+#	echo "BaseRelease mismatch! Editing ${SPEC_FILE} with \"BaseRelease: ${BASE_RELEASE}\"..."
+#	perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${BASE_RELEASE}@" ${SPEC_FILE}
+#fi
 
 # Checks for libhal
-if [ -x /usr/bin/pkg-config ]; then
-	/usr/bin/pkg-config  --silence-errors hal
-	libhal=$?
-	/usr/bin/pkg-config  --silence-errors dbus-glib-1
-	dbus=$?
-	if [ $dbus -eq 0 -a $libhal -eq 0 ]; then
-		echo 'Using hal and dbus/dbus-glibc-1 for xvfilemgr..'
-		rpmextras="--with libhal"
-	else
-		echo 'Unable to use hal and/or dbus-glibc-1 for xvfilemgr, Skipping...'
-	fi
-fi
+#if [ -x /usr/bin/pkg-config ]; then
+#	/usr/bin/pkg-config  --silence-errors hal
+#	libhal=$?
+#	/usr/bin/pkg-config  --silence-errors dbus-glib-1
+#	dbus=$?
+#	if [ $dbus -eq 0 -a $libhal -eq 0 ]; then
+#		echo 'Using hal and dbus/dbus-glibc-1 for xvfilemgr..'
+#		rpmextras="--with libhal"
+#	else
+#		echo 'Unable to use hal and/or dbus-glibc-1 for xvfilemgr, Skipping...'
+#	fi
+#fi
 
 /usr/bin/rpmbuild -ba \
 	${rpmextras} \

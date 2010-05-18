@@ -1,11 +1,10 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.19%{?dist}
+Release: 24.16%{dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
-Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
-Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4p5.src.tar.gz
+Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4.src.tar.gz
 Source2: xtoolplaces-1.7.1-1.tar.gz
 Source3: Xinitrc.ol
 Source4: openwin
@@ -23,7 +22,6 @@ Source15: openwin-menu-screensave
 Source16: openwin-menu-t
 Source17: openwin-menu-u
 Source18: openwin-menu-xlock
-Source28: openwin-menu-OWacomp-stub
 Source19: openwin.sh
 Source20: openwin.csh
 Source21: OpenWin
@@ -31,93 +29,34 @@ Source22: toolwait
 Source23: owplaces
 Source24: Xmodmap.ol
 Source25: OpenWindows.desktop
-Source26: OWdefaults
-Source67: VirtualDesktop
 Source50: audio.xpm
 Source51: mozicon16.xpm
 Source52: xv.xpm
-Source54: openwin-i386.conf
-Source55: openwin-x86_64.conf
-Source63: host_ia32.def
-Source64: host_x86_64.def
+Source53: host.def
+Source54: openwin.conf
 Patch0: http://ftp.debian.org/debian/pool/main/x/xview/xview_3.2p1.4-24.diff
 Patch1: olvwm-4.4.patch
 Patch2: xview_xv_error.patch
 Patch3: xview_WM_TRANSIENT.SCC.diff
 Patch4: xview_scroll_mouse.patch
 Patch5: xview_build.patch
-Patch6: xview_glibc28_regexp.patch
-Patch7: xview_3.2p1.4-25_amd64.diff
 License: Distributable
 Group: X11/Libraries
-ExclusiveArch: i386 i686 x86_64
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-%{_arch}-soft
+ExclusiveArch: i386
+BuildRoot: /tmp/%{name}-%{version}-%{release}-soft
+Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 URL: http://freshmeat.net/projects/XView
-BuildRequires: imake
-BuildRequires: libX11-devel, libXext-devel, libXt-devel
-BuildRequires: libXpm-devel
-BuildRequires: bison
-BuildRequires: flex
-%if "%{?dist}" == ".fc17"
-Requires: flex-static
-%endif
-BuildRequires: ncurses-devel
-Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x11-utils, xorg-x11-fonts-100dpi, xorg-x11-fonts-75dpi, xorg-x11-fonts-misc
 %define _enable_debug_packages 1
+%if "%{?dist}" == ".el5"
+Requires: xorg-x11-fonts-misc
+%endif
 
 %changelog
-* Wed Nov  2 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.19.el5
-- Fixes for building under RHEL7.
-
-* Tue Oct 11 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.18.el5
-- Run polkit-1 auth agent if found.
-
-* Mon Oct 03 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.17.el5
-- Made user-side configs be sourced last to take precedence over system-wide.
-
-* Mon Jul 20 2015 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.16.el5
-- Rebuilt with sigs (RHEL5) issue..
-
-* Sun Jan 19 2014 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.15.el5
-
-* Sat Jan 18 2014 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.14.el5
-- Some more minor fixes to openwin startup script (DISPLAY as :X isn't as good as :X.Z ).
-
-* Thu May 23 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.12.el5
-- Some minor fixes to openwin env scripts.
-
-* Tue Jan  8 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.11.el5
-- Initial attempt at building both 32bit and 64bit packages.
-
-* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.10.el5
-- Add xmkmf templates to /usr/share/X11/config
-
-* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.9.el5
-- Minor changes.
-
-* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.8.el5
-- Added back ssh-agent, if present, to Xinitrc.
-
-* Wed Aug  4 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.7.el5
-- Revamped openwin-menu-programs again, added openwin-menu-OWacomp-stub as a stub.
-
-* Mon Jun 21 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.6.el5
-- Revamped openwin-menu-programs, added back missing background file for olvwm.
-
-* Mon May 31 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.5.el5
-- move diffs from 3.2p1.4-24 to 3.2p1.4-25 to xview_glibc28_regexp.patch.
-- attempt to improve scroll mouse support patch.
-
-* Tue May 18 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-24.17.el5
-- rebuilt olvwm4 tarball (fixes corrupted archive).
-- Modified openwin-menus and added some OWacomp entries.
-- Append to MANPATH, if present in the users env.
-
-* Wed Mar 10 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-24.15.el5
+* Wed Mar 10 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 - Patch for _WM_TRANSIENT, thanks to Eskandar Ensafi.
 - Added .el5 dependency for xorg-x11-fonts-misc (olcursor font)
 
-* Wed Dec 30 2009 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-24.11.el5
+* Wed Dec 30 2009 Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 - use ssh-agent, if present.
 
 * Mon Oct 19 2009 Vincent S. Cojot <openlook@NOSPAM.cojot.name>
@@ -234,10 +173,10 @@ programming are included in this package.
 Also includes documents on the XView API (Application Programming Interface).
 
 %prep
-%setup -q -T -a 1 -c -n olvwm-4.5
-%setup -q -T -a 2 -c -n xtoolplaces-1.7.1-1
+%setup -q -D -T -a 1 -c -n olvwm-4.5
+%setup -q -D -T -a 2 -c -n xtoolplaces-1.7.1-1
 %setup -q -T -b 0 -n %{name}-%{version}
-# %{__perl} -pi -e 's@/usr/bin/X11/imake@/usr/bin/imake@g' $RPM_BUILD_DIR/%{name}-%{version}/imake
+# perl -pi -e 's@/usr/bin/X11/imake@/usr/bin/imake@g' $RPM_BUILD_DIR/%{name}-%{version}/imake
 mv $RPM_BUILD_DIR/olvwm-4.5 $RPM_BUILD_DIR/%{name}-%{version}/clients/olvwm-4.5
 mv $RPM_BUILD_DIR/xtoolplaces-1.7.1-1 $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1
 %patch0 -p1 -b .orig
@@ -246,76 +185,60 @@ mv $RPM_BUILD_DIR/xtoolplaces-1.7.1-1 $RPM_BUILD_DIR/%{name}-%{version}/clients/
 %patch3 -p1 -b .orig
 %patch4 -p1 -b .orig
 %patch5 -p1 -b .orig
-# %patch6 -p1 -b .orig
-%patch7 -p1 -b .amd64
-
-%ifarch x86_64
-	%{__install} -m0644 %{SOURCE64} config/host.def
-%else
-	%{__install} -m0644 %{SOURCE63} config/host.def
-%endif
+# -m32 hack on amd64
+if [ "x`uname -p`" = "xx86_64" ]; then
+	%{__install} -m0644 $RPM_SOURCE_DIR/host.def $RPM_BUILD_DIR/%{name}-%{version}/config/host.def
+fi
 echo '  CFCLAGS += -g' >> $RPM_BUILD_DIR/%{name}-%{version}/imake.append
 
 %build
 rm -fr $RPM_BUILD_ROOT
-%{__mkdir} -p $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT
 OPENWINHOME=/usr/openwin bash Build-LinuxXView.bash libs clients olvwm contrib
 cd $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1 && gmake -f Makefile.simple
 
 %install
 DESTDIR=$RPM_BUILD_ROOT bash Build-LinuxXView.bash instlibs instclients instolvwm instcontrib
 
-%{__mkdir} -p $RPM_BUILD_ROOT/etc/profile.d
+mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin.sh $RPM_BUILD_ROOT/etc/profile.d/openwin.sh
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin.csh $RPM_BUILD_ROOT/etc/profile.d/openwin.csh
 
 # RHEL3
-%{__mkdir} -p $RPM_BUILD_ROOT/etc/X11/gdm/Sessions
+mkdir -p $RPM_BUILD_ROOT/etc/X11/gdm/Sessions
 %{__install} -m0555 $RPM_SOURCE_DIR/OpenWin $RPM_BUILD_ROOT/etc/X11/gdm/Sessions/OpenWin
 
 # RHEL4
-%{__mkdir} -p $RPM_BUILD_ROOT/etc/X11/dm/Sessions
+mkdir -p $RPM_BUILD_ROOT/etc/X11/dm/Sessions
 %{__install} -m0555 $RPM_SOURCE_DIR/OpenWindows.desktop $RPM_BUILD_ROOT/etc/X11/dm/Sessions/OpenWindows.desktop
 
 # RHEL5
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/share/xsessions
+mkdir -p $RPM_BUILD_ROOT/usr/share/xsessions
 %{__install} -m0555 $RPM_SOURCE_DIR/OpenWindows.desktop $RPM_BUILD_ROOT/usr/share/xsessions/OpenWindows.desktop
 
-%{__mkdir} -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
-%{__install} -m0644 $RPM_SOURCE_DIR/openwin-i386.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d/openwin-i386.conf
-%ifarch x86_64
-	%{__install} -m0644 $RPM_SOURCE_DIR/openwin-x86_64.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d/openwin-x86_64.conf
-%endif
+mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
+%{__install} -m0644 $RPM_SOURCE_DIR/openwin.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d/openwin.conf
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib
-%ifarch x86_64
-	%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/%{_lib}
-	mv -iv $RPM_BUILD_ROOT/usr/openwin/lib/lib{xview,olgx}.so* $RPM_BUILD_ROOT/usr/openwin/%{_lib}
-	mv -iv $RPM_BUILD_ROOT/usr/openwin/lib/lib{xview,olgx}.a $RPM_BUILD_ROOT/usr/openwin/%{_lib}
-%endif
-
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/lib
+mkdir -p $RPM_BUILD_ROOT/usr/lib
 ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_menu
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/X11R6/bin
+mkdir -p $RPM_BUILD_ROOT/usr/X11R6/bin
 %{__install} -m0555 $RPM_SOURCE_DIR/startx.openwin $RPM_BUILD_ROOT/usr/X11R6/bin
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/share/include/images
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/share/include/images
 %{__install} -m0444 $RPM_SOURCE_DIR/xv.xpm $RPM_BUILD_ROOT/usr/openwin/share/include/images/xv.xpm
 %{__install} -m0444 $RPM_SOURCE_DIR/audio.xpm $RPM_BUILD_ROOT/usr/openwin/share/include/images/audio.xpm
 %{__install} -m0444 $RPM_SOURCE_DIR/mozicon16.xpm $RPM_BUILD_ROOT/usr/openwin/share/include/images/mozicon16.xpm
-%{__install} -m0444 $RPM_SOURCE_DIR/VirtualDesktop $RPM_BUILD_ROOT/usr/openwin/share/include/images/VirtualDesktop
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/bin
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/bin
 %{__install} -m0555 $RPM_SOURCE_DIR/toolwait $RPM_BUILD_ROOT/usr/openwin/bin/toolwait
 %{__install} -m0555 $RPM_SOURCE_DIR/owplaces $RPM_BUILD_ROOT/usr/openwin/bin/owplaces
-%{__install} -m0755 $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1/xtoolplaces $RPM_BUILD_ROOT/usr/openwin/bin/xtoolplaces
+%{__install} -m0555 $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1/xtoolplaces $RPM_BUILD_ROOT/usr/openwin/bin/xtoolplaces
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin $RPM_BUILD_ROOT/usr/openwin/bin/openwin
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/lib
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-programs $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-programs
-%{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-OWacomp-stub $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-OWacomp-stub
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-clocks $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-clocks
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-d $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-d
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-e $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-e
@@ -326,7 +249,7 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-u $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-u
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-xlock $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-xlock
 
-# %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib/config
+# mkdir -p $RPM_BUILD_ROOT/usr/openwin/lib/config
 # %{__install} -m0444 config/XView.cf $RPM_BUILD_ROOT/usr/openwin/lib/config/XView.cf
 # %{__install} -m0444 config/XView.lib $RPM_BUILD_ROOT/usr/openwin/lib/config/XView.lib
 # %{__install} -m0444 config/XView.obj $RPM_BUILD_ROOT/usr/openwin/lib/config/XView.obj
@@ -334,22 +257,13 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 # %{__install} -m0444 config/XView.rules $RPM_BUILD_ROOT/usr/openwin/lib/config/XView.rules
 # %{__install} -m0444 config/XView.tmpl $RPM_BUILD_ROOT/usr/openwin/lib/config/XView.tmpl
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/share/X11/config
-%{__install} -m0444 config/XView.cf $RPM_BUILD_ROOT/usr/share/X11/config/XView.cf
-%{__install} -m0444 config/XView.lib $RPM_BUILD_ROOT/usr/share/X11/config/XView.lib
-%{__install} -m0444 config/XView.obj $RPM_BUILD_ROOT/usr/share/X11/config/XView.obj
-%{__install} -m0444 config/XView.prog $RPM_BUILD_ROOT/usr/share/X11/config/XView.prog
-%{__install} -m0444 config/XView.rules $RPM_BUILD_ROOT/usr/share/X11/config/XView.rules
-%{__install} -m0444 config/XView.tmpl $RPM_BUILD_ROOT/usr/share/X11/config/XView.tmpl
-
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib/app-defaults
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/lib/app-defaults
 %{__install} -m0555 $RPM_SOURCE_DIR/Xinitrc.ol $RPM_BUILD_ROOT/usr/openwin/lib/Xinitrc
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin-init $RPM_BUILD_ROOT/usr/openwin/lib/openwin-init
-### %{__install} -m0444 $RPM_SOURCE_DIR/openwin.Xdefaults $RPM_BUILD_ROOT/usr/openwin/lib/Xdefaults
-%{__install} -m0444 $RPM_SOURCE_DIR/OWdefaults $RPM_BUILD_ROOT/usr/openwin/lib/Xdefaults
+%{__install} -m0444 $RPM_SOURCE_DIR/openwin.Xdefaults $RPM_BUILD_ROOT/usr/openwin/lib/Xdefaults
 %{__install} -m0444 $RPM_SOURCE_DIR/Xmodmap.ol $RPM_BUILD_ROOT/usr/openwin/lib/Xmodmap
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/share/locale/C/props
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/share/locale/C/props
 %{__install} -m0444 contrib/misc/props-locale.C $RPM_BUILD_ROOT/usr/openwin/share/locale/C/props/C
 %{__install} -m0444 contrib/misc/props-locale.basic_setting $RPM_BUILD_ROOT/usr/openwin/share/locale/C/props/basic_setting
 
@@ -360,13 +274,12 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__install} -m0555 contrib/misc/remove_brackets $RPM_BUILD_ROOT/usr/openwin/bin
 %{__install} -m0555 contrib/misc/shift_lines $RPM_BUILD_ROOT/usr/openwin/bin
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/share
-cp -a doc $RPM_BUILD_ROOT/usr/openwin/share && %{__chmod} -R a+Xr,u+w $RPM_BUILD_ROOT/usr/openwin/share/doc
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/share
+cp -a doc $RPM_BUILD_ROOT/usr/openwin/share
 %{__install} -m0444 debian/changelog $RPM_BUILD_ROOT/usr/openwin/share/doc/ChangeLog
 
-%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/share/src/xview && %{__chmod} -R a+Xr,u+w $RPM_BUILD_ROOT/usr/openwin/share/src/xview
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/share/src/xview
 cp -a contrib/examples $RPM_BUILD_ROOT/usr/openwin/share/src/xview
-find $RPM_BUILD_ROOT/usr/openwin/share/src/xview/examples/bin -type f -exec %{__chmod} 0755 {} \;
 find $RPM_BUILD_ROOT/usr/openwin/share/src/xview -name "*.o" -exec rm -fv {} \;
 
 #%{__install} -m0555 clients/olvwm-4.5/olvwm $RPM_BUILD_ROOT/usr/openwin/bin
@@ -378,31 +291,21 @@ find $RPM_BUILD_ROOT/usr/openwin/share/src/xview -name "*.o" -exec rm -fv {} \;
 
 %post
 if [ ! -f /etc/man.config ]; then
-	if [ -f /etc/man.conf ]; then
-		echo "MANPATH /usr/openwin/man" > /etc/man.conf
-		%{__chmod} 644 /etc/man.conf
-	fi
+	echo "MANPATH /usr/openwin/man" > /etc/man.conf
+	chmod 644 /etc/man.conf
 else
-	if ! %{__grep} '^MANPATH /usr/openwin/man' /etc/man.config > /dev/null; then
+	if ! grep '^MANPATH /usr/openwin/man' /etc/man.config > /dev/null; then
 		echo "MANPATH /usr/openwin/man" >> /etc/man.config
 	fi
 fi
 if [ ! -d /etc/ld.so.conf.d ]; then
 	if [ ! -f /etc/ld.so.conf ]; then
 		echo "/usr/openwin/lib" > /etc/ld.so.conf
-		%ifarch x86_64
-			echo "/usr/openwin/lib64" >> /etc/ld.so.conf
-		%endif
-		%{__chmod} 644 /etc/ld.so.conf
+		chmod 600 /etc/ld.so.conf
 	else
-		if ! %{__grep} '^/usr/openwin/lib$' /etc/ld.so.conf > /dev/null; then
+		if ! grep '^/usr/openwin/lib$' /etc/ld.so.conf > /dev/null; then
 			echo "/usr/openwin/lib" >> /etc/ld.so.conf
 		fi
-		%ifarch x86_64
-			if ! %{__grep} '^/usr/openwin/lib64$' /etc/ld.so.conf > /dev/null; then
-				echo "/usr/openwin/lib64" >> /etc/ld.so.conf
-			fi
-		%endif
 	fi
 fi
 
@@ -411,21 +314,15 @@ fi
 %postun
 # Commented out for now
 if [ "1" = "0" ]; then
-	%{__grep} -v /usr/openwin/lib /etc/ld.so.conf > /etc/ld.so.conf.net
+	grep -v /usr/openwin/lib /etc/ld.so.conf > /etc/ld.so.conf.net
 	mv -f /etc/ld.so.conf.net /etc/ld.so.conf
-	%{__grep} -v /usr/openwin/man /etc/man.config > /etc/man.config.net
+	grep -v /usr/openwin/man /etc/man.config > /etc/man.config.net
 	mv -f /etc/man.config.net /etc/man.config
 fi
 
 /sbin/ldconfig
 
 %post clients
-# Install stub for OWacomp menu
-if [ ! -f /usr/openwin/lib/openwin-menu-OWacomp ]; then
-	if [ -f /usr/openwin/lib/openwin-menu-OWacomp-stub ]; then
-		%{__install} -m0444 /usr/openwin/lib/openwin-menu-OWacomp-stub /usr/openwin/lib/openwin-menu-OWacomp
-	fi
-fi
 
 %post devel
 
@@ -441,17 +338,13 @@ rm -fr $RPM_BUILD_ROOT
 %attr(0555,root,root) /usr/share/xsessions/OpenWindows.desktop
 %attr(0755,root,root) /etc/profile.d/openwin.sh
 %attr(0755,root,root) /etc/profile.d/openwin.csh
-%attr(0644,root,root) /etc/ld.so.conf.d/openwin-i386.conf
 %config /usr/openwin/lib/app-defaults
 %dir /usr/openwin/lib
-%ifarch x86_64
-%attr(0644,root,root) /etc/ld.so.conf.d/openwin-x86_64.conf
-%dir /usr/openwin/%{_lib}
-%endif
-%attr(0755,root,root) /usr/openwin/%{_lib}/libolgx.so.*
-%attr(0755,root,root) /usr/openwin/%{_lib}/libxview.so.*
-%attr(0755,root,root) /usr/openwin/%{_lib}/libolgx.so
-%attr(0755,root,root) /usr/openwin/%{_lib}/libxview.so
+%attr(0755,root,root) /usr/openwin/lib/libolgx.so.*
+%attr(0755,root,root) /usr/openwin/lib/libxview.so.*
+%attr(0644,root,root) /etc/ld.so.conf.d/openwin.conf
+/usr/openwin/lib/libolgx.so
+/usr/openwin/lib/libxview.so
 
 %files clients
 %defattr(-,root,root)
@@ -469,7 +362,6 @@ rm -fr $RPM_BUILD_ROOT
 %config /usr/openwin/lib/help
 %config /usr/openwin/lib/openwin-menu
 %config /usr/openwin/lib/openwin-menu-programs
-%config /usr/openwin/lib/openwin-menu-OWacomp-stub
 %config /usr/openwin/lib/openwin-menu-clocks
 %config /usr/openwin/lib/openwin-menu-d
 %config /usr/openwin/lib/openwin-menu-e
@@ -488,7 +380,6 @@ rm -fr $RPM_BUILD_ROOT
 /usr/openwin/share/include/images/xv.xpm
 /usr/openwin/share/include/images/audio.xpm
 /usr/openwin/share/include/images/mozicon16.xpm
-/usr/openwin/share/include/images/VirtualDesktop
 %attr(0755,root,root) /usr/X11R6/bin/startx.openwin
 
 %files devel
@@ -499,12 +390,12 @@ rm -fr $RPM_BUILD_ROOT
 /usr/openwin/include/pixrect/*.h
 /usr/openwin/include/xview/*.h
 /usr/openwin/include/xview_private/*.h
-/usr/openwin/%{_lib}/libolgx.a
-/usr/openwin/%{_lib}/libxview.a
-/usr/share/X11/config/XView.*
+/usr/openwin/lib/libolgx.a
+/usr/openwin/lib/libxview.a
 
 %files devel-examples
 %defattr(-,root,root)
 /usr/openwin/share/doc
+%attr(0755,root,root) /usr/openwin/share/src/xview/examples/bin/*
 /usr/openwin/share/src
 
