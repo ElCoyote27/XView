@@ -278,7 +278,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/openwin/share
 cp -a doc $RPM_BUILD_ROOT/usr/openwin/share
 %{__install} -m0444 debian/changelog $RPM_BUILD_ROOT/usr/openwin/share/doc/ChangeLog
 
-mkdir -p $RPM_BUILD_ROOT/usr/openwin/share/src/xview
+mkdir -p $RPM_BUILD_ROOT/usr/openwin/share/src/xview && chmod -R a+Xr,u+w $RPM_BUILD_ROOT/usr/openwin/share/src/xview
 cp -a contrib/examples $RPM_BUILD_ROOT/usr/openwin/share/src/xview
 find $RPM_BUILD_ROOT/usr/openwin/share/src/xview -name "*.o" -exec rm -fv {} \;
 
