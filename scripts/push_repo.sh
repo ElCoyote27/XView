@@ -1,5 +1,5 @@
 #!/bin/bash
-# Rev: $Id: push_repo.sh,v 1.2 2010/05/18 08:34:14 vcojot Exp $
+# Rev: $Id: push_repo.sh,v 1.3 2010/05/18 08:43:56 vcojot Exp $
 
 # Local variables
 CUR_DATE=`date '+%Y%m%d'`
@@ -9,5 +9,9 @@ BASE_DIR=$(dirname $TMP_DIR)
 RPM_BASE_DIR=${BASE_DIR}/build
 DEST_DIR=thor:Vincent/Code
 
+#
+RSYNC_CMD=rsync
+RSYNC_OPTIONS="-avnz --exclude=XView/build/BUILD"
+
 # Main routine
-rsync -avz --exclude=${RPM_BASE_DIR}/BUILD/\* ${BASE_DIR} ${DEST_DIR}
+${RSYNC_CMD} ${RSYNC_OPTIONS} ${BASE_DIR} ${DEST_DIR}
