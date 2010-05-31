@@ -1,7 +1,7 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 24.17%{dist}
+Release: 25.5%{dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
 Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4p5.src.tar.gz
@@ -40,6 +40,7 @@ Patch2: xview_xv_error.patch
 Patch3: xview_WM_TRANSIENT.SCC.diff
 Patch4: xview_scroll_mouse.patch
 Patch5: xview_build.patch
+Patch6: xview_glibc28_regexp.patch
 License: Distributable
 Group: X11/Libraries
 ExclusiveArch: i386
@@ -52,6 +53,10 @@ Requires: xorg-x11-fonts-misc
 %endif
 
 %changelog
+* Mon May 31 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.5.el5
+- move diffs from 3.2p1.4-24 to 3.2p1.4-25 to xview_glibc28_regexp.patch.
+- attempt to improve scroll mouse support patch.
+
 * Tue May 18 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-24.17.el5
 - rebuilt olvwm4 tarball (fixes corrupted archive).
 - Modified openwin-menus and added some OWacomp entries.
@@ -190,6 +195,7 @@ mv $RPM_BUILD_DIR/xtoolplaces-1.7.1-1 $RPM_BUILD_DIR/%{name}-%{version}/clients/
 %patch3 -p1 -b .orig
 %patch4 -p1 -b .orig
 %patch5 -p1 -b .orig
+# %patch6 -p1 -b .orig
 # -m32 hack on amd64
 if [ "x`uname -p`" = "xx86_64" ]; then
 	%{__install} -m0644 $RPM_SOURCE_DIR/host.def $RPM_BUILD_DIR/%{name}-%{version}/config/host.def
