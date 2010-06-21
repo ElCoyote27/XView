@@ -1,7 +1,7 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.5%{dist}
+Release: 25.6%{dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
 Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4p5.src.tar.gz
@@ -29,6 +29,8 @@ Source22: toolwait
 Source23: owplaces
 Source24: Xmodmap.ol
 Source25: OpenWindows.desktop
+Source26: OWdefaults
+Source67: VirtualDesktop
 Source50: audio.xpm
 Source51: mozicon16.xpm
 Source52: xv.xpm
@@ -53,6 +55,9 @@ Requires: xorg-x11-fonts-misc
 %endif
 
 %changelog
+* Mon Jun 21 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.6.el5
+- Revamped openwin-menu-programs, added back missing background file for olvwm.
+
 * Mon May 31 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.5.el5
 - move diffs from 3.2p1.4-24 to 3.2p1.4-25 to xview_glibc28_regexp.patch.
 - attempt to improve scroll mouse support patch.
@@ -240,6 +245,7 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__install} -m0444 $RPM_SOURCE_DIR/xv.xpm $RPM_BUILD_ROOT/usr/openwin/share/include/images/xv.xpm
 %{__install} -m0444 $RPM_SOURCE_DIR/audio.xpm $RPM_BUILD_ROOT/usr/openwin/share/include/images/audio.xpm
 %{__install} -m0444 $RPM_SOURCE_DIR/mozicon16.xpm $RPM_BUILD_ROOT/usr/openwin/share/include/images/mozicon16.xpm
+%{__install} -m0444 $RPM_SOURCE_DIR/VirtualDesktop $RPM_BUILD_ROOT/usr/openwin/share/include/images/VirtualDesktop
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/bin
 %{__install} -m0555 $RPM_SOURCE_DIR/toolwait $RPM_BUILD_ROOT/usr/openwin/bin/toolwait
@@ -271,7 +277,8 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib/app-defaults
 %{__install} -m0555 $RPM_SOURCE_DIR/Xinitrc.ol $RPM_BUILD_ROOT/usr/openwin/lib/Xinitrc
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin-init $RPM_BUILD_ROOT/usr/openwin/lib/openwin-init
-%{__install} -m0444 $RPM_SOURCE_DIR/openwin.Xdefaults $RPM_BUILD_ROOT/usr/openwin/lib/Xdefaults
+### %{__install} -m0444 $RPM_SOURCE_DIR/openwin.Xdefaults $RPM_BUILD_ROOT/usr/openwin/lib/Xdefaults
+%{__install} -m0444 $RPM_SOURCE_DIR/OWdefaults $RPM_BUILD_ROOT/usr/openwin/lib/Xdefaults
 %{__install} -m0444 $RPM_SOURCE_DIR/Xmodmap.ol $RPM_BUILD_ROOT/usr/openwin/lib/Xmodmap
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/share/locale/C/props
@@ -394,6 +401,7 @@ rm -fr $RPM_BUILD_ROOT
 /usr/openwin/share/include/images/xv.xpm
 /usr/openwin/share/include/images/audio.xpm
 /usr/openwin/share/include/images/mozicon16.xpm
+/usr/openwin/share/include/images/VirtualDesktop
 %attr(0755,root,root) /usr/X11R6/bin/startx.openwin
 
 %files devel
