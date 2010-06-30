@@ -1,7 +1,7 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.6%{dist}
+Release: 25.6%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
 Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4p5.src.tar.gz
