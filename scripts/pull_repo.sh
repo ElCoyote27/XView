@@ -1,5 +1,5 @@
 #!/bin/bash
-# Rev: $Id: pull_repo.sh,v 1.1 2012/05/21 10:30:39 vcojot Exp $
+# Rev: $Id: pull_repo.sh,v 1.2 2012/05/21 10:31:32 vcojot Exp $
 
 # Local variables
 CUR_DATE=`date '+%Y%m%d'`
@@ -11,7 +11,7 @@ SRC_DIR=thor:Vincent/Code/XView
 
 #
 RSYNC_CMD=rsync
-RSYNC_OPTIONS="-auvzn --bwlimit=2048 --stats \
+RSYNC_OPTIONS="-auvz --bwlimit=2048 --stats \
 	--exclude=`basename ${BASE_DIR}`/build/BUILD \
 	--exclude=`basename ${BASE_DIR}`/build/tmp"
 
