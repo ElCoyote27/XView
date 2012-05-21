@@ -1,7 +1,7 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.6%{?dist}
+Release: 25.8%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
 Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4p5.src.tar.gz
@@ -22,6 +22,7 @@ Source15: openwin-menu-screensave
 Source16: openwin-menu-t
 Source17: openwin-menu-u
 Source18: openwin-menu-xlock
+Source55: openwin-menu-OWacomp-stub
 Source19: openwin.sh
 Source20: openwin.csh
 Source21: OpenWin
@@ -55,6 +56,12 @@ Requires: xorg-x11-fonts-misc
 %endif
 
 %changelog
+* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.8.el5
+- Added back ssh-agent, if present, to Xinitrc.
+
+* Wed Aug  4 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.7.el5
+- Revamped openwin-menu-programs again, added openwin-menu-OWacomp-stub as a stub.
+
 * Mon Jun 21 2010 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.6.el5
 - Revamped openwin-menu-programs, added back missing background file for olvwm.
 
@@ -256,6 +263,7 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-programs $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-programs
+%{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-OWacomp-stub $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-OWacomp-stub
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-clocks $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-clocks
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-d $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-d
 %{__install} -m0444 $RPM_SOURCE_DIR/openwin-menu-e $RPM_BUILD_ROOT/usr/openwin/lib/openwin-menu-e
@@ -344,6 +352,12 @@ fi
 /sbin/ldconfig
 
 %post clients
+# Install stub for OWacomp menu
+if [ ! -f /usr/openwin/lib/openwin-menu-OWacomp ]; then
+	if [ -f /usr/openwin/lib/openwin-menu-OWacomp-stub ]; then
+		%{__install} -m0444 /usr/openwin/lib/openwin-menu-OWacomp-stub /usr/openwin/lib/openwin-menu-OWacomp
+	fi
+fi
 
 %post devel
 
@@ -383,6 +397,7 @@ rm -fr $RPM_BUILD_ROOT
 %config /usr/openwin/lib/help
 %config /usr/openwin/lib/openwin-menu
 %config /usr/openwin/lib/openwin-menu-programs
+%config /usr/openwin/lib/openwin-menu-OWacomp-stub
 %config /usr/openwin/lib/openwin-menu-clocks
 %config /usr/openwin/lib/openwin-menu-d
 %config /usr/openwin/lib/openwin-menu-e
