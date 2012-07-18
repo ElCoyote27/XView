@@ -282,6 +282,14 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 # %{__install} -m0444 config/XView.rules $RPM_BUILD_ROOT/usr/openwin/lib/config/XView.rules
 # %{__install} -m0444 config/XView.tmpl $RPM_BUILD_ROOT/usr/openwin/lib/config/XView.tmpl
 
+%{__mkdir} -p $RPM_BUILD_ROOT/usr/share/X11/config
+%{__install} -m0444 config/XView.cf $RPM_BUILD_ROOT/usr/share/X11/config/XView.cf
+%{__install} -m0444 config/XView.lib $RPM_BUILD_ROOT/usr/share/X11/config/XView.lib
+%{__install} -m0444 config/XView.obj $RPM_BUILD_ROOT/usr/share/X11/config/XView.obj
+%{__install} -m0444 config/XView.prog $RPM_BUILD_ROOT/usr/share/X11/config/XView.prog
+%{__install} -m0444 config/XView.rules $RPM_BUILD_ROOT/usr/share/X11/config/XView.rules
+%{__install} -m0444 config/XView.tmpl $RPM_BUILD_ROOT/usr/share/X11/config/XView.tmpl
+
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib/app-defaults
 %{__install} -m0555 $RPM_SOURCE_DIR/Xinitrc.ol $RPM_BUILD_ROOT/usr/openwin/lib/Xinitrc
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin-init $RPM_BUILD_ROOT/usr/openwin/lib/openwin-init
@@ -429,6 +437,7 @@ rm -fr $RPM_BUILD_ROOT
 /usr/openwin/include/xview_private/*.h
 /usr/openwin/lib/libolgx.a
 /usr/openwin/lib/libxview.a
+/usr/share/X11/config/XView.*
 
 %files devel-examples
 %defattr(-,root,root)
