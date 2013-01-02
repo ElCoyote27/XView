@@ -1,5 +1,5 @@
 #!/bin/bash
-# Rev: $Id: pull_repo.sh,v 1.2 2012/05/21 10:31:32 vcojot Exp $
+# Rev: $Id: pull_repo.sh,v 1.3 2013/01/02 14:32:29 raistlin Exp $
 
 # Local variables
 CUR_DATE=`date '+%Y%m%d'`
@@ -7,7 +7,7 @@ TMP_DIR=$(cd `dirname $0`;pwd)
 DEST_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
 RPM_BASE_DIR=${BASE_DIR}/build
-SRC_DIR=thor:Vincent/Code/XView
+SRC_DIR=thor:World/Vincent/Code/XView
 
 #
 RSYNC_CMD=rsync
