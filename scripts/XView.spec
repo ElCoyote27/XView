@@ -1,8 +1,9 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.9%{?dist}
+Release: 25.11%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
+Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
 Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4p5.src.tar.gz
 Source2: xtoolplaces-1.7.1-1.tar.gz
@@ -35,8 +36,10 @@ Source67: VirtualDesktop
 Source50: audio.xpm
 Source51: mozicon16.xpm
 Source52: xv.xpm
-Source53: host.def
-Source54: openwin.conf
+Source54: openwin-i386.conf
+Source55: openwin-x86_64.conf
+Source63: host_ia32.def
+Source64: host_x86_64.def
 Patch0: http://ftp.debian.org/debian/pool/main/x/xview/xview_3.2p1.4-24.diff
 Patch1: olvwm-4.4.patch
 Patch2: xview_xv_error.patch
@@ -46,16 +49,28 @@ Patch5: xview_build.patch
 Patch6: xview_glibc28_regexp.patch
 License: Distributable
 Group: X11/Libraries
-ExclusiveArch: i386
-BuildRoot: /tmp/%{name}-%{version}-%{release}-soft
-Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
+ExclusiveArch: i386 x86_64
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-soft
 URL: http://freshmeat.net/projects/XView
-%define _enable_debug_packages 1
-%if "%{?dist}" == ".el5"
-Requires: xorg-x11-fonts-misc
+BuildRequires: imake
+BuildRequires: libX11-devel, libXext-devel, libXt-devel
+BuildRequires: libXpm-devel
+BuildRequires: bison
+BuildRequires: flex
+%if "%{?dist}" == ".fc17"
+Requires: flex-static
 %endif
+BuildRequires: ncurses-devel
+Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x11-utils, xorg-x11-fonts-100dpi, xorg-x11-fonts-75dpi, xorg-x11-fonts-misc
+%define _enable_debug_packages 1
 
 %changelog
+* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.8.el5
+- Add xmkmf templates to /usr/share/X11/config
+
+* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.9.el5
+- Minor changes.
+
 * Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.8.el5
 - Added back ssh-agent, if present, to Xinitrc.
 
@@ -208,10 +223,12 @@ mv $RPM_BUILD_DIR/xtoolplaces-1.7.1-1 $RPM_BUILD_DIR/%{name}-%{version}/clients/
 %patch4 -p1 -b .orig
 %patch5 -p1 -b .orig
 # %patch6 -p1 -b .orig
-# -m32 hack on amd64
-if [ "x`uname -p`" = "xx86_64" ]; then
-	%{__install} -m0644 $RPM_SOURCE_DIR/host.def $RPM_BUILD_DIR/%{name}-%{version}/config/host.def
-fi
+
+%ifarch x86_64
+	%{__install} -m0644 %{SOURCE64} config/host.def
+%else
+	%{__install} -m0644 %{SOURCE63} config/host.def
+%endif
 echo '  CFCLAGS += -g' >> $RPM_BUILD_DIR/%{name}-%{version}/imake.append
 
 %build
@@ -240,7 +257,16 @@ DESTDIR=$RPM_BUILD_ROOT bash Build-LinuxXView.bash instlibs instclients instolvw
 %{__install} -m0555 $RPM_SOURCE_DIR/OpenWindows.desktop $RPM_BUILD_ROOT/usr/share/xsessions/OpenWindows.desktop
 
 %{__mkdir} -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
-%{__install} -m0644 $RPM_SOURCE_DIR/openwin.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d/openwin.conf
+%{__install} -m0644 $RPM_SOURCE_DIR/openwin-i386.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d/openwin-i386.conf
+%ifarch x86_64
+	%{__install} -m0644 $RPM_SOURCE_DIR/openwin-x86_64.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d/openwin-x86_64.conf
+%endif
+
+%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib
+%ifarch x86_64
+	%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/%{_lib}
+	mv -iv $RPM_BUILD_ROOT/usr/openwin/lib/lib*.so* $RPM_BUILD_ROOT/usr/openwin/%{_lib}
+%endif
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/lib
 ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_menu
@@ -381,13 +407,16 @@ rm -fr $RPM_BUILD_ROOT
 %attr(0555,root,root) /usr/share/xsessions/OpenWindows.desktop
 %attr(0755,root,root) /etc/profile.d/openwin.sh
 %attr(0755,root,root) /etc/profile.d/openwin.csh
+%attr(0644,root,root) /etc/ld.so.conf.d/openwin.conf
 %config /usr/openwin/lib/app-defaults
 %dir /usr/openwin/lib
-%attr(0755,root,root) /usr/openwin/lib/libolgx.so.*
-%attr(0755,root,root) /usr/openwin/lib/libxview.so.*
-%attr(0644,root,root) /etc/ld.so.conf.d/openwin.conf
-/usr/openwin/lib/libolgx.so
-/usr/openwin/lib/libxview.so
+%ifarch x86_64
+%dir /usr/openwin/%{_lib}
+%endif
+%attr(0755,root,root) /usr/openwin/%{_lib}/libolgx.so.*
+%attr(0755,root,root) /usr/openwin/%{_lib}/libxview.so.*
+%attr(0755,root,root) /usr/openwin/%{_lib}/libolgx.so
+%attr(0755,root,root) /usr/openwin/%{_lib}/libxview.so
 
 %files clients
 %defattr(-,root,root)
