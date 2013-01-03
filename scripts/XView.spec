@@ -364,11 +364,19 @@ fi
 if [ ! -d /etc/ld.so.conf.d ]; then
 	if [ ! -f /etc/ld.so.conf ]; then
 		echo "/usr/openwin/lib" > /etc/ld.so.conf
+		%ifarch x86_64
+			echo "/usr/openwin/lib64" >> /etc/ld.so.conf
+		%endif
 		%{__chmod} 644 /etc/ld.so.conf
 	else
 		if ! %{__grep} '^/usr/openwin/lib$' /etc/ld.so.conf > /dev/null; then
 			echo "/usr/openwin/lib" >> /etc/ld.so.conf
 		fi
+		%ifarch x86_64
+			if ! %{__grep} '^/usr/openwin/lib64$' /etc/ld.so.conf > /dev/null; then
+				echo "/usr/openwin/lib64" >> /etc/ld.so.conf
+			fi
+		%endif
 	fi
 fi
 
@@ -407,10 +415,11 @@ rm -fr $RPM_BUILD_ROOT
 %attr(0555,root,root) /usr/share/xsessions/OpenWindows.desktop
 %attr(0755,root,root) /etc/profile.d/openwin.sh
 %attr(0755,root,root) /etc/profile.d/openwin.csh
-%attr(0644,root,root) /etc/ld.so.conf.d/openwin.conf
+%attr(0644,root,root) /etc/ld.so.conf.d/openwin-i386.conf
 %config /usr/openwin/lib/app-defaults
 %dir /usr/openwin/lib
 %ifarch x86_64
+%attr(0644,root,root) /etc/ld.so.conf.d/openwin-x86_64.conf
 %dir /usr/openwin/%{_lib}
 %endif
 %attr(0755,root,root) /usr/openwin/%{_lib}/libolgx.so.*
