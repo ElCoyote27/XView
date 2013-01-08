@@ -13,10 +13,10 @@ if [ ! -f ${SPEC_FILE} ]; then
 fi
 
 # Make sure the base dirs are all there...
-for mydir in ${RPM_BASE_DIR}/SOURCES ${RPM_BASE_DIR}/SRPMS ${RPM_BASE_DIR}/RPMS ${RPM_BASE_DIR}/SPECS ${RPM_BASE_DIR}/BUILD ${RPM_BASE_DIR}/tmp
+for mydir in ${RPM_BASE_DIR}/SOURCES ${RPM_BASE_DIR}/SRPMS ${RPM_BASE_DIR}/RPMS ${RPM_BASE_DIR}/SPECS ${RPM_BASE_DIR}/BUILD ${RPM_BASE_DIR}/tmp ${RPM_BASE_DIR}/BUILD/`uname -i`
 do
 	if [ ! -d ${mydir} ]; then
-		mkdir -p ${mydir} || exit 1
+		mkdir -vp ${mydir} || exit 1
 	fi	
 done
 
@@ -45,6 +45,6 @@ done
 	${rpmextras} \
 	--define "dist .el5" \
 	--define "_topdir ${RPM_BASE_DIR}" \
+	--define "_builddir ${RPM_BASE_DIR}/BUILD/`uname -i`" \
 	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
 	${SPEC_FILE}
-
