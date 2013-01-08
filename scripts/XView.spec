@@ -51,7 +51,7 @@ Patch7: xview_3.2p1.4-25_amd64.diff
 License: Distributable
 Group: X11/Libraries
 ExclusiveArch: i386 x86_64
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-soft
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-%{_arch}-soft
 URL: http://freshmeat.net/projects/XView
 BuildRequires: imake
 BuildRequires: libX11-devel, libXext-devel, libXt-devel
