@@ -66,7 +66,7 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
-* Mon Tue Jan  8 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.11.el5
+* Mon Jan  8 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.11.el5
 - Initial attempt at building both 32bit and 64bit packages.
 
 * Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.10.el5
