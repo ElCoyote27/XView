@@ -47,6 +47,7 @@ Patch3: xview_WM_TRANSIENT.SCC.diff
 Patch4: xview_scroll_mouse.patch
 Patch5: xview_build.patch
 Patch6: xview_glibc28_regexp.patch
+Patch7: xview_3.2p1.4-25_amd64.diff
 License: Distributable
 Group: X11/Libraries
 ExclusiveArch: i386 x86_64
@@ -223,6 +224,7 @@ mv $RPM_BUILD_DIR/xtoolplaces-1.7.1-1 $RPM_BUILD_DIR/%{name}-%{version}/clients/
 %patch4 -p1 -b .orig
 %patch5 -p1 -b .orig
 # %patch6 -p1 -b .orig
+%patch7 -p1 -b .amd64
 
 %ifarch x86_64
 	%{__install} -m0644 %{SOURCE64} config/host.def
@@ -265,7 +267,8 @@ DESTDIR=$RPM_BUILD_ROOT bash Build-LinuxXView.bash instlibs instclients instolvw
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib
 %ifarch x86_64
 	%{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/%{_lib}
-	mv -iv $RPM_BUILD_ROOT/usr/openwin/lib/lib*.so* $RPM_BUILD_ROOT/usr/openwin/%{_lib}
+	mv -iv $RPM_BUILD_ROOT/usr/openwin/lib/lib{xview,olgx}.so* $RPM_BUILD_ROOT/usr/openwin/%{_lib}
+	mv -iv $RPM_BUILD_ROOT/usr/openwin/lib/lib{xview,olgx}.a $RPM_BUILD_ROOT/usr/openwin/%{_lib}
 %endif
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/lib
@@ -473,8 +476,8 @@ rm -fr $RPM_BUILD_ROOT
 /usr/openwin/include/pixrect/*.h
 /usr/openwin/include/xview/*.h
 /usr/openwin/include/xview_private/*.h
-/usr/openwin/lib/libolgx.a
-/usr/openwin/lib/libxview.a
+/usr/openwin/%{_lib}/libolgx.a
+/usr/openwin/%{_lib}/libxview.a
 /usr/share/X11/config/XView.*
 
 %files devel-examples
