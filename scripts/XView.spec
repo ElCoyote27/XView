@@ -66,7 +66,10 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
-* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.8.el5
+* Mon Tue Jan  8 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.11.el5
+- Initial attempt at building both 32bit and 64bit packages.
+
+* Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.10.el5
 - Add xmkmf templates to /usr/share/X11/config
 
 * Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.9.el5
@@ -286,7 +289,7 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/bin
 %{__install} -m0555 $RPM_SOURCE_DIR/toolwait $RPM_BUILD_ROOT/usr/openwin/bin/toolwait
 %{__install} -m0555 $RPM_SOURCE_DIR/owplaces $RPM_BUILD_ROOT/usr/openwin/bin/owplaces
-%{__install} -m0555 $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1/xtoolplaces $RPM_BUILD_ROOT/usr/openwin/bin/xtoolplaces
+%{__install} -m0755 $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1/xtoolplaces $RPM_BUILD_ROOT/usr/openwin/bin/xtoolplaces
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin $RPM_BUILD_ROOT/usr/openwin/bin/openwin
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib
