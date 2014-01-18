@@ -1,7 +1,7 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.11%{?dist}
+Release: 25.14%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
@@ -66,6 +66,12 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sat Jan 18 2014 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.14.el5
+- Some more minor fixes to openwin startup script (DISPLAY as :X isn't as good as :X.Z ).
+
+* Thu May 23 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.12.el5
+- Some minor fixes to openwin env scripts.
+
 * Mon Jan  8 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.11.el5
 - Initial attempt at building both 32bit and 64bit packages.
 
