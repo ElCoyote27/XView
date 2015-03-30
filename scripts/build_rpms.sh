@@ -5,6 +5,8 @@ SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
 SPEC_FILE=${BASE_DIR}/${SRC_DIR}/XView.spec
 RPM_BASE_DIR=${BASE_DIR}/build
+VERSION="$(awk '{ print $7 }' /etc/redhat-release|cut -c1)"
+DIST=".el${VERSION}"
 rpmextras=""
 
 # Find spec file...
@@ -43,7 +45,7 @@ done
 
 /usr/bin/rpmbuild -ba \
 	${rpmextras} \
-	--define "dist .el5" \
+	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BASE_DIR}/BUILD/`uname -i`" \
 	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
