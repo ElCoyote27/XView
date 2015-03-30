@@ -1,7 +1,7 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.14%{?dist}
+Release: 25.15%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
@@ -23,7 +23,7 @@ Source15: openwin-menu-screensave
 Source16: openwin-menu-t
 Source17: openwin-menu-u
 Source18: openwin-menu-xlock
-Source55: openwin-menu-OWacomp-stub
+Source28: openwin-menu-OWacomp-stub
 Source19: openwin.sh
 Source20: openwin.csh
 Source21: OpenWin
@@ -50,7 +50,7 @@ Patch6: xview_glibc28_regexp.patch
 Patch7: xview_3.2p1.4-25_amd64.diff
 License: Distributable
 Group: X11/Libraries
-ExclusiveArch: i386 x86_64
+ExclusiveArch: i386 i686 x86_64
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-%{_arch}-soft
 URL: http://freshmeat.net/projects/XView
 BuildRequires: imake

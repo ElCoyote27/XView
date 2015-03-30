@@ -1,10 +1,13 @@
 #!/bin/bash
-CUR_DATE=`date '+%Y%m%d'`
+CUR_DATE=$(date '+%Y%m%d')
 TMP_DIR=$(cd `dirname $0`;pwd)
 SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
 SPEC_FILE=${BASE_DIR}/${SRC_DIR}/XView.spec
 RPM_BASE_DIR=${BASE_DIR}/build
+RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
+RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
+
 VERSION="$(awk '{ print $7 }' /etc/redhat-release|cut -c1)"
 DIST=".el${VERSION}"
 rpmextras=""
@@ -15,7 +18,7 @@ if [ ! -f ${SPEC_FILE} ]; then
 fi
 
 # Make sure the base dirs are all there...
-for mydir in ${RPM_BASE_DIR}/SOURCES ${RPM_BASE_DIR}/SRPMS ${RPM_BASE_DIR}/RPMS ${RPM_BASE_DIR}/SPECS ${RPM_BASE_DIR}/BUILD ${RPM_BASE_DIR}/tmp ${RPM_BASE_DIR}/BUILD/`uname -i`
+for mydir in ${RPM_BASE_DIR}/SOURCES ${RPM_BASE_DIR}/SRPMS ${RPM_BASE_DIR}/RPMS ${RPM_BASE_DIR}/SPECS ${RPM_BASE_DIR}/BUILD ${RPM_BASE_DIR} ${RPM_BASE_DIR}/BUILD/$(uname -i) ${RPM_BUILD_DIR} ${RPM_TMP_PATH}
 do
 	if [ ! -d ${mydir} ]; then
 		mkdir -vp ${mydir} || exit 1
@@ -47,6 +50,6 @@ done
 	${rpmextras} \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
-	--define "_builddir ${RPM_BASE_DIR}/BUILD/`uname -i`" \
-	--define "_tmppath ${RPM_BASE_DIR}/tmp" \
+	--define "_builddir ${RPM_BUILD_DIR}" \
+	--define "_tmppath ${RPM_TMP_PATH}" \
 	${SPEC_FILE}
