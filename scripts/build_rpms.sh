@@ -47,7 +47,7 @@ done
 #fi
 
 /usr/bin/rpmbuild -ba \
-	${rpmextras} \
+	${rpmextras} --sign \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BUILD_DIR}" \
