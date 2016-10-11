@@ -77,6 +77,12 @@ if [ -x /usr/bin/gnome-volume-manager ]; then
         /usr/bin/gnome-volume-manager &
 fi
 
+# Polkit so users can run Gnome-Related tools
+if [ -x /usr/libexec/polkit-gnome-authentication-agent-1 ]; then
+	/usr/libexec/polkit-gnome-authentication-agent-1 &
+fi
+
+# Window Manager
 if [ ! -z "$WINDOWMANAGER" ]; then
 	xsetroot -def
 	exec $WINDOWMANAGER
