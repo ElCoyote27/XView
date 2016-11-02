@@ -1,7 +1,7 @@
 Summary: XView libraries for X11
 Name: xview
 Version: 3.2p1.4
-Release: 25.18%{?dist}
+Release: 25.19%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
@@ -66,6 +66,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Wed Nov  2 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.19.el5
+- Fixes for building under RHEL7.
+
 * Tue Oct 11 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.18.el5
 - Run polkit-1 auth agent if found.
 
