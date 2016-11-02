@@ -66,7 +66,7 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
-* Mon Oct 11 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.18.el5
+* Tue Oct 11 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.18.el5
 - Run polkit-1 auth agent if found.
 
 * Mon Oct 03 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.17.el5
@@ -83,7 +83,7 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 * Thu May 23 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.12.el5
 - Some minor fixes to openwin env scripts.
 
-* Mon Jan  8 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.11.el5
+* Tue Jan  8 2013 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.11.el5
 - Initial attempt at building both 32bit and 64bit packages.
 
 * Mon May 21 2012 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.10.el5
@@ -358,7 +358,7 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__install} -m0555 contrib/misc/shift_lines $RPM_BUILD_ROOT/usr/openwin/bin
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/share
-cp -a doc $RPM_BUILD_ROOT/usr/openwin/share
+cp -a doc $RPM_BUILD_ROOT/usr/openwin/share && %{__chmod} -R a+Xr,u+w $RPM_BUILD_ROOT/usr/openwin/share/doc
 %{__install} -m0444 debian/changelog $RPM_BUILD_ROOT/usr/openwin/share/doc/ChangeLog
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/share/src/xview && %{__chmod} -R a+Xr,u+w $RPM_BUILD_ROOT/usr/openwin/share/src/xview
