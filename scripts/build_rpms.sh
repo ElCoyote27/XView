@@ -22,7 +22,7 @@ for mydir in ${RPM_BASE_DIR}/SOURCES ${RPM_BASE_DIR}/SRPMS ${RPM_BASE_DIR}/RPMS 
 do
 	if [ ! -d ${mydir} ]; then
 		mkdir -vp ${mydir} || exit 1
-	fi	
+	fi
 done
 
 #
@@ -46,8 +46,15 @@ done
 #	fi
 #fi
 
-/usr/bin/rpmbuild -ba \
+if [ -x /usr/bin/linux32 ]; then
+	BOOTSTRAP=/usr/bin/linux32
+else
+	BOOTSTRAP=
+fi
+
+${BOOTSTRAP} /usr/bin/rpmbuild -ba \
 	${rpmextras} --sign \
+	--target i386 \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BUILD_DIR}" \
