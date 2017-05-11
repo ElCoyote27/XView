@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: rcs2git.sh,v 1.1 2017/05/11 20:17:22 raistlin Exp raistlin $
+# $Id: rcs2git.sh,v 1.1 2017/05/11 20:17:22 raistlin Exp $
 #
 [ "$BASH" ] && function whence
 {
