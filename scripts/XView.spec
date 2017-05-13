@@ -1,12 +1,11 @@
 Summary: XView libraries for X11
 Name: xview
+%define BaseRelease 20170513
 Version: 3.2p1.4
-Release: 25.19%{?dist}
+Release: 25.20%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
-Source0: metalab.unc.edu:/pub/Linux/distributions/debian/main/source/x11/xview_3.2p1.4.orig.tar.gz
-Source1: http://home.nyc.rr.com/twopks/olvwm/olvwm4p5.src.tar.gz
-Source2: xtoolplaces-1.7.1-1.tar.gz
+Source0: XView-%{version}-%{BaseRelease}.zip
 Source3: Xinitrc.ol
 Source4: openwin
 Source5: startx.openwin
@@ -234,33 +233,20 @@ programming are included in this package.
 Also includes documents on the XView API (Application Programming Interface).
 
 %prep
-%setup -q -T -a 1 -c -n olvwm-4.5
-%setup -q -T -a 2 -c -n xtoolplaces-1.7.1-1
-%setup -q -T -b 0 -n %{name}-%{version}
-# %{__perl} -pi -e 's@/usr/bin/X11/imake@/usr/bin/imake@g' $RPM_BUILD_DIR/%{name}-%{version}/imake
-mv $RPM_BUILD_DIR/olvwm-4.5 $RPM_BUILD_DIR/%{name}-%{version}/clients/olvwm-4.5
-mv $RPM_BUILD_DIR/xtoolplaces-1.7.1-1 $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1
-%patch0 -p1 -b .orig
-#%patch1 -p1 -b .orig
-%patch2 -p1 -b .orig
-%patch3 -p1 -b .orig
-%patch4 -p1 -b .orig
-%patch5 -p1 -b .orig
-# %patch6 -p1 -b .orig
-%patch7 -p1 -b .amd64
+%setup -q -T -b 0 -n XView
 
 %ifarch x86_64
 	%{__install} -m0644 %{SOURCE64} config/host.def
 %else
 	%{__install} -m0644 %{SOURCE63} config/host.def
 %endif
-echo '  CFCLAGS += -g' >> $RPM_BUILD_DIR/%{name}-%{version}/imake.append
+echo '  CFCLAGS += -g' >> $RPM_BUILD_DIR/XView/imake.append
 
 %build
 rm -fr $RPM_BUILD_ROOT
 %{__mkdir} -p $RPM_BUILD_ROOT
 OPENWINHOME=/usr/openwin bash Build-LinuxXView.bash libs clients olvwm contrib
-cd $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1 && gmake -f Makefile.simple
+cd $RPM_BUILD_DIR/XView/clients/xtoolplaces-1.7.1-1 && gmake -f Makefile.simple
 
 %install
 DESTDIR=$RPM_BUILD_ROOT bash Build-LinuxXView.bash instlibs instclients instolvwm instcontrib
@@ -309,7 +295,7 @@ ln -sf ../openwin/lib/.text_extras_menu $RPM_BUILD_ROOT/usr/lib/.text_extras_men
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/bin
 %{__install} -m0555 $RPM_SOURCE_DIR/toolwait $RPM_BUILD_ROOT/usr/openwin/bin/toolwait
 %{__install} -m0555 $RPM_SOURCE_DIR/owplaces $RPM_BUILD_ROOT/usr/openwin/bin/owplaces
-%{__install} -m0755 $RPM_BUILD_DIR/%{name}-%{version}/clients/xtoolplaces-1.7.1-1/xtoolplaces $RPM_BUILD_ROOT/usr/openwin/bin/xtoolplaces
+%{__install} -m0755 $RPM_BUILD_DIR/XView/clients/xtoolplaces-1.7.1-1/xtoolplaces $RPM_BUILD_ROOT/usr/openwin/bin/xtoolplaces
 %{__install} -m0555 $RPM_SOURCE_DIR/openwin $RPM_BUILD_ROOT/usr/openwin/bin/openwin
 
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/openwin/lib
