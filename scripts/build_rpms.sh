@@ -28,6 +28,16 @@ do
 	fi
 done
 
+# Only build the source rpm for el6 (as of 201705)
+case ${VERSION} in
+	5|7)
+		rpm_pkgs="-bb"
+		;;
+	6)
+		rpm_pkgs="-ba"
+		;;
+esac
+
 #
 TMP_REL=$(echo ${RPM_BASE_DIR}/SOURCES/XView-${CUR_VERSION}-*.zip|xargs -n1|tail -1)
 # Sanity check
@@ -69,8 +79,8 @@ else
 	BOOTSTRAP=
 fi
 
-${BOOTSTRAP} /usr/bin/rpmbuild -ba \
-	${rpmextras} \
+${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
+	${rpmextras} --sign \
 	--target i386 \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
