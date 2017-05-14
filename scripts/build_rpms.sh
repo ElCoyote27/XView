@@ -81,7 +81,7 @@ fi
 
 ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	${rpmextras} --sign \
-	--target i386 \
+	--target i686 \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BUILD_DIR}" \
