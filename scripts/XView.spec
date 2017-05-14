@@ -233,6 +233,7 @@ programming are included in this package.
 Also includes documents on the XView API (Application Programming Interface).
 
 %prep
+rm -fr $RPM_BUILD_ROOT
 %setup -q -T -b 0 -n XView
 
 %ifarch x86_64
@@ -243,7 +244,6 @@ Also includes documents on the XView API (Application Programming Interface).
 echo '  CFCLAGS += -g' >> $RPM_BUILD_DIR/XView/imake.append
 
 %build
-rm -fr $RPM_BUILD_ROOT
 %{__mkdir} -p $RPM_BUILD_ROOT
 OPENWINHOME=/usr/openwin bash Build-LinuxXView.bash libs clients olvwm contrib
 cd $RPM_BUILD_DIR/XView/clients/xtoolplaces-1.7.1-1 && gmake -f Makefile.simple
