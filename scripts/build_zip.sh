@@ -26,5 +26,5 @@ fi
 
 if [ -x /usr/bin/zip ]; then
 	cd ${BASE_DIR}
-	/usr/bin/zip -9qr ${ZIP_NAME} ${SRC_DIR} -x '*.o' -x 'core' -x "${SRC_DIR}/build/*"
+	/usr/bin/zip -9qr ${ZIP_NAME} ${SRC_DIR} scripts -x '*.o' -x 'core' -x "${SRC_DIR}/build/*"
 fi
