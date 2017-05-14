@@ -233,7 +233,7 @@ programming are included in this package.
 Also includes documents on the XView API (Application Programming Interface).
 
 %prep
-rm -fr $RPM_BUILD_ROOT
+rm -fr $RPM_BUILD_ROOT scripts
 %setup -q -T -b 0 -n XView
 
 %ifarch x86_64
