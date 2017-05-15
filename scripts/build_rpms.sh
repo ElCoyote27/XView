@@ -30,10 +30,10 @@ done
 
 # Only build the source rpm for el6 (as of 201705)
 case ${VERSION} in
-	5|7)
+	5)
 		rpm_pkgs="-bb"
 		;;
-	6)
+	6|7)
 		rpm_pkgs="-ba"
 		;;
 esac
