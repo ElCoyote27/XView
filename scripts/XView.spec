@@ -1,8 +1,8 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20170513
+%define BaseRelease 20170905
 Version: 3.2p1.4
-Release: 25.20%{?dist}
+Release: 25.21%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -65,6 +65,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Mon Sep  5 2017 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.21.el5
+- Blank release, global rebuild.
+
 * Wed Nov  2 2016 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.19.el5
 - Fixes for building under RHEL7.
 
