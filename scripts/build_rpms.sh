@@ -73,8 +73,8 @@ if [ -x /usr/bin/pkg-config ]; then
 	fi
 fi
 
-if [ -x /usr/bin/linux32 ]; then
-	BOOTSTRAP=/usr/bin/linux32
+if [ "x$(uname -p)" = "xx86_64" ]; then
+	BOOTSTRAP="setarch i686"
 else
 	BOOTSTRAP=
 fi
