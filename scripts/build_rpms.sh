@@ -8,7 +8,7 @@ RPM_BASE_DIR=${BASE_DIR}/build
 RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
 RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
 
-VERSION="$(awk '{ print $7 }' /etc/redhat-release|cut -c1)"
+VERSION="$(lsb_release -sr|cut -f1 -d.)"
 DIST=".el${VERSION}"
 rpmextras=""
 
@@ -87,4 +87,16 @@ ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	--define "_builddir ${RPM_BUILD_DIR}" \
 	--define "_tmppath ${RPM_TMP_PATH}" \
 	${SPEC_FILE}
+
+# Do it one for time for RHEL8
+if [[ "${DIST}" = ".el7" ]]; then
+	${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
+		${rpmextras} --sign \
+		--target i686 \
+		--define "dist .el8" \
+		--define "_topdir ${RPM_BASE_DIR}" \
+		--define "_builddir ${RPM_BUILD_DIR}" \
+		--define "_tmppath ${RPM_TMP_PATH}" \
+		${SPEC_FILE}
+fi
 
