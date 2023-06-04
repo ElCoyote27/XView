@@ -33,7 +33,7 @@ case ${VERSION} in
 	5)
 		rpm_pkgs="-bb"
 		;;
-	6|7)
+	6|7|8)
 		rpm_pkgs="-ba"
 		;;
 esac
