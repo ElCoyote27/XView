@@ -7,7 +7,7 @@ TMP_DIR=$(cd `dirname $0`;pwd)
 DEST_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
 RPM_BASE_DIR=${BASE_DIR}/build
-SRC_DIR=thor:World/Vincent/Code/XView
+SRC_DIR=thor:World/Vincent/Code/GIT/XView
 
 #
 RSYNC_CMD=rsync
