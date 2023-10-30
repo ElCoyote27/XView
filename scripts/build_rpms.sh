@@ -86,7 +86,7 @@ fi
 # Build 32bit on el7
 if [[ "${DIST}" = ".el7" ]]; then
 	BOOTSTRAP="setarch i686"
-echo ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
+${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	${rpmextras} --sign \
 	--target i686 \
 	--define "dist ${DIST}" \
@@ -98,8 +98,8 @@ fi
 
 # Build 64bit on el8
 if [[ "${DIST}" = ".el8" ]]; then
-	BOOTSTRAP="setarch x86_64"
-echo ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
+	BOOTSTRAP=
+${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	${rpmextras} --sign \
 	--target x86_64 \
 	--define "dist ${DIST}" \
