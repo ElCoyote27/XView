@@ -14,11 +14,6 @@ rpmextras=""
 # Get version from library
 CUR_VERSION="3.2p1.4"
 
-# Find spec file...
-if [ ! -f ${SPEC_FILE} ]; then
-	echo "Unable to find spec file ${SPEC_FILE}!" ; exit 1
-fi
-
 # Make sure the base dirs are all there...
 for mydir in ${RPM_BASE_DIR}/SOURCES ${RPM_BASE_DIR}/SRPMS ${RPM_BASE_DIR}/RPMS ${RPM_BASE_DIR}/SPECS ${RPM_BASE_DIR}/BUILD ${RPM_BUILD_DIR} ${RPM_TMP_PATH}
 do
@@ -42,6 +37,11 @@ for ARCH_DIR in XView-32 XView-64
 do
 SPEC_FILE=${BASE_DIR}/${SRC_DIR}/${ARCH_DIR}.spec
 TMP_REL=$(echo ${RPM_BASE_DIR}/SOURCES/${ARCH_DIR}-${CUR_VERSION}-*.zip|xargs -n1|tail -1)
+# Find spec file...
+if [ ! -f ${SPEC_FILE} ]; then
+	echo "Unable to find spec file ${SPEC_FILE}!" ; exit 1
+fi
+
 # Sanity check
 if [ ! -f ${TMP_REL} ]; then
 	echo "Missing zip file: ${TMP_REL}!" ; exit 1
@@ -93,7 +93,7 @@ ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BUILD_DIR}" \
 	--define "_tmppath ${RPM_TMP_PATH}" \
-	${SPEC_FILE}
+	${BASE_DIR}/${SRC_DIR}/XView-32.spec
 fi
 
 # Build 64bit on el8
@@ -106,6 +106,6 @@ ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BUILD_DIR}" \
 	--define "_tmppath ${RPM_TMP_PATH}" \
-	${SPEC_FILE}
+	${BASE_DIR}/${SRC_DIR}/XView-64.spec
 fi
 
