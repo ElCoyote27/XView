@@ -3,7 +3,6 @@ CUR_DATE=$(date '+%Y%m%d')
 TMP_DIR=$(cd `dirname $0`;pwd)
 SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
-SPEC_FILE=${BASE_DIR}/${SRC_DIR}/XView.spec
 RPM_BASE_DIR=${BASE_DIR}/build
 RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
 RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
@@ -39,12 +38,15 @@ case ${VERSION} in
 esac
 
 #
-TMP_REL=$(echo ${RPM_BASE_DIR}/SOURCES/XView-${CUR_VERSION}-*.zip|xargs -n1|tail -1)
+for ARCH_DIR in XView-32 XView-64
+do
+SPEC_FILE=${BASE_DIR}/${SRC_DIR}/${ARCH_DIR}.spec
+TMP_REL=$(echo ${RPM_BASE_DIR}/SOURCES/${ARCH_DIR}-${CUR_VERSION}-*.zip|xargs -n1|tail -1)
 # Sanity check
 if [ ! -f ${TMP_REL} ]; then
 	echo "Missing zip file: ${TMP_REL}!" ; exit 1
 fi
-BASE_RELEASE=$(basename $TMP_REL .zip|sed -e "s/XView-${CUR_VERSION}-//")
+BASE_RELEASE=$(basename $TMP_REL .zip|sed -e "s/${ARCH_DIR}-${CUR_VERSION}-//")
 
 # In case we missed them:
 grep -q "^Version: ${CUR_VERSION}\$" ${SPEC_FILE}
@@ -58,6 +60,8 @@ if [ $? -eq 1 ]; then
 	echo "BaseRelease mismatch! Editing ${SPEC_FILE} with \"BaseRelease: ${BASE_RELEASE}\"..."
 	perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${BASE_RELEASE}@" ${SPEC_FILE}
 fi
+
+done
 
 # Checks for libhal
 if [ -x /usr/bin/pkg-config ]; then
@@ -79,7 +83,10 @@ else
 	BOOTSTRAP=
 fi
 
-${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
+# Build 32bit on el7
+if [[ "${DIST}" = ".el7" ]]; then
+	BOOTSTRAP="setarch i686"
+echo ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	${rpmextras} --sign \
 	--target i686 \
 	--define "dist ${DIST}" \
@@ -87,16 +94,18 @@ ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	--define "_builddir ${RPM_BUILD_DIR}" \
 	--define "_tmppath ${RPM_TMP_PATH}" \
 	${SPEC_FILE}
+fi
 
-# Do it one for time for RHEL8
-if [[ "${DIST}" = ".el7" ]]; then
-	${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
-		${rpmextras} --sign \
-		--target i686 \
-		--define "dist .el8" \
-		--define "_topdir ${RPM_BASE_DIR}" \
-		--define "_builddir ${RPM_BUILD_DIR}" \
-		--define "_tmppath ${RPM_TMP_PATH}" \
-		${SPEC_FILE}
+# Build 64bit on el8
+if [[ "${DIST}" = ".el8" ]]; then
+	BOOTSTRAP="setarch x86_64"
+echo ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
+	${rpmextras} --sign \
+	--target x86_64 \
+	--define "dist ${DIST}" \
+	--define "_topdir ${RPM_BASE_DIR}" \
+	--define "_builddir ${RPM_BUILD_DIR}" \
+	--define "_tmppath ${RPM_TMP_PATH}" \
+	${SPEC_FILE}
 fi
 
