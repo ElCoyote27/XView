@@ -7,7 +7,8 @@ CUR_DATE=`date '+%Y%m%d'`
 }
 #
 BASE_DIR="$(cd $(/usr/bin/dirname $(whence -- $0 || echo $0));cd ..;pwd)"
-SRC_DIR="XView"
+for SRC_DIR in XView-32 XView-64
+do
 
 # Get version from library
 if [ -f ${BASE_DIR}/${SRC_DIR}/lib/libxview/base/xview_impl.h ]; then
@@ -16,7 +17,7 @@ else
 	CUR_VERSION="ALPHA"
 fi
 
-ZIP_NAME="${BASE_DIR}/build/SOURCES/XView-${CUR_VERSION}-${CUR_DATE}.zip"
+ZIP_NAME="${BASE_DIR}/build/SOURCES/${SRC_DIR}-${CUR_VERSION}-${CUR_DATE}.zip"
 
 echo "Building ${ZIP_NAME} from ${BASE_DIR}/${SRC_DIR} ..."
 OUT_DIR=$(dirname ${ZIP_NAME})
@@ -28,3 +29,5 @@ if [ -x /usr/bin/zip ]; then
 	cd ${BASE_DIR}
 	/usr/bin/zip -9qr ${ZIP_NAME} ${SRC_DIR} scripts -x '*.o' -x 'core' -x "${SRC_DIR}/build/*"
 fi
+
+done
