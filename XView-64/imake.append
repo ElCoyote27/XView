@@ -1,0 +1,11 @@
+
+# Variable-definitions appended by imake-wrapper
+  XVDESTDIR      = /usr/openwin
+  EXTRA_DEFINES  = -DOPENWINHOME_DEFAULT=\"/usr/openwin\" -D_DEFAULT_SOURCE -DSYSV_UCONTEXT
+  CONFIGDIR      = /usr/openwin/lib/config
+  INCLUDES      := -I/var/tmp/xv/xview-64bit/build/include  -I/usr/openwin/include $(INCLUDES) -I/usr/include/tirpc
+  LOCAL_LDFLAGS := -L/var/tmp/xv/xview-64bit/lib/libolgx -L/var/tmp/xv/xview-64bit/lib/libxview -ltirpc  -L/usr/openwin/lib $(LOCAL_LDFLAGS)
+  MAKEOVERRIDES  =
+  CFLAGS        += -g $(EXTRA_CFLAGS)
+# End of variable-definitions appended by imake-wrapper
+
