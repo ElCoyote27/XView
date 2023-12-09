@@ -30,6 +30,8 @@ screen_layout(root, child, op, d1, d2, d3, d4, d5)
 /* Alpha compatibility, mbuck@debian.org */
 #if defined(__alpha) || defined(__x86_64__) || defined(_XV_API_BROKEN_64BIT) || defined(__amd64__)
     unsigned long *d1, *d2, *d3, *d4, *d5;
+#else
+    long *d1, *d2, *d3, *d4, *d5;
 #endif
 {
     int             top_level = (int) xv_get(child,

@@ -5,7 +5,7 @@ Version: 3.2p1.4
 Release: 25.24%{?dist}
 Distribution: RHAS 3 (Taroon) / RHAS 4 (Nahant) / RHEL 5 (Tikanga)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
-Source0: XView-64-%{version}-%{BaseRelease}.zip
+Source0: XView-%{version}-%{BaseRelease}.zip
 Source3: Xinitrc.ol
 Source4: openwin
 Source5: startx.openwin

@@ -3,16 +3,22 @@ CUR_DATE=$(date '+%Y%m%d')
 TMP_DIR=$(cd `dirname $0`;pwd)
 SRC_DIR=$(basename $TMP_DIR)
 BASE_DIR=$(dirname $TMP_DIR)
+SPEC_FILE=${BASE_DIR}/${SRC_DIR}/XView.spec
 RPM_BASE_DIR=${BASE_DIR}/build
 RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
 RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
 
-VERSION="$(lsb_release -sr|cut -f1 -d.)"
+VERSION="$(awk '{ print $7 }' /etc/redhat-release|cut -c1)"
 DIST=".el${VERSION}"
 rpmextras=""
 
 # Get version from library
 CUR_VERSION="3.2p1.4"
+
+# Find spec file...
+if [ ! -f ${SPEC_FILE} ]; then
+	echo "Unable to find spec file ${SPEC_FILE}!" ; exit 1
+fi
 
 # Make sure the base dirs are all there...
 for mydir in ${RPM_BASE_DIR}/SOURCES ${RPM_BASE_DIR}/SRPMS ${RPM_BASE_DIR}/RPMS ${RPM_BASE_DIR}/SPECS ${RPM_BASE_DIR}/BUILD ${RPM_BUILD_DIR} ${RPM_TMP_PATH}
@@ -24,29 +30,21 @@ done
 
 # Only build the source rpm for el6 (as of 201705)
 case ${VERSION} in
-	5)
+	5|7)
 		rpm_pkgs="-bb"
 		;;
-	6|7|8)
+	6)
 		rpm_pkgs="-ba"
 		;;
 esac
 
 #
-for ARCH_DIR in XView-32 XView-64
-do
-SPEC_FILE=${BASE_DIR}/${SRC_DIR}/${ARCH_DIR}.spec
-TMP_REL=$(echo ${RPM_BASE_DIR}/SOURCES/${ARCH_DIR}-${CUR_VERSION}-*.zip|xargs -n1|tail -1)
-# Find spec file...
-if [ ! -f ${SPEC_FILE} ]; then
-	echo "Unable to find spec file ${SPEC_FILE}!" ; exit 1
-fi
-
+TMP_REL=$(echo ${RPM_BASE_DIR}/SOURCES/XView-${CUR_VERSION}-*.zip|xargs -n1|tail -1)
 # Sanity check
 if [ ! -f ${TMP_REL} ]; then
 	echo "Missing zip file: ${TMP_REL}!" ; exit 1
 fi
-BASE_RELEASE=$(basename $TMP_REL .zip|sed -e "s/${ARCH_DIR}-${CUR_VERSION}-//")
+BASE_RELEASE=$(basename $TMP_REL .zip|sed -e "s/XView-${CUR_VERSION}-//")
 
 # In case we missed them:
 grep -q "^Version: ${CUR_VERSION}\$" ${SPEC_FILE}
@@ -60,8 +58,6 @@ if [ $? -eq 1 ]; then
 	echo "BaseRelease mismatch! Editing ${SPEC_FILE} with \"BaseRelease: ${BASE_RELEASE}\"..."
 	perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${BASE_RELEASE}@" ${SPEC_FILE}
 fi
-
-done
 
 # Checks for libhal
 if [ -x /usr/bin/pkg-config ]; then
@@ -77,35 +73,18 @@ if [ -x /usr/bin/pkg-config ]; then
 	fi
 fi
 
-if [ "x$(uname -p)" = "xx86_64" ]; then
-	BOOTSTRAP="setarch i686"
+if [ -x /usr/bin/linux32 ]; then
+	BOOTSTRAP=/usr/bin/linux32
 else
 	BOOTSTRAP=
 fi
 
-# Build 32bit on el7
-if [[ "${DIST}" = ".el7" ]]; then
-	BOOTSTRAP="setarch i686"
 ${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
 	${rpmextras} --sign \
-	--target i686 \
+	--target i386 \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BUILD_DIR}" \
 	--define "_tmppath ${RPM_TMP_PATH}" \
-	${BASE_DIR}/${SRC_DIR}/XView-32.spec
-fi
-
-# Build 64bit on el8
-if [[ "${DIST}" = ".el8" ]]; then
-	BOOTSTRAP=
-${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
-	${rpmextras} --sign \
-	--target x86_64 \
-	--define "dist ${DIST}" \
-	--define "_topdir ${RPM_BASE_DIR}" \
-	--define "_builddir ${RPM_BUILD_DIR}" \
-	--define "_tmppath ${RPM_TMP_PATH}" \
-	${BASE_DIR}/${SRC_DIR}/XView-64.spec
-fi
+	${SPEC_FILE}
 
