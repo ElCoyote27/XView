@@ -8,7 +8,8 @@ RPM_BASE_DIR=${BASE_DIR}/build
 RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
 RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
 
-VERSION="$(awk '{ print $7 }' /etc/redhat-release|cut -c1)"
+VERSION="$(awk '{ print $6 }' /etc/redhat-release|cut -c1)"
+ARCH="$(uname -i)"
 DIST=".el${VERSION}"
 rpmextras=""
 
@@ -28,13 +29,13 @@ do
 	fi
 done
 
-# Only build the source rpm for el6 (as of 201705)
-case ${VERSION} in
-	5|7)
-		rpm_pkgs="-bb"
-		;;
-	6)
+# Only build the source rpm for el8 (as of 201705)
+case ${ARCH} in
+	x86_64)
 		rpm_pkgs="-ba"
+		;;
+	i386)
+		rpm_pkgs="-bb"
 		;;
 esac
 
@@ -73,15 +74,20 @@ if [ -x /usr/bin/pkg-config ]; then
 	fi
 fi
 
-if [ -x /usr/bin/linux32 ]; then
-	BOOTSTRAP=/usr/bin/linux32
-else
-	BOOTSTRAP=
-fi
-
-${BOOTSTRAP} /usr/bin/rpmbuild ${rpm_pkgs} \
+# Build 64bit
+/usr/bin/rpmbuild -ba \
 	${rpmextras} --sign \
-	--target i386 \
+	--target x86_64 \
+	--define "dist ${DIST}" \
+	--define "_topdir ${RPM_BASE_DIR}" \
+	--define "_builddir ${RPM_BUILD_DIR}" \
+	--define "_tmppath ${RPM_TMP_PATH}" \
+	${SPEC_FILE}
+
+# Build 32bit
+/usr/bin/linux32 /usr/bin/rpmbuild -bb \
+	${rpmextras} --sign \
+	--target i686 \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
 	--define "_builddir ${RPM_BUILD_DIR}" \
