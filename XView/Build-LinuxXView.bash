@@ -11,6 +11,13 @@
 
 [ $# -gt 0 ] && set -e
 
+ARCH=$(uname -p)
+if [ "x${ARCH}" = "xx86_64" ]; then
+	EXTRAFLAGS="-Wimplicit -D_XV_API_BROKEN_64BIT"
+else
+	EXTRAFLAGS=""
+fi
+
 if ! [ -d lib/libxview ]; then
   echo Please change to XView source tree and try again
   exit 1
@@ -34,7 +41,7 @@ cat > imake.append <<EOF
 
 # Variable-definitions appended by imake-wrapper
   XVDESTDIR      = $OWDEST
-  EXTRA_DEFINES  = -DOPENWINHOME_DEFAULT=\"$OPENWINHOME\" -D_DEFAULT_SOURCE -DSYSV_UCONTEXT
+  EXTRA_DEFINES  = -DOPENWINHOME_DEFAULT=\"$OPENWINHOME\" -D_DEFAULT_SOURCE -DSYSV_UCONTEXT $EXTRAFLAGS
   CONFIGDIR      = $OPENWINHOME/lib/config
   INCLUDES      := -I`pwd`/build/include $IMAKE_EXTRA_INCLUDES -I$OWDEST/include \$(INCLUDES) -I/usr/include/tirpc
   LOCAL_LDFLAGS := -L`pwd`/lib/libolgx -L`pwd`/lib/libxview -ltirpc $IMAKE_EXTRA_LOCAL_LDFLAGS -L$OWDEST/lib \$(LOCAL_LDFLAGS)
