@@ -379,45 +379,16 @@ find $RPM_BUILD_ROOT/usr/openwin/share/src/xview -name "*.o" -exec rm -fv {} \;
 
 
 %post
-if [ ! -f /etc/man.config ]; then
-	if [ -f /etc/man.conf ]; then
-		echo "MANPATH /usr/openwin/man" > /etc/man.conf
-		%{__chmod} 644 /etc/man.conf
-	fi
-else
-	if ! %{__grep} '^MANPATH /usr/openwin/man' /etc/man.config > /dev/null; then
-		echo "MANPATH /usr/openwin/man" >> /etc/man.config
-	fi
-fi
-if [ ! -d /etc/ld.so.conf.d ]; then
-	if [ ! -f /etc/ld.so.conf ]; then
-		echo "/usr/openwin/lib" > /etc/ld.so.conf
-		%ifarch x86_64
-			echo "/usr/openwin/lib64" >> /etc/ld.so.conf
-		%endif
-		%{__chmod} 644 /etc/ld.so.conf
-	else
-		if ! %{__grep} '^/usr/openwin/lib$' /etc/ld.so.conf > /dev/null; then
-			echo "/usr/openwin/lib" >> /etc/ld.so.conf
-		fi
-		%ifarch x86_64
-			if ! %{__grep} '^/usr/openwin/lib64$' /etc/ld.so.conf > /dev/null; then
-				echo "/usr/openwin/lib64" >> /etc/ld.so.conf
-			fi
-		%endif
+if [ -f /etc/man_db.conf ]; then
+	if ! %{__grep} '^MANPATH /usr/openwin/man' /etc/man_db.conf > /dev/null; then
+		echo "MANPATH /usr/openwin/man" >> /etc/man_db.conf
+		%{__chmod} 644 /etc/man_db.conf
 	fi
 fi
 
 /sbin/ldconfig
 
 %postun
-# Commented out for now
-if [ "1" = "0" ]; then
-	%{__grep} -v /usr/openwin/lib /etc/ld.so.conf > /etc/ld.so.conf.net
-	mv -f /etc/ld.so.conf.net /etc/ld.so.conf
-	%{__grep} -v /usr/openwin/man /etc/man.config > /etc/man.config.net
-	mv -f /etc/man.config.net /etc/man.config
-fi
 
 /sbin/ldconfig
 
@@ -433,7 +404,7 @@ fi
 
 %post devel-examples
 
-%clean 
+%clean
 %{__rm} -fr $RPM_BUILD_ROOT
 %{__rm} -rf %{buildroot}
 
