@@ -13,9 +13,9 @@
 
 ARCH=$(uname -p)
 if [ "x${ARCH}" = "xx86_64" ]; then
-	EXTRAFLAGS="-Wimplicit -D_XV_API_BROKEN_64BIT"
+	EXTRAFLAGS="-Wimplicit -D_XV_API_BROKEN_64BIT -DSYSV_UCONTEXT"
 else
-	EXTRAFLAGS=""
+	EXTRAFLAGS="-DSYSV_UCONTEXT"
 fi
 
 if ! [ -d lib/libxview ]; then
