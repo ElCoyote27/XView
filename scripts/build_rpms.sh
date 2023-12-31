@@ -84,7 +84,7 @@ fi
 	--define "_tmppath ${RPM_TMP_PATH}" \
 	${SPEC_FILE}
 
-# Build 32bit
+# Build 32bit for backward compatibility
 /usr/bin/linux32 /usr/bin/rpmbuild -bb \
 	${rpmextras} --sign \
 	--target i686 \

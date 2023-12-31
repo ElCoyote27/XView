@@ -2,7 +2,7 @@ Summary: XView libraries for X11
 Name: xview
 %define BaseRelease 20231231
 Version: 3.2p1.4
-Release: 26.3%{?dist}
+Release: 26.4%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -65,6 +65,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sun Dec 31 2023 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-26.4
+- Yet another bump.
+
 * Sun Dec 31 2023 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-26.3
 - rebase on https://github.com/ggodd/xview-64bit due to formatting.
 
