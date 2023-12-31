@@ -535,8 +535,13 @@ file_list_destroy ( public, status )
 	xv_free_ref( private->directory );
 	xv_free_ref( private->regex_pattern );
 #ifdef __linux__
+#ifdef __REPB_PREFIX
 	if (private->regex_compile != NULL && private->regex_compile->__REPB_PREFIX(allocated))
 		xv_free_ref( private->regex_compile->__REPB_PREFIX(buffer));
+#else /* __REPB_PREFIX */
+	if (private->regex_compile != NULL && private->regex_compile->allocated)
+		xv_free_ref( private->regex_compile->buffer);
+#endif /* __REPB_PREFIX */
 #endif
 	xv_free_ref( private->regex_compile );
 	xv_free_ref( private->dotdot_string );
@@ -1236,22 +1241,35 @@ flist_compile_regex( private )
 
     if (private->regex_compile == NULL) {
         private->regex_compile = xv_alloc_n(regex_t, 1);
+#ifdef __REPB_PREFIX
         private->regex_compile->__REPB_PREFIX(translate) = NULL;
     }
     if (private->regex_compile->__REPB_PREFIX(allocated) == 0) {
         private->regex_compile->__REPB_PREFIX(buffer) = xv_alloc_n(char, MAXPATHLEN + 1);
         private->regex_compile->__REPB_PREFIX(allocated) = MAXPATHLEN + 1;
     }
+#else /* __REPB_PREFIX */
+        private->regex_compile->translate = NULL;
+    }
+    if (private->regex_compile->allocated == 0) {
+        private->regex_compile->buffer = xv_alloc_n(char, MAXPATHLEN + 1);
+        private->regex_compile->allocated = MAXPATHLEN + 1;
+    }
+#endif /* __REPB_PREFIX */
     re_compile_pattern(private->regex_pattern, strlen(private->regex_pattern),
 			private->regex_compile);
-} 
+}
 
 static int
 flist_match_regex( s, private )
      char *s;
      File_list_private *private;
 {
+#ifdef __REPB_PREFIX
     if (private->regex_compile == NULL || private->regex_compile->__REPB_PREFIX(allocated) == 0)
+#else /* __REPB_PREFIX */
+    if (private->regex_compile == NULL || private->regex_compile->allocated == 0)
+#endif /* __REPB_PREFIX */
         return 0;
     return (re_match(private->regex_compile, s, strlen(s), 0, NULL) != -1);
 }
