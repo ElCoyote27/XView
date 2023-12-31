@@ -1,6 +1,6 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20231230
+%define BaseRelease 20231231
 Version: 3.2p1.4
 Release: 26.2%{?dist}
 Distribution: RHEL 8 (Ootpa)
@@ -248,8 +248,7 @@ programming are included in this package.
 Also includes documents on the XView API (Application Programming Interface).
 
 %prep
-%{__rm} -rf %{buildroot} scripts
-%{__rm} -fr $RPM_BUILD_ROOT
+%{__rm} -rf %{buildroot} $RPM_BUILD_ROOT scripts
 %setup -q -T -b 0 -n XView
 
 %ifarch x86_64
