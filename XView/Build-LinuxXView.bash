@@ -13,9 +13,9 @@
 
 ARCH=$(uname -p)
 if [ "x${ARCH}" = "xx86_64" ]; then
-	EXTRAFLAGS="-Wimplicit -D_XV_API_BROKEN_64BIT -DSYSV_UCONTEXT"
+	EXTRAFLAGS="-Wimplicit -D_XV_API_BROKEN_64BIT"
 else
-	EXTRAFLAGS="-DSYSV_UCONTEXT"
+	EXTRAFLAGS=""
 fi
 
 if ! [ -d lib/libxview ]; then
@@ -43,21 +43,21 @@ cat > imake.append <<EOF
   XVDESTDIR      = $OWDEST
   EXTRA_DEFINES  = -DOPENWINHOME_DEFAULT=\"$OPENWINHOME\" -D_DEFAULT_SOURCE -DSYSV_UCONTEXT $EXTRAFLAGS
   CONFIGDIR      = $OPENWINHOME/lib/config
-  INCLUDES      := -I`pwd`/build/include $IMAKE_EXTRA_INCLUDES -I$OWDEST/include \$(INCLUDES) -I/usr/include/tirpc
-  LOCAL_LDFLAGS := -L`pwd`/lib/libolgx -L`pwd`/lib/libxview -ltirpc $IMAKE_EXTRA_LOCAL_LDFLAGS -L$OWDEST/lib \$(LOCAL_LDFLAGS)
+  INCLUDES      := -I$(pwd)/build/include $IMAKE_EXTRA_INCLUDES -I$OWDEST/include \$(INCLUDES) -I/usr/include/tirpc
+  LOCAL_LDFLAGS := -L$(pwd)/lib/libolgx -L$(pwd)/lib/libxview -ltirpc $IMAKE_EXTRA_LOCAL_LDFLAGS -L$OWDEST/lib \$(LOCAL_LDFLAGS)
   MAKEOVERRIDES  =
   CFLAGS        += -g \$(EXTRA_CFLAGS)
 # End of variable-definitions appended by imake-wrapper
 
 EOF
 
-IMAKEAPPEND="`pwd`/imake.append"
-IMAKEINCLUDE="-I`pwd`/config -I$BUILDPREFIX/usr/lib/X11/config -I$BUILDPREFIX/usr/X11R6/lib/X11/config -I/usr/lib/X11/config -I/usr/X11R6/lib/X11/config -I/usr/share/X11/config"
+IMAKEAPPEND="$(pwd)/imake.append"
+IMAKEINCLUDE="-I$(pwd)/config -I$BUILDPREFIX/usr/lib/X11/config -I$BUILDPREFIX/usr/X11R6/lib/X11/config -I/usr/lib/X11/config -I/usr/X11R6/lib/X11/config -I/usr/share/X11/config"
 
 # Make sure our wrappers are in the path
 if [ -z "$XVIEW_SETUP" ]; then
   [ -n "$BUILDPREFIX" ] && PATH="$BUILDPREFIX/bin:$PATH"
-  PATH="`pwd`:$PATH"
+  PATH="$(pwd):$PATH"
 fi
 
 PS1='\h:\w(XView-build)\$ '
@@ -133,14 +133,14 @@ while [ $# -gt 0 ]; do
       [ -z "$DESTDIR" ] || chown -R root.root $DESTDIR/usr
       ;;
     tar)
-      DIRNAME="`pwd`"
+      DIRNAME="$(pwd)"
       DIRNAME="${DIRNAME##*/}"
       ( cd $DESTDIR/ && tar cv ${OPENWINHOME##/} ${X11DIR##/}/lib/X11/config/XView.* ) | \
         gzip -9 > ../$DIRNAME.bin.tar.gz
       ;;
     srctar)
       rm -f imake.append
-      DIRNAME="`pwd`"
+      DIRNAME="$(pwd)"
       DIRNAME="${DIRNAME##*/}"
       (
         cd ..
@@ -156,7 +156,7 @@ while [ $# -gt 0 ]; do
       ;;
     diff)
       rm -f imake.append
-      DIRNAME="`pwd`"
+      DIRNAME="$(pwd)"
       DIRNAME="${DIRNAME##*/}"
       (
         cd ..
