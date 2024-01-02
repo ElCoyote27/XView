@@ -8,7 +8,7 @@ RPM_BASE_DIR=${BASE_DIR}/build
 RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
 RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
 
-VERSION="$(awk '{ print $6 }' /etc/redhat-release|cut -c1)"
+VERSION="$(lsb_release -sr|cut -f1 -d'.')"
 ARCH="$(uname -i)"
 DIST=".el${VERSION}"
 rpmextras=""
@@ -85,7 +85,7 @@ fi
 #	${SPEC_FILE}
 
 # Build 32bit for backward compatibility
-/usr/bin/linux32 /usr/bin/rpmbuild -bb \
+/usr/bin/linux32 /usr/bin/rpmbuild -ba \
 	${rpmextras} --sign \
 	--target i686 \
 	--define "dist ${DIST}" \
