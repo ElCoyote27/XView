@@ -10,27 +10,17 @@ static char     sccsid[] = "@(#)fm_layout.c 20.51 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/fm_layout_.h>
-#include <xview_private/fm_geom_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/xv_deaf_.h>
-#include <xview_private/windowutil_.h>
-#include <xview_private/win_input_.h>
-#include <xview_private/win_geom_.h>
-#include <xview_private/win_treeop_.h>
 #include <xview_private/i18n_impl.h>
 #include <xview_private/fm_impl.h>
 #include <xview_private/draw_impl.h>
 #include <xview/win.h>
-#include <xview/defaults.h>
 
-
+static Xv_Window frame_prev_child();
+static void     expand_sw();
+static void	frame_adjust_for_footer();
 #ifdef OW_I18N
-static void frame_adjust_for_IMstatus(Frame frame, Xv_Window IMstatus, int insert);
+static void     frame_adjust_for_IMstatus();
 #endif
-static Xv_Window frame_prev_child(Xv_Window first, Xv_Window target_child);
-static void expand_sw(Frame_class_info *frame, Xv_Window child, Rect *rectp);
-static void frame_adjust_for_footer(Frame frame, Xv_Window footer, int insert);
 
 /* ARGSUSED */
 /* VARARGS3 */
@@ -39,7 +29,12 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
     Frame		frame_public;
     register Xv_Window	child;
     Window_layout_op	op;
+/* Alpha compatibility, mbuck@debian.org, FIXME: I don't understand this */
+#if defined(__alpha) || defined(_XV_API_BROKEN_64BIT)
     unsigned long       d1, d2, d3, d4, d5;
+#else
+    int             	d1, d2, d3, d4, d5;
+#endif
 {
     register Frame_class_info *frame = NULL;
     int			is_subframe;
@@ -169,8 +164,8 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 
       case WIN_DESTROY:{
 	    Xv_Window      *first_child;
-	    Xv_Window       prev_child = 0;
-	    Xv_Window       next_child = 0;
+	    Xv_Window       prev_child = NULL;
+	    Xv_Window       next_child = NULL;
 
 	    /*
 	     * we cannot rely on the is_subframe flag for destroy because the
@@ -203,9 +198,9 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 
 	    /* don't reference the child anymore if it had the input focus */
 	    if (child == frame->focus_subwindow)
-		frame->focus_subwindow = 0;
+		frame->focus_subwindow = NULL;
 	    if (frame->primary_focus_sw == child)
-		frame->primary_focus_sw = 0;
+		frame->primary_focus_sw = NULL;
 	    break;
 	}
 
@@ -242,7 +237,7 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 	break;
 
       case WIN_LAYOUT:{
-	    int            *layout_supported = (int *)d1;
+	    int            *layout_supported = (int *) d1;
 
 	    *layout_supported = TRUE;
 	    break;
@@ -259,7 +254,7 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 	    return (0);
 
 	{
-	    int *y = (int *)d2;
+	    int *y = (int *) d2;
 
 	    *y = rect.r_top + rect.r_height;
 	    if (is_subframe) {
@@ -280,7 +275,7 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 	    return (0);
 
 	{
-	    int *x = (int *)d2;
+	    int *x = (int *) d2;
 
 	    *x = rect.r_left + rect.r_width;
 	    if (is_subframe) {
@@ -292,7 +287,7 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 
 
       case WIN_GET_X:{
-	    int *x = (int *)d1;
+	    int *x = (int *) d1;
 
 	    (void) win_getrect(child, &rect);	/* inner rect */
 	    *x = rect.r_left;
@@ -305,7 +300,7 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 	}
 
       case WIN_GET_Y:{
-	    int *y = (int *)d1;
+	    int *y = (int *) d1;
 
 	    (void) win_getrect(child, &rect);	/* inner rect */
 	    *y = rect.r_top;
@@ -317,7 +312,7 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 	}
 
       case WIN_GET_WIDTH:{
-	    int *w = (int *)d1;
+	    int *w = (int *) d1;
 
 	    (void) win_getrect(child, &rect);	/* inner rect */
 	    *w = rect.r_width;
@@ -325,7 +320,7 @@ frame_layout(frame_public, child, op, d1, d2, d3, d4, d5)
 	}
 
       case WIN_GET_HEIGHT:{
-	    int *h = (int *)d1;
+	    int *h = (int *) d1;
 
 	    (void) win_getrect(child, &rect);	/* inner rect */
 	    *h = rect.r_height;

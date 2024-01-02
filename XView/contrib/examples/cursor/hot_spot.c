@@ -44,7 +44,6 @@ char *argv[];
  */
 void
 do_it(item, event)
-Xv_opaque item;
 {
     Rect *r;
     Panel panel = (Panel)xv_get(item, PANEL_PARENT_PANEL);

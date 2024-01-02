@@ -47,6 +47,8 @@
 #include "kbdfuncs.h"
 #include "client.h"
 
+extern unsigned int FindModifierMask();
+
 /* Locals */
 static XEvent lastPress;
 static int  lastX, lastY, minX;

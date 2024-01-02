@@ -22,14 +22,16 @@
 #include "globals.h"
 #include "win.h"
 #include "menu.h"
-#include "services.h"
-#include "virtual.h"
-#include "mem.h"
-#include "images.h"
 
 /*
  *      Frame/icon menu action procs
  */
+extern int  WindowOpenCloseAction(), WindowFullRestoreSizeAction();
+extern int  WindowMoveAction(), WindowResizeAction();
+extern int  WindowPropsAction(), WindowBackAction(), WindowRefreshAction();
+extern int  WindowQuitAction(), WindowDismissThisAction();
+extern int  WindowDismissAllAction(), WindowFlashOwnerAction();
+extern int  WindowStickAction();
 
 /*
  *      Buttons used to build the frame and icon menus
@@ -234,6 +236,7 @@ ownerButton = {
     NULL
 };
 
+extern int	VDMMenuAction();
 /*
  * Menu buttons for VDM motion menu
  */

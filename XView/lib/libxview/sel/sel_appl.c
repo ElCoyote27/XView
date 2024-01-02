@@ -10,27 +10,24 @@ static char     sccsid[] = "@(#)sel_appl.c 20.30 93/06/29";
  *	file for terms of the license.
  */
 
-#include <xview_private/sel_appl_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/xv_.h>
 #include <xview_private/i18n_impl.h>
 #include <xview_private/portable.h>
+#include <xview_private/seln_impl.h>
 #include <xview/attr.h>
 #include <xview/rect.h>
 #include <xview/server.h>
 #include <xview/sel_compat.h>
 
-static void seln_init_request_buffer(Seln_request *buffer, Seln_holder *holder);
+static void     seln_init_request_buffer();
 
 /*
  * Generic request to another holder
  */
 Xv_public Seln_request *
 #ifdef ANSI_FUNC_PROTO
-_seln_ask(Seln_holder *holder, ...)
+seln_ask(Seln_holder *holder, ...)
 #else
-_seln_ask(holder, va_alist)
+seln_ask(holder, va_alist)
     Seln_holder    *holder;
 va_dcl
 #endif
@@ -47,9 +44,9 @@ va_dcl
 /*ARGSUSED*/
 Xv_public Seln_request *
 #ifdef ANSI_FUNC_PROTO
-_selection_ask(Xv_Server server, Seln_holder *holder, ...)
+selection_ask(Xv_Server server, Seln_holder *holder, ...)
 #else
-_selection_ask(server, holder, va_alist)
+selection_ask(server, holder, va_alist)
     Xv_Server       server;
     Seln_holder    *holder;
 va_dcl
@@ -93,9 +90,9 @@ va_dcl
 
 Xv_public void
 #ifdef ANSI_FUNC_PROTO
-_seln_init_request(Seln_request *buffer, Seln_holder *holder, ...)
+seln_init_request(Seln_request *buffer, Seln_holder *holder, ...)
 #else
-_seln_init_request(buffer, holder, va_alist)
+seln_init_request(buffer, holder, va_alist)
     Seln_request   *buffer;
     Seln_holder    *holder;
 va_dcl
@@ -114,10 +111,10 @@ va_dcl
 /*ARGSUSED*/
 Xv_public void
 #ifdef ANSI_FUNC_PROTO
-_selection_init_request(Xv_Server server, Seln_request *buffer,
+selection_init_request(Xv_Server server, Seln_request *buffer,
                        Seln_holder *holder, ...)
 #else
-_selection_init_request(server, buffer, holder, va_alist)
+selection_init_request(server, buffer, holder, va_alist)
     Xv_Server	    server;
     Seln_request   *buffer;
     Seln_holder    *holder;
@@ -143,10 +140,10 @@ va_dcl
 
 Xv_public       Seln_result
 #ifdef ANSI_FUNC_PROTO
-_seln_query(Seln_holder *holder, Seln_result (*reader) (Seln_request *),
+seln_query(Seln_holder *holder, Seln_result (*reader) (Seln_request *),
            char *context, ...)
 #else
-_seln_query(holder, reader, context, va_alist)
+seln_query(holder, reader, context, va_alist)
     Seln_holder    *holder;
     Seln_result(*reader) ();
     char           *context;
@@ -168,10 +165,10 @@ va_dcl
 /*ARGSUSED*/
 Xv_public       Seln_result
 #ifdef ANSI_FUNC_PROTO
-_selection_query(Xv_Server server, Seln_holder *holder,
+selection_query(Xv_Server server, Seln_holder *holder,
            Seln_result (*reader) (Seln_request *), char *context, ...)
 #else
-_selection_query(server, holder, reader, context, va_alist)
+selection_query(server, holder, reader, context, va_alist)
     Xv_Server       server;
     Seln_holder    *holder;
     Seln_result	  (*reader) ();

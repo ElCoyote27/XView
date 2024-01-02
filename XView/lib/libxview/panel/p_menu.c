@@ -40,7 +40,7 @@ panel_set_menu(ip, avlist)
 {
     register Attr_attribute attr;	/* each attribute */
 
-    while (attr = *avlist++) {
+    while (attr = (int)*avlist++) {
 	switch (attr) {
 	  case PANEL_SHOW_MENU_MARK:
 	    if ((int) *avlist++)

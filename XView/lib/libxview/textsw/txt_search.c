@@ -15,15 +15,8 @@ static char     sccsid[] = "@(#)txt_search.c 20.45 93/06/28";
  */
 
 
-#include <xview_private/txt_search_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/txt_again_.h>
-#include <xview_private/txt_edit_.h>
-#include <xview_private/txt_find_.h>
-#include <xview_private/txt_getkey_.h>
-#include <xview_private/txt_popup_.h>
-#include <xview_private/txt_sel_.h>
 #include <xview_private/primal.h>
+#include <xview_private/txt_impl.h>
 #include <xview_private/ev_impl.h>
 #include <sys/time.h>
 #include <signal.h>
@@ -62,12 +55,16 @@ typedef enum {
     WRAP_ITEM = 7
 } Search_panel_item_enum;
 
-static void find_forwards_action_proc(Menu menu, Menu_item item);
-static void find_backwards_action_proc(Menu menu, Menu_item item);
-static int do_replace_proc(Textsw_view_handle view);
-static void do_replace_all_proc(Textsw_view_handle view, int do_replace_first, unsigned direction);
+Pkg_private Textsw_view_handle text_view_frm_p_itm();
+
+Ev_mark_object textsw_add_mark_internal();
+Textsw_index textsw_replace();
+
+#ifdef __STDC__
 static Panel_setting search_cmd_proc(Panel_item item, Event *event);
-static void create_search_items(Panel panel, Textsw_view_handle view);
+#else
+static Panel_setting search_cmd_proc();
+#endif
 
 Pkg_private	Es_index
 textsw_do_search_proc(view, direction, ring_bell_status, wrapping_off, is_global)
@@ -314,7 +311,7 @@ search_cmd_proc(item, event)
 
     if (item == search_panel_items[(int) FIND_ITEM]) {
 	(void) textsw_do_search_proc(view,
-			      EV_FIND_DEFAULT, (RING_IF_NOT_FOUND | RING_IF_ONLY_ONE), wrapping_off, 1);
+			      EV_FIND_DEFAULT, (RING_IF_NOT_FOUND | RING_IF_ONLY_ONE), wrapping_off);
 
     } else if (item == search_panel_items[(int) REPLACE_ITEM]) {
 	if (TXTSW_IS_READ_ONLY(folio) || !do_replace_proc(view)) {
@@ -323,14 +320,14 @@ search_cmd_proc(item, event)
     } else if (item == search_panel_items[(int) FIND_THEN_REPLACE_ITEM]) {
 	if (!TXTSW_IS_READ_ONLY(folio)) {
 	    if (textsw_do_search_proc(view,
-			       EV_FIND_DEFAULT, RING_IF_NOT_FOUND, wrapping_off, 1) != ES_CANNOT_SET)
+			       EV_FIND_DEFAULT, RING_IF_NOT_FOUND, wrapping_off) != ES_CANNOT_SET)
 		(void) do_replace_proc(view);
 	}
     } else if (item == search_panel_items[(int) REPLACE_THEN_FIND_ITEM]) {
 	if (!TXTSW_IS_READ_ONLY(folio)) {
 	    (void) do_replace_proc(view);
 	    (void) textsw_do_search_proc(view,
-			  EV_FIND_DEFAULT, RING_IF_NOT_FOUND, wrapping_off, 1);
+			  EV_FIND_DEFAULT, RING_IF_NOT_FOUND, wrapping_off);
 	}
     } else if (item == search_panel_items[(int) REPLACE_ALL_ITEM]) {
 	(void) do_replace_all_proc(view, FALSE, EV_FIND_DEFAULT);
@@ -354,6 +351,7 @@ create_search_items(panel, view)
     static int	   init_str = 0;
     CHAR           search_string[MAX_STR_LENGTH];
     Es_index       dummy;
+    Pkg_private void search_event_proc();
 
     if (!init_str)  {
         /*

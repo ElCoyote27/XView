@@ -16,7 +16,6 @@ static char     sccsid[] = "@(#)om_compat.c 20.16 90/06/21";
 
 /* ------------------------------------------------------------------- */
 
-#include <xview_private/om_compat_.h>
 #include <xview_private/om_impl.h>
 #include <xview_private/portable.h>
 
@@ -24,9 +23,9 @@ static char     sccsid[] = "@(#)om_compat.c 20.16 90/06/21";
 
 Sv1_public      Menu
 #ifdef ANSI_FUNC_PROTO
-_menu_create(Attr_attribute attr1, ...)
+menu_create(Attr_attribute attr1, ...)
 #else
-_menu_create(attr1, va_alist)
+menu_create(attr1, va_alist)
     Attr_attribute attr1;
 va_dcl
 #endif
@@ -51,9 +50,9 @@ va_dcl
 
 Sv1_public      Menu_item
 #ifdef ANSI_FUNC_PROTO
-_menu_create_item(Attr_attribute attr1, ...)
+menu_create_item(Attr_attribute attr1, ...)
 #else
-_menu_create_item(attr1, va_alist)
+menu_create_item(attr1, va_alist)
     Attr_attribute attr1;
 va_dcl
 #endif
@@ -75,9 +74,9 @@ va_dcl
 
 Sv1_public      Xv_opaque
 #ifdef ANSI_FUNC_PROTO
-_menu_set(Menu menu_public, ...)
+menu_set(Menu menu_public, ...)
 #else
-_menu_set(menu_public, va_alist)
+menu_set(menu_public, va_alist)
     Menu            menu_public;
 va_dcl
 #endif

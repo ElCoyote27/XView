@@ -21,20 +21,8 @@ static char sccsid[] = "@(#)props.c 1.64 91/09/14";
 #include <mltext/XFontSet.h>
 #endif /* OW_I18N */
 
-#include <unistd.h>
-
 #define MONO_PROPS LOCALIZE("Icons"), LOCALIZE("Menus"), LOCALIZE("Miscellaneous"), LOCALIZE("Mouse Settings"), LOCALIZE("Localization"), NULL
 #define COLOR_PROPS LOCALIZE("Color"), MONO_PROPS
-
-extern void apply_colors(void);
-extern void reset_localization(void);
-extern void reset_colors(void);
-extern void create_color_panel(void);
-extern void create_localization_panel(void);
-extern Cms create_palette(void);
-extern char *bindtextdomain(char *domain_name, unsigned char *binding);
-
-void create_icon_panel(void);
 
 
 Frame       frame;
@@ -147,13 +135,12 @@ apply_props_proc(panel_item, event)
     Event       ie;
 
     if (panel_item) {
-	result = notice_prompt(frame, NULL,
+	result = notice_prompt(frame, &ie,
 			       NOTICE_MESSAGE_STRINGS,
 			       LOCALIZE(" Applying your changes will modify\n your ~/.Xdefaults file.  All comments\n in your file will be lost.  Do you\n want to do this?"),
 			       NULL,
 			       NOTICE_BUTTON_YES, LOCALIZE("Yes"),
 			       NOTICE_BUTTON_NO, LOCALIZE("No"),
-			       XV_SHOW, TRUE,
 			       NULL);
 
 	if (result == NOTICE_NO) {
@@ -171,7 +158,7 @@ apply_props_proc(panel_item, event)
 		    if ((Panel_item_type) xv_get(id->panel_item,
 					PANEL_ITEM_CLASS) == PANEL_TEXT_ITEM)
 			defaults_set_integer(id->name,
-					     atoi((char*)xv_get(id->panel_item,
+					     atoi(xv_get(id->panel_item,
 							 PANEL_VALUE)));
 		    else
 			defaults_set_integer(id->name,
@@ -181,7 +168,7 @@ apply_props_proc(panel_item, event)
 		    if ((Panel_item_type) xv_get(id->panel_item,
 					PANEL_ITEM_CLASS) == PANEL_TEXT_ITEM)
 			defaults_set_string(id->name,
-					(char*)xv_get(id->panel_item, PANEL_VALUE));
+					xv_get(id->panel_item, PANEL_VALUE));
 		    else {
 			int         index;
 			int         i;
@@ -235,7 +222,7 @@ set_props_values(panel_item, event)
 	    switch (id->type) {
 	    case D_number:
 		tmp = defaults_get_integer(id->name, id->class,
-					   (long)id->default_value);
+					   id->default_value);
 		if ((Panel_item_type) xv_get(id->panel_item, PANEL_ITEM_CLASS)
 			== PANEL_TEXT_ITEM) {
 		    sprintf(number_string, "%d", tmp);
@@ -274,8 +261,8 @@ set_props_values(panel_item, event)
 		break;
 	    case D_boolean:
 		xv_set(id->panel_item, PANEL_VALUE,
-		       defaults_get_boolean(id->name, id->class,
-					    (Bool)(long)id->default_value),
+		       (Attr_attribute)defaults_get_boolean(id->name, id->class,
+					    id->default_value),
 		       NULL);
 		break;
 	    default:
@@ -317,7 +304,7 @@ reset_props_proc(panel_item, event)
     xv_set(panel_item, PANEL_NOTIFY_STATUS, XV_ERROR, NULL);
 }
 
-void
+
 create_icon_panel()
 {
     Panel_item  choice_item;
@@ -351,7 +338,7 @@ create_icon_panel()
     window_fit_width(panel_group[ICON_PANEL + color]);
 }
 
-void
+
 create_menu_panel()
 {
     Panel_item  dr_item, mp_item;
@@ -418,7 +405,6 @@ create_menu_panel()
 }
 
 
-void
 create_misc_panel()
 {
     Panel       misc_panel = panel_group[MISC_PANEL + color];
@@ -561,7 +547,6 @@ create_misc_panel()
     window_fit_width(panel_group[MISC_PANEL + color]);
 }
 
-void
 create_mouse_set_panel()
 {
     Panel_item  msg_item;
@@ -644,7 +629,6 @@ create_mouse_set_panel()
     window_fit_width(mouse_set_panel);
 }
 
-void
 add_buttons()
 {
     Font_string_dims apply_size;
@@ -699,7 +683,6 @@ add_buttons()
     }
 }
 
-void
 create_panels()
 {
     int         i;
@@ -727,7 +710,6 @@ create_panels()
 }
 
 /* ARGSUSED */
-void
 factory_choice(panel_item, event)
     Panel_item  panel_item;
     Event      *event;
@@ -760,7 +742,6 @@ factory_choice(panel_item, event)
 
 
 /* ARGSUSED */
-void
 show_props_category(panel_item, which_panel, event)
     Panel_item  panel_item;
     int         which_panel;
@@ -810,10 +791,9 @@ frame_unmap_proc(frame, event, arg, type)
     if (event_action(event) == ACTION_CLOSE) {
 	exit(0);
     }
-    return (notify_next_event_func(frame, (Notify_event)event, arg, type));
+    return (notify_next_event_func(frame, event, arg, type));
 }
 
-void
 main(argc, argv)
     int         argc;
     char       *argv[];

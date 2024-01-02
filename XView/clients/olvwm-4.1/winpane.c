@@ -32,12 +32,6 @@
 #include "virtual.h"
 #include "client.h"
 #include "states.h"
-#include "winpane.h"
-#include "wincolor.h"
-#include "winnofoc.h"
-#include "winframe.h"
-#include "wingframe.h"
-#include "info.h"
 
 /***************************************************************************
 * global data
@@ -46,6 +40,9 @@
 extern Atom AtomChangeState;
 extern Atom AtomColorMapWindows;
 extern Window NoFocusWin;
+extern void ColormapChange();
+extern Time TimeFresh();
+extern void FrameGetGravityOffset();
 
 /***************************************************************************
 * private data
@@ -56,21 +53,6 @@ extern Window NoFocusWin;
 
 static ClassPane classPane;
 static Bool disallowMappedRepositioning = False;
-
-static int eventEnterLeaveNotify(Display* dpy, XEvent *event, WinPane *winInfo);
-static int eventColormapNotify(Display* dpy, XEvent *event, WinPane *winInfo);
-static int eventUnmapNotify(Display* dpy, XEvent *event, WinPane *winInfo);
-static int eventDestroyNotify(Display* dpy, XEvent *event, WinPane *winInfo);
-static int eventPropertyNotify(Display* dpy, XEvent *event, WinPane *winInfo);
-static int eventClientMessage(Display* dpy, XEvent *event, WinPane *winInfo);
-static void eventExtension(Display* dpy, XEvent *event, WinPane *winInfo);
-static int drawPane(Display* dpy, WinGeneric *winInfo);
-static int focusPane(Display* dpy, WinGeneric *winInfo, Bool focus);
-static int destroyPane(Display* dpy, WinGeneric *winInfo);
-static int setconfigPane(Display* dpy, WinPane *winInfo);
-static int newconfigPane(WinPane *win, XConfigureRequestEvent *pxcre);
-static int newposPane(WinPane *win, int x, int y);
-static int setsizePane(WinPane *win, int w, int h);
 
 /***************************************************************************
 * private functions
@@ -86,7 +68,7 @@ XEvent	*event;
 WinPane	*winInfo;
 {
     if (event->xany.type == EnterNotify)
-        ColorWindowCrossing(dpy, event, (WinGeneric * )winInfo);
+        ColorWindowCrossing(dpy, event, winInfo);
 }
 
 /* 
@@ -177,7 +159,7 @@ WinPane	*winInfo;
 /*
  * eventExtension - handle extension events
  */
-static void
+static int
 /* ARGSUSED */
 eventExtension(dpy, event, winInfo)
     Display	*dpy;
@@ -297,6 +279,7 @@ XConfigureRequestEvent *pxcre;
     Client *cli = win->core.client;
     int oldX, oldY;
     WinPaneFrame *winFrame = cli->framewin;
+    void FrameMoveRelative();
     int dwidth, dheight;
     int dx, dy;
 
@@ -378,7 +361,7 @@ XConfigureRequestEvent *pxcre;
 
     if (pxcre->value_mask & (CWStackMode | CWSibling))
     {
-	GFrameSetStack((WinGenericFrame *)winFrame, pxcre->value_mask, pxcre->detail, pxcre->above);
+	GFrameSetStack(winFrame, pxcre->value_mask, pxcre->detail, pxcre->above);
     }
 
     return win->core.dirtyconfig;
@@ -460,7 +443,7 @@ XWindowAttributes *paneattrs;
 	w->core.self = win;
 	w->class = &classPane;
 	w->core.kind = WIN_PANE;
-	WinAddChild(par,(WinGeneric *)w);
+	WinAddChild(par,w);
 	w->core.children = NULL;
 	w->core.client = cli;
 	w->core.x = 0; 		/* gets fixed up later */
@@ -477,7 +460,7 @@ XWindowAttributes *paneattrs;
 	cli->framewin->fcore.panewin = (WinGenericPane *)w;
 
 	/* register the window */
-	WIInstallInfo((WinGeneric *)w);
+	WIInstallInfo(w);
 
 	/* Put the window in the save set so it doesn't go away */
 	XChangeSaveSet(cli->dpy,win,SetModeInsert);
@@ -545,7 +528,7 @@ Display *dpy;
 	classPane.core.xevents[DestroyNotify] = eventDestroyNotify;
 	classPane.core.xevents[PropertyNotify] = eventPropertyNotify;
 	classPane.core.xevents[ClientMessage] = eventClientMessage;
-	classPane.core.extEventHdlr = (FuncPtr)eventExtension;
+	classPane.core.extEventHdlr = eventExtension;
 	classPane.core.focusfunc = focusPane;
 	classPane.core.drawfunc = NULL;
 	classPane.core.destroyfunc = destroyPane;

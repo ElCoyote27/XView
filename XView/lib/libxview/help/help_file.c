@@ -10,9 +10,6 @@ static char     sccsid[] = "@(#)help_file.c 1.17 90/12/04";
  *	file for terms of the license.
  */
 
-#include <xview_private/help_file_.h>
-#include <xview_private/xv_.h>
-#include <xview_private/xv_util_.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
@@ -32,7 +29,6 @@ static char     sccsid[] = "@(#)help_file.c 1.17 90/12/04";
 #endif
 #define MAX_MORE_HELP_CMD 128
 
-static int help_search_file(char *key, char **more_help);
 Xv_private char *xv_strtok();
 
 static FILE    *help_file;

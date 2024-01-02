@@ -10,16 +10,8 @@ static char     sccsid[] = "@(#)filter.c 20.28 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/filter_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/input_.h>
-#include <xview_private/io_.h>
-#include <xview_private/str_strms_.h>
-#include <xview_private/whitespace_.h>
-#include <xview_private/xv_.h>
 #include <ctype.h>
 #include <string.h>
-#include <xview/pkg.h>
 #include <xview_private/io_stream.h>
 #include <xview_private/i18n_impl.h>
 #include <xview_private/portable.h>
@@ -45,9 +37,12 @@ static char     sccsid[] = "@(#)filter.c 20.28 93/06/28";
  * Unresolved issues:  reporting error positions.
  */
 
-static struct CharAction digits(char c);
+char           *stream_fgets();
+
 static enum CharClass breakProc(char c);
-static int any_shell_meta(register char *s);
+static struct CharAction digits(char c);
+static int any_shell_meta(char  *s);
+
 
 struct filter_rec **
 xv_parse_filter_table(in, filename)
@@ -121,6 +116,7 @@ xv_parse_filter_table(in, filename)
 	 */
 	if (any_shell_meta(scratch)) {
 	    char           *shell;
+	    extern char    *getenv();
 
 	    if ((shell = getenv("SHELL")) == NULL)
 		shell = "/bin/sh";

@@ -45,15 +45,6 @@ typedef unsigned long   Pixel;      /* Index into colormap              */
 #include "mem.h"
 #include "error.h"
 #include "pixmap.h"
-#include "gif.h"
-#include "reduce.h"
-#include "usermenu.h"
-
-#ifdef NOT
-static Bool makePixmapFromBitmap(Display* dpy, ScreenInfo *scrInfo, char *bitmapfile, Pixmap *pixmap);
-#endif
-static void makeBitmapSearchPath(void);
-static char *findBitmapFile(char *fileName);
 
 void
 _swaplong (bp, n)
@@ -106,7 +97,7 @@ XColor **colors;
       FILE *fin;
       int ret;
       int screen;
-      XImage *in_image, *out_image;
+      XImage *in_image, *out_image, *ReadGIF();
       XWDFileHeader header;
       XVisualInfo vinfo, *vinfos;
       XColor color;
@@ -224,7 +215,7 @@ register XImage *in_image, *out_image;
     {
 	XColor *badColor, *okColor, *theColor;
 	double this, min;
-	XColor *new_palette;
+	XColor *new_palette, *reduce();
 
 /* Find a a good set of colors to use */
 	new_palette = reduce (in_image, ncolors, colors, GRV.MaxMapColors);
@@ -477,6 +468,9 @@ makePixmapFromBitmap(dpy, scrInfo, bitmapfile, pixmap)
 }
 #endif
 
+typedef enum { BadFormat, XBitmapFormat,
+                SunIconFormat, XPixmapFormat, GifFormat } ImageFormat;
+
 ImageFormat
 imageFileFormat(filename)
     char        *filename;
@@ -485,11 +479,10 @@ imageFileFormat(filename)
 FILE    *fp;
 char    s[256];
 int     dummy;
-char* tmp;
  
     if ((fp = fopen(filename, "r")) == NULL)
         return BadFormat;
-    tmp = fgets(s, 255, fp);
+    fgets(s, 255, fp);
     fclose(fp);
 #ifdef XPM
     if (strncmp(s, "/* XPM */", 9) == 0) /* XPM 3.x format */
@@ -562,7 +555,7 @@ findBitmapFile(fileName)
 {
         char    **dir;
         char    fullPath[MAXPATHLEN];
-	char	*new;
+	char	*new, *ExpandPath();
         int     i;
 	Bool	freeFile = False;
 

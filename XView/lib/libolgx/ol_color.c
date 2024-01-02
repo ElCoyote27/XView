@@ -8,10 +8,8 @@
  * Referernce: Hearn/Baker, "Computer Graphics", Prentice Hall, Section 14-4.
  */
 
-#include <olgx_private/ol_color_.h>
+#include "olgx_impl.h"
 
-static int max3(register int x, register int y, register int z);
-static int min3(register int x, register int y, register int z);
 
 /*
  * Private Routine  return the max of three x,y,z in x

@@ -10,19 +10,13 @@ static char     sccsid[] = "@(#)p_select.c 20.81 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/p_select_.h>
-#include <xview_private/help_.h>
-#include <xview_private/p_utl_.h>
 #include <string.h>
+#include <xview_private/panel_impl.h>
 #include <xview_private/draw_impl.h>
 #include <xview/scrollbar.h>
 #include <xview/sel_attrs.h>
 #include <xview/sel_svc.h>
 #include <xview/font.h>
-
-static int panel_event_is_drag(Event *event);
-static Item_info *panel_find_item(Panel_info *panel, Event *event);
-static int event_in_view_window(register Panel_info *panel, register Event *event);
 
 Xv_public char xv_iso_cancel;
 Xv_public char xv_iso_default_action;
@@ -31,6 +25,10 @@ Xv_public char xv_iso_next_element;
 Xv_public char xv_iso_select;
 
 extern int panel_item_destroy_flag;
+
+static int      event_in_view_window();
+static int	panel_event_is_drag();
+static Item_info *panel_find_item();
 
 #define	CTRL_D_KEY	'\004'
 #define	CTRL_G_KEY	'\007'
@@ -359,7 +357,7 @@ panel_default_event(p_public, event, arg)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_handle_event(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;
@@ -377,7 +375,7 @@ panel_handle_event(client_object, event)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_begin_preview(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;
@@ -392,7 +390,7 @@ panel_begin_preview(client_object, event)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_update_preview(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;
@@ -407,7 +405,7 @@ panel_update_preview(client_object, event)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_accept_preview(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;
@@ -436,7 +434,7 @@ panel_accept_preview(client_object, event)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_cancel_preview(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;
@@ -458,7 +456,7 @@ panel_cancel_preview(client_object, event)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_accept_menu(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;
@@ -482,7 +480,7 @@ panel_accept_menu(client_object, event)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_accept_key(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;
@@ -497,7 +495,7 @@ panel_accept_key(client_object, event)
 }
 
 
-Sv1_public void
+Sv1_public
 panel_cancel(client_object, event)
     Panel_item      client_object;	/* could be a Panel */
     Event          *event;

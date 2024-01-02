@@ -10,12 +10,6 @@ static char     sccsid[] = "@(#)p_gauge.c 1.30 93/06/28 Copyr 1984 Sun Micro";
  *	file for terms of the license.
  */
 
-#include <xview_private/p_gauge_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/pf_text_.h>
-#include <xview_private/p_utl_.h>
-#include <xview_private/scrn_get_.h>
-#include <xview_private/xv_.h>
 #include <X11/Xlib.h>
 #include <xview/sun.h>
 #include <xview_private/panel_impl.h>
@@ -34,6 +28,46 @@ static char     sccsid[] = "@(#)p_gauge.c 1.30 93/06/28 Copyr 1984 Sun Micro";
 #define TICK_THICKNESS	2
 #define MIN_TICK_GAP	4	/* minimum gap between ticks */
 #define MIN_TICK_STRING_GAP 6
+
+#ifdef OW_I18N
+extern struct pr_size xv_pf_textwidth_wc();
+#else
+extern struct pr_size xv_pf_textwidth();
+#endif /* OW_I18N */
+
+/* XView functions */
+Pkg_private int gauge_init();
+Pkg_private Xv_opaque gauge_set_avlist();
+Pkg_private Xv_opaque gauge_get_attr();
+Pkg_private int gauge_destroy();
+
+/* Panel Item Operations */
+static void     gauge_paint();
+static void	gauge_layout();
+
+/* Local functions */
+static void     paint_gauge();
+static void     update_rects();
+
+
+static Panel_ops ops = {
+    panel_default_handle_event,		/* handle_event() */
+    NULL,				/* begin_preview() */
+    NULL,				/* update_preview() */
+    NULL,				/* cancel_preview() */
+    NULL,				/* accept_preview() */
+    NULL,				/* accept_menu() */
+    NULL,				/* accept_key() */
+    panel_default_clear_item,		/* clear() */
+    gauge_paint,			/* paint() */
+    NULL,				/* resize() */
+    NULL,				/* remove() */
+    NULL,				/* restore() */
+    gauge_layout,			/* layout() */
+    NULL,				/* accept_kbd_focus() */
+    NULL,				/* yield_kbd_focus() */
+    NULL				/* extension: reserved for future use */
+};
 
 typedef struct {	/* data for a gauge */
     Panel_item      public_self;/* back pointer to object */
@@ -60,31 +94,13 @@ typedef struct {	/* data for a gauge */
     unsigned int vertical:1;
 } Gauge_info;
 
-static void gauge_paint(Panel_item item_public);
-static void gauge_layout(Panel_item item_public, Rect *deltas);
+static int etoi();
+
+#ifdef __STDC__
 static int etoi(Gauge_info *dp, int value);
-static void paint_gauge(Item_info *ip);
-static void update_rects(register Item_info *ip);
-
-static Panel_ops ops = {
-    panel_default_handle_event,		/* handle_event() */
-    NULL,				/* begin_preview() */
-    NULL,				/* update_preview() */
-    NULL,				/* cancel_preview() */
-    NULL,				/* accept_preview() */
-    NULL,				/* accept_menu() */
-    NULL,				/* accept_key() */
-    panel_default_clear_item,		/* clear() */
-    gauge_paint,			/* paint() */
-    NULL,				/* resize() */
-    NULL,				/* remove() */
-    NULL,				/* restore() */
-    gauge_layout,			/* layout() */
-    NULL,				/* accept_kbd_focus() */
-    NULL,				/* yield_kbd_focus() */
-    NULL				/* extension: reserved for future use */
-};
-
+#else
+static int etoi();
+#endif
 
 /* ========================================================================= */
 
@@ -154,7 +170,7 @@ gauge_set_avlist(item_public, avlist)
 	    return result;
     }
 
-    while ((attr = *avlist++) != (Attr_attribute)NULL) {
+    while ((attr = (int)*avlist++) != (Attr_attribute)NULL) {
 	switch (attr) {
 	  case PANEL_VALUE:
 	    dp->value = (int) *avlist++;

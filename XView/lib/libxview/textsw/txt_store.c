@@ -14,11 +14,8 @@ static char     sccsid[] = "@(#)txt_store.c 1.31 93/06/28";
  * Text store popup frame creation and support.
  */
 
-#include <xview_private/txt_store_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/txt_file_.h>
-#include <xview_private/txt_popup_.h>
 #include <xview_private/primal.h>
+#include <xview_private/txt_impl.h>
 #include <xview_private/ev_impl.h>
 #include <sys/time.h>
 #include <signal.h>
@@ -50,10 +47,12 @@ typedef enum {
 
 Pkg_private Panel_item store_panel_items[];
 
-static int do_store_proc(Textsw_folio folio, Event *ie);
+Pkg_private Textsw_view_handle text_view_frm_p_itm();
+Pkg_private Xv_Window frame_from_panel_item();
+
 static Panel_setting store_cmd_proc(Panel_item item, Event *event);
 static Panel_setting store_cmd_proc_accel(Panel_item item, Event *event);
-static void create_store_items(Panel panel, Textsw_view_handle view);
+
 
 static int
 do_store_proc(folio, ie)
@@ -65,7 +64,7 @@ do_store_proc(folio, ie)
     Frame           popup_frame;
     Frame           frame;
     Xv_Notice	    text_notice;
-    char            curr_dir[MAX_STR_LENGTH], *dir;
+    char            curr_dir[MAX_STR_LENGTH];
 #ifdef OW_I18N
     CHAR            curr_dir_ws[MAX_STR_LENGTH];
 #endif
@@ -110,7 +109,7 @@ do_store_proc(folio, ie)
 #endif /* OW_I18N */
 
     /* if "cd" is not disabled and the "cd" dir is not the current dir */
-    dir = getcwd(curr_dir, MAX_STR_LENGTH);
+    (void) getcwd(curr_dir, MAX_STR_LENGTH);
 #ifdef OW_I18N
     (void) mbstowcs(curr_dir_ws, curr_dir, MAX_STR_LENGTH);
     if (STRCMP(curr_dir_ws, dir_str) != 0) {	/* } for match */
@@ -252,13 +251,13 @@ create_store_items(panel, view)
 {
 
     CHAR            store_string[MAX_STR_LENGTH];
-    char            current_dir_store_string[MAX_STR_LENGTH], *dir;
+    char            current_dir_store_string[MAX_STR_LENGTH];
     Es_index        dummy;
 
 
     store_string[0] = (CHAR)'\0';
     (void) textsw_get_selection(view, &dummy, &dummy, store_string, MAX_STR_LENGTH);
-    dir = getcwd(current_dir_store_string, MAX_STR_LENGTH);
+    (void) getcwd(current_dir_store_string, MAX_STR_LENGTH);
     store_panel_items[(int) DIR_STRING_ITEM] = panel_create_item(panel, PANEL_TEXT,
 						 PANEL_LABEL_X, ATTR_COL(0),
 						 PANEL_LABEL_Y, ATTR_ROW(0),

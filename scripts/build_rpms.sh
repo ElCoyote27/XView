@@ -75,14 +75,14 @@ if [ -x /usr/bin/pkg-config ]; then
 fi
 
 # Build 64bit
-/usr/bin/rpmbuild -ba \
-	${rpmextras} --sign \
-	--target x86_64 \
-	--define "dist ${DIST}" \
-	--define "_topdir ${RPM_BASE_DIR}" \
-	--define "_builddir ${RPM_BUILD_DIR}" \
-	--define "_tmppath ${RPM_TMP_PATH}" \
-	${SPEC_FILE}
+#/usr/bin/rpmbuild -ba \
+#	${rpmextras} --sign \
+#	--target x86_64 \
+#	--define "dist ${DIST}" \
+#	--define "_topdir ${RPM_BASE_DIR}" \
+#	--define "_builddir ${RPM_BUILD_DIR}" \
+#	--define "_tmppath ${RPM_TMP_PATH}" \
+#	${SPEC_FILE}
 
 # Build 32bit for backward compatibility
 /usr/bin/linux32 /usr/bin/rpmbuild -bb \

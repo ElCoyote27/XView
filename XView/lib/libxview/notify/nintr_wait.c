@@ -14,8 +14,7 @@ static char     sccsid[] = "@(#)nintr_wait.c 20.12 93/06/28 Copyr 1985 Sun Micro
  * Nint_r_wait.c - Implement the notify_remove_wait3_func interface.
  */
 
-#include <xview_private/nintr_wait_.h>
-#include <xview_private/nintremove_.h>
+#include <xview_private/ntfy.h>
 #include <xview_private/ndet.h>
 #include <xview_private/nint.h>
 
@@ -27,5 +26,5 @@ notify_remove_wait3_func(nclient, func, pid)
 {
     /* Don't check pid because may be gone by now */
     return (nint_remove_func(nclient, func, NTFY_WAIT3,
-			     (NTFY_DATA)(long)pid, NTFY_USE_DATA));
+			     (NTFY_DATA) pid, NTFY_USE_DATA));
 }

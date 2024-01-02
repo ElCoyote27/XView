@@ -24,10 +24,6 @@ static char     sccsid[] = "@(#)ow_view.c 1.43 91/04/24";
  * Include files:
  */
 
-#include <xview_private/ow_view_.h>
-#include <xview_private/ow_evt_.h>
-#include <xview_private/ow_resize_.h>
-#include <xview_private/xv_.h>
 #include <stdio.h>
 #include <xview_private/ow_impl.h>
 #include <xview/cms.h>
@@ -38,25 +34,38 @@ Attr_attribute  openwin_view_context_key;
  * Declaration of Functions Defined in This File (in order):
  */
 
-#ifndef __linux__
-static int openwin_check_views(Xv_openwin_info *owin);
-#else
-Pkg_private int openwin_check_views(Xv_openwin_info *owin);
-#endif
-static int openwin_test_for_sb(Xv_openwin_info *owin, Scrollbar sb, Scrollbar_setting sb_direction, Openwin_view_info **view, int *last_sb);
-static void openwin_init_view(Xv_openwin_info *owin, Openwin_view_info *twin, Openwin_split_direction direction, Rect *r, Openwin_view_info **new_view);
-static void openwin_free_view(Openwin_view_info *view);
-static void openwin_remove_scrollbars(Openwin_view_info *view);
-static void openwin_create_viewwindow(Xv_openwin_info *owin, Openwin_view_info *from_view, Openwin_view_info *view, Rect *r);
-static void openwin_link_view(Xv_openwin_info *owin, Openwin_view_info *view);
-static int openwin_unlink_view(Xv_openwin_info *owin, Openwin_view_info *view);
+#ifdef __STDC__
 static int openwin_check_view(Openwin_view_info *view);
-static int openwin_locate_right_viewers(Openwin_view_info *views, Rect *, Openwin_view_info *bounders[]);
-static int openwin_locate_left_viewers(Openwin_view_info *views, Rect *r, Openwin_view_info *bounders[]);
-static int openwin_locate_bottom_viewers(Openwin_view_info *views, Rect *r, Openwin_view_info *bounders[]);
-static int openwin_locate_top_viewers(Openwin_view_info *views, Rect *r, Openwin_view_info *bounders[]);
-static void openwin_expand_viewers(Xv_openwin_info *owin, Openwin_view_info *old_view, Openwin_view_info **viewers, Rect *r, Openwin_split_direction direction);
-static void openwin_register_initial_sb(Xv_openwin_info *owin, Openwin_view_info *view, Scrollbar sb, Scrollbar_setting direction);
+#else
+static int openwin_check_view();
+#endif
+
+void            openwin_create_initial_view();
+void            openwin_destroy_views();
+int             openwin_count_views();
+Openwin_view_info *openwin_nth_view();
+int             openwin_viewdata_for_view();
+int             openwin_viewdata_fo_sb();
+void            openwin_split_view();
+int             openwin_fill_view_gap();
+void            openwin_copy_scrollbar();
+void            openwin_remove_split();
+
+static          openwin_init_view();
+static          openwin_free_view();
+static          openwin_remove_scrollbars();
+static          openwin_create_viewwindow();
+static          openwin_test_for_sb();
+static          openwin_link_view();
+static int      openwin_unlink_view();
+static          openwin_locate_right_viewers();
+static          openwin_locate_left_viewers();
+static          openwin_locate_bottom_viewers();
+static          openwin_locate_top_viewers();
+static          openwin_expand_viewers();
+static          openwin_register_initial_sb();
+static int      openwin_check_view(Openwin_view_info *view);
+
 
 /******************************************************************/
 
@@ -75,11 +84,11 @@ openwin_create_initial_view(owin)
     /* add scrollbars if we have seen them */
     if (owin->vsb_on_create) {
 	openwin_register_initial_sb(owin, new_view, owin->vsb_on_create, SCROLLBAR_VERTICAL);
-	owin->vsb_on_create = (Scrollbar)NULL;
+	owin->vsb_on_create = NULL;
     }
     if (owin->hsb_on_create) {
 	openwin_register_initial_sb(owin, new_view, owin->hsb_on_create, SCROLLBAR_HORIZONTAL);
-	owin->hsb_on_create = (Scrollbar)NULL;
+	owin->hsb_on_create = NULL;
     }
 }
 
@@ -139,7 +148,6 @@ openwin_count_views(owin)
 Pkg_private Openwin_view_info *
 openwin_nth_view(owin, place)
     Xv_openwin_info *owin;
-    int place;
 {
     int             i = 0;
     Openwin_view_info *view = owin->views;
@@ -193,7 +201,7 @@ openwin_viewdata_for_sb(owin, sb, view, sb_direction, last_sb)
     return (openwin_test_for_sb(owin, sb, *sb_direction, view, last_sb));
 }
 
-static int
+static
 openwin_test_for_sb(owin, sb, sb_direction, view, last_sb)
     Xv_openwin_info *owin;
     Scrollbar       sb;
@@ -209,7 +217,7 @@ openwin_test_for_sb(owin, sb, sb_direction, view, last_sb)
 	test_sb = openwin_sb(test_view, sb_direction);
 	if (test_sb == sb) {
 	    *view = test_view;
-	} else if (test_sb != (Scrollbar)NULL) {
+	} else if (test_sb != NULL) {
 	    *last_sb = FALSE;
 	}
     }
@@ -255,7 +263,7 @@ openwin_split_view(owin, view, direction, pos, view_start)
     openwin_adjust_view(owin, view, &r);
 
     /* add needed scrollbars */
-    if ((sb = openwin_sb(view, SCROLLBAR_VERTICAL)) != (Scrollbar)NULL) {
+    if ((sb = openwin_sb(view, SCROLLBAR_VERTICAL)) != NULL) {
 	openwin_copy_scrollbar(owin, sb, new_view);
 	if (direction == OPENWIN_SPLIT_HORIZONTAL) {
 	    sb = openwin_sb(new_view, SCROLLBAR_VERTICAL);
@@ -263,7 +271,7 @@ openwin_split_view(owin, view, direction, pos, view_start)
 		   view_start / (int) xv_get(sb, SCROLLBAR_PIXELS_PER_UNIT), NULL);
 	}
     }
-    if ((sb = openwin_sb(view, SCROLLBAR_HORIZONTAL)) != (Scrollbar)NULL) {
+    if ((sb = openwin_sb(view, SCROLLBAR_HORIZONTAL)) != NULL) {
 	openwin_copy_scrollbar(owin, sb, new_view);
 	if (direction == OPENWIN_SPLIT_VERTICAL) {
 	    sb = openwin_sb(new_view, SCROLLBAR_HORIZONTAL);
@@ -362,7 +370,7 @@ openwin_remove_split(owin, view)
     openwin_remove_scrollbars(view);
 }
 
-static void
+static
 openwin_init_view(owin, twin, direction, r, new_view)
     Xv_openwin_info *owin;
     Openwin_view_info *twin;
@@ -412,7 +420,7 @@ openwin_init_view(owin, twin, direction, r, new_view)
 }
 
 
-static void
+static
 openwin_free_view(view)
     Openwin_view_info *view;
 {
@@ -422,7 +430,7 @@ openwin_free_view(view)
     free((char *) view);
 }
 
-static void
+static
 openwin_remove_scrollbars(view)
     Openwin_view_info *view;
 {
@@ -431,15 +439,15 @@ openwin_remove_scrollbars(view)
     vsb = openwin_sb(view, SCROLLBAR_VERTICAL);
     hsb = openwin_sb(view, SCROLLBAR_HORIZONTAL);
 
-    if (vsb != (Scrollbar)NULL) {
+    if (vsb != NULL) {
 	xv_destroy_status(vsb, DESTROY_CLEANUP);
     }
-    if (hsb != (Scrollbar)NULL) {
+    if (hsb != NULL) {
 	xv_destroy_status(hsb, DESTROY_CLEANUP);
     }
 }
 
-static void
+static
 openwin_create_viewwindow(owin, from_view, view, r)
     Xv_openwin_info *owin;
     Openwin_view_info *from_view, *view;
@@ -513,7 +521,7 @@ openwin_create_viewwindow(owin, from_view, view, r)
     }
 }
 
-static void
+static
 openwin_link_view(owin, view)
     Xv_openwin_info *owin;
     Openwin_view_info *view;
@@ -560,12 +568,12 @@ openwin_check_view(view)
     if (ret != XV_OK)
 	return (ret);
 
-    if ((sb = openwin_sb(view, SCROLLBAR_VERTICAL)) != (Scrollbar)NULL) {
+    if ((sb = openwin_sb(view, SCROLLBAR_VERTICAL)) != NULL) {
 	ret = xv_destroy_status(sb, DESTROY_CHECKING);
 	if (ret != XV_OK)
 	    return (ret);
     }
-    if ((sb = openwin_sb(view, SCROLLBAR_HORIZONTAL)) != (Scrollbar)NULL) {
+    if ((sb = openwin_sb(view, SCROLLBAR_HORIZONTAL)) != NULL) {
 	ret = xv_destroy_status(sb, DESTROY_CHECKING);
 	if (ret != XV_OK)
 	    return (ret);
@@ -734,7 +742,7 @@ openwin_locate_top_viewers(views, r, bounders)
     return (found_min && found_max);
 }
 
-static void
+static
 openwin_expand_viewers(owin, old_view, viewers, r, direction)
     Xv_openwin_info *owin;
     Openwin_view_info *old_view;
@@ -770,7 +778,7 @@ openwin_expand_viewers(owin, old_view, viewers, r, direction)
     }
 }
 
-static void
+static
 openwin_register_initial_sb(owin, view, sb, direction)
     Xv_openwin_info *owin;
     Openwin_view_info *view;

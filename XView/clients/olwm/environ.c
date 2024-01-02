@@ -40,10 +40,6 @@ typedef struct _env {
 /* -----------------------------------------------------------------------
  *	Local Functions
  * -----------------------------------------------------------------------*/
-static void createEnv(Env *env, int nadditions);
-static void putEnv(Env *env, char *name, char *value);
-static void putDisplayEnv(Env *env, Display *dpy, int screen);
-static void putSunViewEnv(Env *env, Display *dpy, int screen);
 
 /*
  *	createEnv - Creates a new environment array that is the length of

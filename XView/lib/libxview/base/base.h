@@ -12,7 +12,6 @@
 #include <malloc.h>
 
 #include <xview/xv_c_types.h>
-#include <xview/pkg.h>
 
 #if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
 #include <stdlib.h>
@@ -27,7 +26,7 @@
 #define XV_OK		0
 #define	XV_ERROR	1
 
-#if defined(__x86_64__) || defined(__ia64__) || defined(_XV_API_BROKEN_64BIT) || defined(__amd64__)
+#if defined(__x86_64__) || defined(__ia64__) || defined(_XV_API_BROKEN_64BIT)
 
 #ifndef TRUE
 #define	TRUE		1L
@@ -81,7 +80,7 @@
 #elif defined(__linux__)
 #define XV_OS_SVR4
 #undef XV_USE_TTCOMPAT
-#define SYSV_WAIT 
+#define SYSV_UCONTEXT 
 #define XV_USE_XVFCNTL 
 #endif
  
@@ -91,10 +90,14 @@
  */
 
 extern void *xv_alloc_save_ret;
+extern void xv_alloc_error();
+extern void *xv_calloc();
 
 #ifdef XV_NO_STRDUP
 #ifdef __linux__
 #include <string.h>
+#else
+extern char *strdup();
 #endif
 #endif /* XV_NO_STRDUP */
 

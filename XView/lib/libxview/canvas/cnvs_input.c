@@ -11,15 +11,7 @@ static char     sccsid[] = "@(#)cnvs_input.c 20.62 93/06/28";
  */
 
 #define xview_other_rl_funcs
-#include <xview_private/cnvs_input_.h>
-#include <xview_private/cnvs_resze_.h>
-#include <xview_private/cnvs_scrol_.h>
-#include <xview_private/win_cntral_.h>
-#include <xview_private/win_damage_.h>
-#include <xview_private/screen_.h>
-#include <xview_private/svr_get_.h>
 #include <xview_private/cnvs_impl.h>
-#include <xview_private/help_.h>
 #include <xview/canvas.h>
 #include <xview/frame.h>
 #include <xview/openmenu.h>
@@ -34,8 +26,13 @@ static char     sccsid[] = "@(#)cnvs_input.c 20.62 93/06/28";
 #define window_event_proc(win, event, arg) \
     (((int (*)())(window_get(win, WIN_EVENT_PROC)))(win, event, arg))
 
-static void canvas_inform_resize(register Canvas_info *canvas);
-static void canvas_clear_damage(Xv_Window window, Rectlist *rl);
+Xv_private Xv_xrectlist *screen_get_clip_rects();
+Xv_private int server_get_fullscreen();
+
+extern Rectlist *win_get_damage();
+
+static void canvas_clear_damage();
+static void canvas_inform_resize();
 
 /*
  * handle events posted to the view window.

@@ -41,7 +41,7 @@ cat > imake.append <<EOF
 
 # Variable-definitions appended by imake-wrapper
   XVDESTDIR      = $OWDEST
-  EXTRA_DEFINES  = -DOPENWINHOME_DEFAULT=\"$OPENWINHOME\" -D_DEFAULT_SOURCE -DSYSV_UCONTEXT $EXTRAFLAGS
+  EXTRA_DEFINES  = -DOPENWINHOME_DEFAULT=\"$OPENWINHOME\" -D_DEFAULT_SOURCE -DSYSV_WAIT $EXTRAFLAGS
   CONFIGDIR      = $OPENWINHOME/lib/config
   INCLUDES      := -I$(pwd)/build/include $IMAKE_EXTRA_INCLUDES -I$OWDEST/include \$(INCLUDES) -I/usr/include/tirpc
   LOCAL_LDFLAGS := -L$(pwd)/lib/libolgx -L$(pwd)/lib/libxview -ltirpc $IMAKE_EXTRA_LOCAL_LDFLAGS -L$OWDEST/lib \$(LOCAL_LDFLAGS)

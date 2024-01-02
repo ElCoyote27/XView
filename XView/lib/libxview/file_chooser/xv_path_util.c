@@ -10,16 +10,11 @@ static char     sccsid[] = "@(#)xv_path_util.c 1.6 93/06/29";
  *	for terms of the license.
  */
 
-#include <xview_private/xv_path_util_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/xv_util_.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <xview/xview.h>
 #include <xview_private/xv_path_util.h>
-#include <xview_private/xv_.h>
-#include <xview_private/expandpath_.h>
 #include <xview_private/portable.h>
 #include <xview_private/i18n_impl.h>
 
@@ -28,6 +23,10 @@ static char     sccsid[] = "@(#)xv_path_util.c 1.6 93/06/29";
 /*
  * Private Utilties used by File Chooser packages
  */
+
+
+extern void	expand_path();
+
 
 
 Pkg_private void
@@ -79,7 +78,7 @@ xv_strcpy ( dest, src )
 	xv_free_ref( dest );
 	dest = new;
     } else {
-	(void) xv_error( (Xv_object)NULL,
+	(void) xv_error( NULL,
 			ERROR_LAYER,	ERROR_SYSTEM,
 			ERROR_STRING,	XV_MSG("out of memory, copying string!"),
 			NULL );
@@ -271,6 +270,7 @@ xv_realpath( file_name, resolved_name )
      char *file_name;
      char *resolved_name;
 {
+    extern char *	xv_strtok();
     char *tok;
 
     if ( !file_name || !resolved_name )

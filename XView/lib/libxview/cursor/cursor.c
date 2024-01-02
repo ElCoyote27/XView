@@ -15,13 +15,6 @@ static char     sccsid[] = "@(#)cursor.c 20.55 93/06/28";
  * 
  */
 
-#include <xview_private/cursor_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/attr_util_.h>
-#include <xview_private/curs_pri_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/xv_.h>
-#include <xview_private/xv_rop_.h>
 #include <X11/Xlib.h>
 #include <xview_private/portable.h>
 #include <xview_private/curs_impl.h>
@@ -32,7 +25,14 @@ static char     sccsid[] = "@(#)cursor.c 20.55 93/06/28";
 #include <xview/screen.h>
 
 
-static Xv_opaque create_text_cursor(Cursor_info *cursor, Xv_Drawable_info *info);
+Xv_private Attr_avlist attr_find();
+
+Pkg_private unsigned long cursor_make_x();
+Pkg_private unsigned long cursor_make_x_font();
+Pkg_private void cursor_free_x();
+Pkg_private void cursor_set_cursor_internal();
+
+static Xv_opaque create_text_cursor();
 
 extern unsigned char txtmove_bits[];
 extern unsigned char txtmove_mask_bits[];
@@ -135,7 +135,7 @@ cursor_create_internal(parent, object, avlist)
 				  NULL);
 	if (!cursor->cur_shape)
 	    return XV_ERROR;
-	xv_rop((Xv_opaque)cursor->cur_shape, 0, 0, pr->pr_width, pr->pr_height, PIX_SRC,
+	xv_rop(cursor->cur_shape, 0, 0, pr->pr_width, pr->pr_height, PIX_SRC,
 	       pr, 0, 0);
 	cursor->flags |= FREE_SHAPE;
 	cursor->cur_xhot = other_cursor->cur_xhot;
@@ -280,7 +280,7 @@ cursor_set_internal(cursor_public, avlist)
     Xv_singlecolor		*fg = NULL, *bg = NULL;	
     XColor			xfg, xbg;
 
-    for (; *avlist; avlist = attr_next(avlist)) {
+    for (; (int)*avlist; avlist = attr_next(avlist)) {
 	arg1 = avlist[1];
 	switch ((int)*avlist) {
 	  case XV_SHOW:
@@ -423,7 +423,7 @@ cursor_set_internal(cursor_public, avlist)
 	   				  pr->pr_size.x, pr->pr_size.y,
 					  pr->pr_depth, cursor->cur_function,
 				          cursor->cur_xhot, cursor->cur_yhot, 
-					  &xfg, &xbg, (Xv_opaque)pr); 
+					  &xfg, &xbg, pr); 
     }
 
     /* BUG: ok to abort? */

@@ -11,11 +11,6 @@ static char     sccsid[] = "@(#)file_list.c 1.30 93/06/28";
  *	for terms of the license.
  */
 
-#include <xview_private/file_list_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/xv_.h>
-#include <xview_private/xv_casecmp_.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <dirent.h>

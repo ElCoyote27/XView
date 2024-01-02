@@ -10,24 +10,6 @@ static char     sccsid[] = "@(#)fm_set.c 20.110 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/fm_set_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/defaults_.h>
-#include <xview_private/fm_cmdline_.h>
-#include <xview_private/fm_display_.h>
-#include <xview_private/fm_get_.h>
-#include <xview_private/fm_layout_.h>
-#include <xview_private/fm_rescale_.h>
-#include <xview_private/fm_win_.h>
-#include <xview_private/frame_init_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/om_set_.h>
-#include <xview_private/windowutil_.h>
-#include <xview_private/win_geom_.h>
-#include <xview_private/wmgr_decor_.h>
-#include <xview_private/svr_parse_.h>
-#include <xview_private/xv_deaf_.h>
-#include <xview_private/xv_.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <xview_private/i18n_impl.h>
@@ -35,6 +17,7 @@ static char     sccsid[] = "@(#)fm_set.c 20.110 93/06/28";
 #include <xview_private/draw_impl.h>
 #include <xview/canvas.h>
 /* ACC_XVIEW */
+#include <xview/defaults.h>
 #include <xview_private/svr_impl.h>
 /* ACC_XVIEW */
 #include <xview/cms.h>
@@ -50,7 +33,18 @@ static char     sccsid[] = "@(#)fm_set.c 20.110 93/06/28";
 
 /* ACC_XVIEW */
 #define		FRAME_MENU_BLOCK	10
+Xv_private int				server_parse_keystr();
+Pkg_private int				frame_set_menu_acc();
+Pkg_private Frame_menu_accelerator	*frame_find_menu_acc();
 /* ACC_XVIEW */
+Pkg_private void frame_display_busy();
+Pkg_private void frame_update_compose_led();
+static 	    void frame_adjust_normal_hints();
+
+static void     frame_change_state();
+static void 	frame_set_icon(); 
+
+Xv_window frame_create_footer();
 
 extern unsigned short default_frame_icon_image[256];
 
@@ -66,10 +60,6 @@ typedef struct {
 
 #define WSSemanticState		(1L<<0)
 #define WSSemanticCompose	(1L<<0)
-
-static void frame_change_state(Frame_class_info *frame, int to_iconic);
-static void frame_adjust_normal_hints(Frame_class_info *frame, int adjustment, Bool *update_hints);
-static void frame_set_icon(Frame_class_info *frame, Icon icon, int *set_icon_rect, Rect icon_rect);
 
 mpr_static(default_frame_icon_mpr, ICON_DEFAULT_WIDTH, ICON_DEFAULT_HEIGHT, 1,
 	   default_frame_icon_image);
@@ -88,8 +78,8 @@ frame_set_avlist(frame_public, avlist)
     static int		 set_icon_rect = FALSE;
     static Rect		 icon_rect;	
     Bool		 update_hints = FALSE;
-    Cms			 new_frame_cms = 0;
-    unsigned long	 new_frame_fg = 0;
+    Cms			 new_frame_cms = (Cms)NULL;
+    unsigned long	 new_frame_fg = NULL;
     Bool		 new_frame_fg_set = FALSE;
     Bool		 update_footer_color = FALSE;
 #ifdef OW_I18N
@@ -101,7 +91,7 @@ frame_set_avlist(frame_public, avlist)
     _xv_pswcs_t     	 pswcs = {0, NULL, NULL};
 #endif
 
-    for (attrs = avlist; *attrs; attrs = attr_next(attrs)) {
+    for (attrs = avlist; (int)*attrs; attrs = attr_next(attrs)) {
 	switch ((int)attrs[0]) {
 	  case FRAME_CLOSED:
 	  case FRAME_CLOSED_RECT: 
@@ -413,7 +403,7 @@ frame_set_avlist(frame_public, avlist)
 	    CHAR		*keystr = (CHAR *)NULL;
             void		(*notify_proc)();
 	    unsigned int	modifiers = 0;
-	    KeyCode		keycode;
+	    short		keycode;
 	    KeySym		keysym;
 	    Xv_opaque		data;
 
@@ -492,7 +482,7 @@ frame_set_avlist(frame_public, avlist)
             Frame_menu_accelerator *accel, *prev_accel;
 	    CHAR		*keystr;
 	    unsigned int	modifiers = 0;
-	    KeyCode		keycode;
+	    short		keycode;
 	    KeySym		keysym;
 	    int			found;
 
@@ -617,7 +607,7 @@ frame_set_avlist(frame_public, avlist)
 		if (status_get(frame, show_footer) != show_footer) {
 		    if (status_get(frame, created)) {
 			if (show_footer) {
-			    if (frame->footer == 0) {
+			    if (frame->footer == NULL) {
 				frame->footer = frame_create_footer(frame);
 			    } else {
 				xv_set(frame->footer, XV_SHOW, TRUE, NULL);
@@ -626,7 +616,7 @@ frame_set_avlist(frame_public, avlist)
 					 (int)xv_get(frame->footer, XV_HEIGHT),
 					 &update_hints);
 			} else {
-			    if (frame->footer != 0) {
+			    if (frame->footer != NULL) {
 				xv_set(frame->footer, XV_SHOW, FALSE, NULL);
 			        frame_adjust_normal_hints(frame,
 					-(int)xv_get(frame->footer, XV_HEIGHT),
@@ -1493,7 +1483,7 @@ frame_update_compose_led(frame, state)
 			 * sizeof returns # of bytes, so we have
 			 * to divide by bytes per long 
 			 */
-			sizeof(Frame_win_state)/4);
+			sizeof(Frame_win_state)/sizeof(unsigned long));
 	XFlush(xv_display(info));
     }
 }
@@ -1532,7 +1522,7 @@ frame_set_icon(frame, icon, set_icon_rect, icon_rect)
 
     if ((frame->default_icon) && (frame->default_icon != icon)) {
 	xv_destroy(frame->default_icon);
-	frame->default_icon = 0;
+	frame->default_icon = NULL;
     }
 		
     if (frame->icon == icon) {

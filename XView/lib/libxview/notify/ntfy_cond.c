@@ -15,20 +15,14 @@ static char     sccsid[] = "@(#)ntfy_cond.c 20.19 93/06/28 Copyr 1985 Sun Micro"
  * detector and dispatcher share.
  */
 
-#include <xview_private/ntfy_cond_.h>
-#include <xview_private/ntfyclient_.h>
-#include <xview_private/ntfy_ctbl_.h>
-#include <xview_private/ntfy_debug_.h>
-#include <xview_private/ntfy_list_.h>
-#include <xview_private/ntfy_node_.h>
-#include <xview_private/ntfyprotec_.h>
+#include <xview_private/ntfy.h>
 #include <stdio.h>		/* For NULL */
 #include <signal.h>
 
 /*
  * Paranoid enumerator protection macros.
  */
-static int ntfy_paranoid_count;
+static          ntfy_paranoid_count;
 #define	NTFY_BEGIN_PARANOID	ntfy_paranoid_count++
 #define	NTFY_IN_PARANOID	(ntfy_paranoid_count > 0)
 #define	NTFY_END_PARANOID   	ntfy_paranoid_count--;
@@ -91,7 +85,7 @@ ntfy_new_condition(condition_list, type, condition_latest, data, use_data)
 	/* Initialize condition */
 	condition->next = NTFY_CONDITION_NULL;
 	condition->type = type;
-	condition->data.an_u_int = (unsigned long) ((use_data) ? data : 0);
+	condition->data.an_u_int = (u_int) ((use_data) ? data : 0);
 	condition->callout.function = notify_nop;
 	condition->func_count = 0;
 	condition->func_next = 0;

@@ -10,7 +10,6 @@ static char     sccsid[] = "@(#)cnvs_scrol.c 20.23 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/cnvs_scrol_.h>
 #include <xview_private/cnvs_impl.h>
 #include <xview/scrollbar.h>
 

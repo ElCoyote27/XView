@@ -10,13 +10,8 @@ static char     sccsid[] = "@(#)seln.c 20.19 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/seln_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/getlogindr_.h>
-#include <xview_private/win_global_.h>
 #include <sys/types.h>
 #include <sys/file.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <errno.h>
 #ifndef XVIEW_USE_INSECURE_TMPFILES
@@ -31,6 +26,10 @@ static char     sccsid[] = "@(#)seln.c 20.19 93/06/28";
 struct selection selnull;
 
 #define	SEL_FILEMODE	0X0777
+
+Xv_public char    *xv_getlogindir();
+
+char           *selection_filename();
 
 /* ARGSUSED */
 void
@@ -100,7 +99,7 @@ selection_get(sel_read, window)
     } else
 	(void) ungetc(c, file);
     if ((n = fscanf(file,
-	 "TYPE=%d, ITEMS=%d, ITEMBYTES=%d, PUBFLAGS=%x, PRIVDATA=%p%c",
+	 "TYPE=%d, ITEMS=%d, ITEMBYTES=%d, PUBFLAGS=%x, PRIVDATA=%lx%c",
 		    &sel->sel_type, &sel->sel_items, &sel->sel_itembytes,
 		    &sel->sel_pubflags, &sel->sel_privdata, &c)) != 6) {
 	(void) win_unlockdata(window);
@@ -142,6 +141,7 @@ selection_clear(window)
 char           *
 selection_filename()
 {
+    char           *getenv();
     char           *name;
 #ifndef XVIEW_USE_INSECURE_TMPFILES
     /* martin.buck@bigfoot.com */

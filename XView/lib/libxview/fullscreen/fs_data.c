@@ -10,9 +10,7 @@ static char     sccsid[] = "@(#)fs_data.c 1.16 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/fs_.h>
-#include <xview_private/fs_get_.h>
-#include <xview_private/fs_set_.h>
+#include <xview_private/fs_impl.h>
 
 Xv_pkg          xv_fullscreen_pkg = {
     "Fullscreen", ATTR_PKG_FULLSCREEN,

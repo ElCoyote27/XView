@@ -12,7 +12,6 @@
 #endif
 
 #include "helpcmd.h"
-#include "helpsend.h"
 
 /* ----------------------------------------------------------------------
  *	ShowHelpWindow

@@ -15,7 +15,6 @@ static char     sccsid[] = "@(#)win_env.c 20.16 93/06/28";
  * other functions)
  */
 
-#include <xview_private/win_env_.h>
 #include <xview/rect.h>
 #include <xview/win_env.h>
 #include <xview/win_struct.h>
@@ -26,7 +25,6 @@ static char     sccsid[] = "@(#)win_env.c 20.16 93/06/28";
 /*
  * Public routines
  */
-void
 we_setparentwindow(windevname)
     char           *windevname;
 {
@@ -44,7 +42,6 @@ we_getparentwindow(windevname)
     return (_we_setstrfromenvironment(WE_PARENT, windevname));
 }
  
-void
 we_setgfxwindow(windevname)
     char           *windevname;
 {
@@ -73,7 +70,7 @@ we_setinitdata(initialrect, initialsavedrect, iconic)
     strcpy( rectstr, WE_INITIALDATA );
     strcat( rectstr, "=" );
     (void) sprintf(rectstr + strlen( rectstr ),
-                   "%04d,%04d,%04d,%04d,%04d,%04d,%04d,%04d,%04d", 
+                   "%04d,%04d,%04d,%04d,%04d,%04d,%04d,%04d,%04ld", 
                    initialrect->r_left, initialrect->r_top, 
                    initialrect->r_width, initialrect->r_height, 
                    initialsavedrect->r_left, initialsavedrect->r_top, 
@@ -92,7 +89,7 @@ we_getinitdata(initialrect, initialsavedrect, iconic)
     if (_we_setstrfromenvironment(WE_INITIALDATA, rectstr)) 
         return (-1); 
     else { 
-        if (sscanf(rectstr, "%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%d", 
+        if (sscanf(rectstr, "%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd", 
                    &initialrect->r_left, &initialrect->r_top, 
                    &initialrect->r_width, &initialrect->r_height, 
                    &initialsavedrect->r_left, &initialsavedrect->r_top, 
@@ -107,7 +104,7 @@ int
 _we_setstrfromenvironment(tag, target)
     char           *tag, *target;
 {
-    char           *en_str;
+    char           *en_str, *getenv();
  
     *target = 0;
     if (en_str = getenv(tag)) {

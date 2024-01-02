@@ -4,7 +4,6 @@ static char     sccsid[] = "@(#)setlocale.c 1.4 93/06/28";
 #endif
 #endif
 
-#include <xview_private/setlocale_.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <xview_private/i18n_impl.h>
@@ -12,6 +11,8 @@ static char     sccsid[] = "@(#)setlocale.c 1.4 93/06/28";
 static char	*default_locale = "C";
 
 #ifndef OS_HAS_LOCALE
+
+extern char	*getenv();
 
 /*
  * setlocale routine for OS that don't have it.

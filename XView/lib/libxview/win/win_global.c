@@ -15,9 +15,6 @@ static char     sccsid[] = "@(#)win_global.c 20.39 93/06/28";
  * exercise global influence on the whole window environment.
  */
 
-#include <xview_private/win_global_.h>
-#include <xview_private/drawable_.h>
-#include <xview_private/win_input_.h>
 #include <stdio.h>
 #include <xview_private/draw_impl.h>
 #include <xview/win_input.h>
@@ -92,10 +89,9 @@ xv_win_grab(window, im, cursor_window, cursor, grab_pointer, grab_kbd,
     Inputmask      *im;
     Xv_object       cursor_window;
     Xv_object       cursor;
-    int grab_pointer, grab_kbd, grab_server;
     int		    grap_pointer_pointer_async, grab_pointer_keyboard_async,
     		    grap_kbd_pointer_async,     grab_kbd_keyboard_async;
-    int		   owner_events, *status; /* informs whether successful or not */
+    int		   *status; /* informs whether successful or not */
 {
     Xv_Drawable_info *info;
     Display        *display;
@@ -105,7 +101,7 @@ xv_win_grab(window, im, cursor_window, cursor, grab_pointer, grab_kbd,
     if (status)
         *status = 1; /* initialize to be OK */
     if (win_grabiodebug)
-	return BadWindow;
+	return;
     DRAWABLE_INFO_MACRO(window, info);
     display = xv_display(info);
 
@@ -166,7 +162,7 @@ xv_win_grab(window, im, cursor_window, cursor, grab_pointer, grab_kbd,
     return (GrabSuccess);
 }
 
-Xv_private void
+Xv_private int
 xv_win_ungrab(window, ungrab_pointer, ungrab_kbd, ungrab_server)
     Xv_object       window;
     int		    ungrab_pointer, ungrab_kbd, ungrab_server;
@@ -215,7 +211,7 @@ win_xgrabio_sync(window, im, cursor_window, cursor)
     unsigned int    xevent_mask = win_im_to_xmask(window, im);
 
     if (win_grabiodebug)
-	return BadWindow;
+	return;
     DRAWABLE_INFO_MACRO(window, info);
     display = xv_display(info);
 
@@ -253,7 +249,6 @@ win_xgrabio_sync(window, im, cursor_window, cursor)
     return (1);
 }
 
-int
 win_xgrabio_async(window, im, cursor_window, cursor)
     Xv_object       window;
     Inputmask      *im;
@@ -265,7 +260,7 @@ win_xgrabio_async(window, im, cursor_window, cursor)
     unsigned int    xevent_mask = win_im_to_xmask(window, im);
 
     if (win_grabiodebug)
-	return BadWindow;
+	return;
     DRAWABLE_INFO_MACRO(window, info);
     display = xv_display(info);
 
@@ -303,7 +298,6 @@ win_xgrabio_async(window, im, cursor_window, cursor)
     return (1);
 }
 
-void
 win_set_grabio_params(window, im, cursor)
     Xv_object       window;
     Inputmask      *im;
@@ -342,7 +336,6 @@ win_releaseio(window)
 	xv_set(xv_server(info), SERVER_JOURNAL_SYNC_EVENT, 1L, NULL);
 }
 
-void
 win_private_gc(window, create_private_gc)
     Xv_object       window;
     int             create_private_gc;

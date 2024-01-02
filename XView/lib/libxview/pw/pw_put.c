@@ -14,8 +14,7 @@ static char     sccsid[] = "@(#)pw_put.c 20.11 89/07/31";
  * Pw_put.c: Implement the pw_put functions of the pixwin.h interface.
  */
 
-#include <xview_private/pw_put_.h>
-#include <xview_private/xv_rop_.h>
+#include <xview_private/pw_impl.h>
 
 Xv_public int
 pw_put(pw, x, y, val)

@@ -24,8 +24,6 @@
 #include "win.h"
 #include "list.h"
 #include "mem.h"
-#include "selection.h"
-#include "properties.h"
 
 
 /* ===== global data ====================================================== */
@@ -36,7 +34,7 @@ Time SelectionTime;
 
 typedef struct _selection_registry {
     Atom selection;
-    void (*handler)(XEvent*);
+    Bool (*handler)();
 } SelectionRegistry;
 
 /*
@@ -60,9 +58,6 @@ extern Atom	AtomName;
 extern Atom	AtomMultiple;
 extern Atom	AtomTargets;
 extern Atom	AtomTimestamp;
-
-static Bool processPrimaryTarget(Display *dpy, Window requestor, Atom target, Atom property);
-static void handlePrimary(XEvent *event);
 
 /* ===== private functions ================================================ */
 
@@ -304,7 +299,7 @@ IsSelected(cli)
  * Add this client to the list of clients on the PRIMARY selection and mark
  * the client as being selected.  Acquires the PRIMARY selection if necessary.
  */
-void
+int
 AddSelection(cli, timestamp)
 	Client *cli;
 	Time timestamp;
@@ -460,7 +455,7 @@ EnumSelections(foo)
 void
 SelectionRegister(selection, handler)
     Atom selection;
-    void (*handler)(XEvent*);
+    Bool (*handler)();
 {
     SelectionRegistry *reg;
 

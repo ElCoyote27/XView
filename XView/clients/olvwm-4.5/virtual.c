@@ -60,18 +60,11 @@
 #define PEEKC()     (*sp)
 #define UNGETC(c)   (--sp)
 #define RETURN(c)   return;
-static regexp_err(int val);
 #define ERROR(val)  regexp_err(val)
 #define TRUE 1
 #define FALSE 0
 
-#ifdef __STDC__
-static void regerr(int val);
-#else
-static void regerr(int val);
-#endif
-
-#include <regexp.h>
+#include <regex.h>
 #ifdef REGEXP
 regexp *expbuf;
 #endif
@@ -2146,7 +2139,8 @@ int		slot;
 				MenuInfoCreate(cache, winInfo, menu, depth, slot);
 }
 
-static regexp_err(val)
+static void
+regexp_err(val)
 int val;
 {
     switch(val) {
@@ -2193,17 +2187,14 @@ int val;
     }
 }
 
-static char expbuf[256];
+/* static char expbuf[256]; */
+regex_t regex;
 
 static int
 rexMatch(string)
     char *string;
 {
-#ifdef REGEXP
-    return regexec(expbuf, string);
-#else
-    return step(string,expbuf);
-#endif
+    return regexec(&regex, string, 0, NULL, 0);
 }
 
 static void
@@ -2236,16 +2227,5 @@ char newPattern[256];
     }
     newPattern[j++] = '$';
     newPattern[j++] = '\0';
-#ifdef REGEXP
-    expbuf = regcomp(newPattern);
-#else
-#if defined(__linux__) && defined(__GLIBC__)
-    /* See comment above.
-     *
-     * martin.buck@bigfoot.com
-     */
-/*    sp = newPattern;*/
-#endif
-    compile(newPattern, expbuf, &expbuf[256], '\0');
-#endif
+    regcomp(&regex, newPattern, REG_NOSUB);
 }

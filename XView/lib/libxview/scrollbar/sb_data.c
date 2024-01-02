@@ -17,10 +17,7 @@ static char     sccsid[] = "@(#)sb_data.c 1.17 93/06/28";
  * Include files:
  */
 
-#include <xview_private/sb_.h>
-#include <xview_private/sb_destroy_.h>
-#include <xview_private/sb_get_.h>
-#include <xview_private/sb_set_.h>
+#include <xview_private/sb_impl.h>
 
 /*
  * Global Defines:

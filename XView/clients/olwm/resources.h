@@ -34,7 +34,8 @@ extern XrmQuark TopInstanceQ;
 extern XrmQuark OpenWinQ;
 extern XrmDatabase OlwmDB;
 
-Bool BoolString(char *s, Bool dflt);
+extern void InitGlobals();
+extern void UpdateGlobals();
 
 #ifdef OW_I18N_L3
 extern void EffectOLLC();

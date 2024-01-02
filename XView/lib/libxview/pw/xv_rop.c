@@ -15,11 +15,6 @@ static char     sccsid[] = "@(#)xv_rop.c 20.55 89/07/31";
  * server.
  */
 
-#include <xview_private/xv_rop_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/screen_.h>
-#include <xview_private/svr_get_.h>
-#include <xview_private/xv_.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <xview_private/pw_impl.h>
@@ -40,6 +35,13 @@ int   GC_CHAIN_KEY;
 #include <xview/xv_xrect.h>
 
 #define INVALID_XID		0
+
+Xv_private int xv_rop_mpr_internal(Display *display, Drawable d, GC gc, int x, int y, int width, int height, Xv_opaque src, int xr, int yr, Xv_Drawable_info *dest_info, short mpr_bits);
+Xv_private int xv_replrop_internal(Display *display, Xv_Drawable_info *info, Drawable d, GC gc, int xw, int yw, int width, int height, Pixrect *src, int xr, int yr, Xv_Drawable_info *dest_info);
+
+extern Xv_xrectlist *screen_get_clip_rects();
+
+Xv_opaque server_get_fullscreen();
 
 Xv_private_data int xv_to_xop[16];
 
@@ -670,7 +672,7 @@ xv_replrop_internal(display, info, d, gc, xw, yw, width, height, src, xr, yr, de
     int             xr, yr;
     Xv_Drawable_info *dest_info;
 {
-    GC              tile_gc = NULL;
+    GC              tile_gc = NULL, xv_get_temp_gc();
     XID             tile;
     XGCValues       values;
     long unsigned   valuemask;
@@ -726,7 +728,7 @@ xv_replrop_internal(display, info, d, gc, xw, yw, width, height, src, xr, yr, de
 Xv_private      GC
 xv_get_temp_gc(display, xid, depth)
     Display        *display;
-    XID    xid;
+    unsigned int    xid;
     int             depth;
 {
 #ifndef SVR4

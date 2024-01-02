@@ -66,12 +66,6 @@ extern Atom AtomRightIMStatus;
 #endif
 extern Atom AtomCompoundText;
 
-static Bool propGetTextProp(Display* dpy, Window win, Atom property, Text **text);
-static Bool propGetOLDecor(Display* dpy, Window win, Atom atom, int *decorFlags);
-#ifdef NOT
-static Bool propGetOLFooter(Display* dpy, Window win, Atom atom, char **footer);
-#endif
-
 /***************************************************************************
  * 	GetWindowProperty
  ***************************************************************************/

@@ -10,7 +10,6 @@ static char     sccsid[] = "@(#)str_utils.c 20.15 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/str_utils_.h>
 #include <ctype.h>
 #include <xview/sun.h>
 #include <xview/str_utils.h>
@@ -61,7 +60,6 @@ Bool
 xv_substrequal(s1, start1, s2, start2, n, case_matters)
     char           *s1, *s2;
     int             start1, start2;
-    int n;
     Bool            case_matters;
 {
     int             i;
@@ -188,7 +186,7 @@ string_get_token(s, index, dest, charproc)
     char           *s;
     int            *index;
     char           *dest;
-    enum CharClass  (*charproc) (char);
+    enum CharClass  (*charproc) ();
 {
     char            c;
     int             i = 0;

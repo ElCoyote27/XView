@@ -13,18 +13,6 @@ static char     sccsid[] = "@(#)tty.c 20.64 93/06/28";
  */
 /*****************************************************************/
 
-#include <xview_private/tty_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/csr_change_.h>
-#include <xview_private/csr_init_.h>
-#include <xview_private/defaults_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/tty_init_.h>
-#include <xview_private/tty_main_.h>
-#include <xview_private/tty_menu_.h>
-#include <xview_private/tty_ntfy_.h>
-#include <xview_private/ttytl_.h>
-#include <xview_private/win_input_.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -40,6 +28,7 @@ static char     sccsid[] = "@(#)tty.c 20.64 93/06/28";
 #include <xview/ttysw.h>
 #include <xview/textsw.h>
 #include <xview/termsw.h>
+#include <xview/defaults.h>
 #include <xview_private/term_impl.h>
 #include <xview/scrollbar.h>
 #include <xview_private/charscreen.h>
@@ -57,26 +46,42 @@ static char     sccsid[] = "@(#)tty.c 20.64 93/06/28";
 
 #define HELP_INFO(s) XV_HELP_DATA, s,
 
-#ifdef OW_I18N
-static Xv_opaque ttysw_set_internal(Tty tty_public, Attr_attribute avlist[], int is_folio);
-#else
-static Xv_opaque ttysw_set_internal(Tty tty_public, Attr_attribute avlist[]);
-#endif
-static Xv_opaque ttysw_get_internal(Tty tty_public, int *status, Tty_attribute attr, va_list args);
+extern char    *getenv();
+extern caddr_t  textsw_checkpoint_undo();
+extern Attr_avlist attr_find();
+
+#ifdef __STDC__
 #if !defined(SVR4) && !defined(linux)
-static void tty_quit_on_death(Ttysw_folio client, int pid, union wait *status, struct rusage *rusage);
+static void	tty_quit_on_death(Ttysw_folio tty_folio_private, int pid, union wait *status, struct rusage *rusage);
+static void	tty_handle_death(Ttysw_folio tty_folio_private, int pid, union wait *status, struct rusage *rusage);
 #else
-static void tty_quit_on_death(Ttysw_folio client, int pid, int *status, struct rusage *rusage);
+static void	tty_quit_on_death(Ttysw_folio tty_folio_private, int pid, int *status, struct rusage *rusage);
+static void	tty_handle_death(Ttysw_folio tty_folio_private, int pid, int *status, struct rusage *rusage);
 #endif
-#if !defined(SVR4) && !defined(linux)
-static void tty_handle_death(Ttysw_folio tty_folio_private, int pid, union wait *status, struct rusage *rusage);
 #else
-static void tty_handle_death(Ttysw_folio tty_folio_private, int pid, int *status, struct rusage *rusage);
+static void	tty_quit_on_death();
+static void	tty_handle_death();
 #endif
 
-extern Xv_Window csr_pixwin;
+Pkg_private Xv_Window csr_pixwin;
+Pkg_private Notify_value ttysw_event();
+
+Pkg_private Menu ttysw_walkmenu();
+Pkg_private Ttysw *ttysw_init_internal();
+
+Pkg_private int tty_folio_init();
+Pkg_private Xv_opaque ttysw_folio_set();
+Pkg_private Xv_opaque ttysw_folio_get();
+Pkg_private int ttysw_folio_destroy();
+
+Pkg_private int tty_view_init();
+Pkg_private Xv_opaque ttysw_view_set();
+Pkg_private Xv_opaque ttysw_view_get();
+Pkg_private int ttysw_view_destroy();
 
 static Pixfont* change_font;
+
+
 
 /*****************************************************************************/
 /* Ttysw init routines for folio and  view	                             */
@@ -89,6 +94,11 @@ tty_folio_init(parent, tty_public, avlist)
     Tty_attribute   avlist[];
 {
     Ttysw_folio     ttysw;	/* Private object data */
+#ifdef OW_I18N
+    Xv_private void		tty_text_start();
+    Xv_private void		tty_text_done();
+    Xv_private void		tty_text_draw();
+#endif
 
     if (!tty_notice_key)  {
 	tty_notice_key = xv_unique_key();
@@ -269,7 +279,7 @@ ttysw_set_internal(tty_public, avlist)
 	    break;
 
 	  case TTY_PAGE_MODE:
-	    (void) ttysw_setopt((Ttysw_folio)TTY_VIEW_HANDLE_FROM_TTY_FOLIO(ttysw), TTYOPT_PAGEMODE, (int)
+	    (void) ttysw_setopt(TTY_VIEW_HANDLE_FROM_TTY_FOLIO(ttysw), TTYOPT_PAGEMODE, (int)
 				(attrs[1]));
 	    break;
 
@@ -313,7 +323,7 @@ ttysw_set_internal(tty_public, avlist)
 		     * down
 		     */
 		    ttysw_removeCursor();
-		    (void) xv_new_tty_chr_font((Pixfont*)attrs[1]);
+		    (void) xv_new_tty_chr_font(attrs[1]);
 		    /* after changing font size, cursor needs to be re-drawn */
 		    (void) ttysw_drawCursor(0, 0);
 		}
@@ -442,7 +452,7 @@ ttysw_folio_set(ttysw_folio_public, avlist)
 #ifdef OW_I18N
     return (ttysw_set_internal(ttysw_folio_public, avlist, 1));
 #else
-    return (ttysw_set_internal(ttysw_folio_public, (Attr_attribute *)avlist));
+    return (ttysw_set_internal(ttysw_folio_public, avlist));
 #endif
 
 }
@@ -455,7 +465,7 @@ ttysw_view_set(ttysw_view_public, avlist)
 #ifdef OW_I18N
     return (ttysw_set_internal(ttysw_view_public, avlist, 0));
 #else
-    return (ttysw_set_internal(ttysw_view_public, (Attr_attribute *)avlist));
+    return (ttysw_set_internal(ttysw_view_public, avlist));
 #endif
 
 }
@@ -621,6 +631,6 @@ ttysw_folio_destroy(ttysw_folio_public, status)
     Ttysw_folio     ttysw_folio_public;
     Destroy_status  status;
 {
-    return (ttysw_destroy((Tty)ttysw_folio_public, status));
+    return (ttysw_destroy(ttysw_folio_public, status));
 }
 

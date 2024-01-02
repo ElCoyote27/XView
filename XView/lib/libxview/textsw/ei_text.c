@@ -14,11 +14,6 @@ static char     sccsid[] = "@(#)ei_text.c 20.79 93/06/28";
  * Entity interpreter for ascii characters interpreted as plain text.
  */
 
-#include <xview_private/ei_text_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/defaults_.h>
-#include <xview_private/es_util_.h>
-#include <xview_private/tty_newtxt_.h>
 #define USING_SETS
 #include <xview_private/primal.h>
 
@@ -43,6 +38,7 @@ static char     sccsid[] = "@(#)ei_text.c 20.79 93/06/28";
 #include <xview/rect.h>
 #include <xview/rectlist.h>
 #include <xview/font.h>
+#include <xview/defaults.h>
 #include <xview/pixwin.h>
 #include <xview_private/ev.h>
 #include <xview/window.h>
@@ -51,34 +47,7 @@ static char     sccsid[] = "@(#)ei_text.c 20.79 93/06/28";
 #include <euc.h>
 #endif
 
-typedef struct run {
-    CHAR           *chars;	/* Pointer to characters to be painted */
-    short           len;	/* Count of characters to be painted */
-    short           x, y;	/* baseline origin to start painting at */
-}               Run;
-
-static int ei_plain_text_set_tab_width(Ei_handle eih, register int tab_width);
-static int ei_plain_text_set_tab_widths(Ei_handle eih, int *widths, int adjust_for_font);
-#ifdef OW_I18N
-static void ei_plain_text_set_dummy_char(Ei_handle eih);
-#endif 
-#ifdef OW_I18N
-static int ei_plain_text_set_font(Ei_handle eih, register Xv_Font font);
-#else
-static int ei_plain_text_set_font(Ei_handle eih, register PIXFONT *font);
-#endif 
-static Ei_handle ei_plain_text_destroy(Ei_handle eih);
-static int ei_plain_text_lines_in_rect(Ei_handle eih, struct rect *rect);
-static struct ei_process_result ei_plain_text_process(Ei_handle eih, int op, Es_buf_handle esbuf, int x, int y, int rop, Xv_Window pw, register struct rect *rect, int tab_origin);
-#ifdef OW_I18N
-static void paint_batch(int op, int rop, Xv_Window pw, struct rect *rect, Run *run, int run_length, struct rect *bounds, Xv_Font font);
-#else
-static void paint_batch(int op, int rop, Xv_Window pw, struct rect *rect, Run *run, int run_length, struct rect *bounds, Pixfont *font);
-#endif
-static caddr_t ei_plain_text_get(Ei_handle eih, Ei_attribute attribute);
-static void ei_classes_initialize(void);
-static struct ei_span_result ei_plain_text_span_of_group(Ei_handle eih, register Es_buf_handle esbuf, register int group_spec, Es_index index);
-static struct ei_process_result ei_plain_text_expand(Ei_handle eih, register Es_buf_handle esbuf, Rect *rect, int x, CHAR *out_buf, int out_buf_len, int tab_origin);
+Pkg_private Es_index es_backup_buf();
 
 #define	NEWLINE	'\n'
 #define	SPACE	' '
@@ -144,6 +113,22 @@ typedef ei_plain_text_object *Eipt_handle;
 #endif /* __linux__ */
 #endif
 
+Pkg_private Ei_handle ei_plain_text_create();
+Pkg_private int ei_plain_text_line_height();
+static Ei_handle ei_plain_text_destroy();
+static caddr_t  ei_plain_text_get();
+static int      ei_plain_text_lines_in_rect();
+static struct ei_process_result ei_plain_text_process();
+int             ei_plain_text_set();
+/* XXXX static int				ei_plain_text_set(); */
+#ifdef OW_I18N
+static void	ei_plain_text_set_dummy_char();
+#endif
+static struct ei_span_result ei_plain_text_span_of_group();
+static struct ei_process_result ei_plain_text_expand();
+static paint_batch();
+
+
 struct ei_ops   ei_plain_text_ops = {
     ei_plain_text_destroy,
     ei_plain_text_get,
@@ -154,6 +139,23 @@ struct ei_ops   ei_plain_text_ops = {
     ei_plain_text_span_of_group,
     ei_plain_text_expand
 };
+
+typedef struct run {
+    CHAR           *chars;	/* Pointer to characters to be painted */
+    short           len;	/* Count of characters to be painted */
+    short           x, y;	/* baseline origin to start painting at */
+}               Run;
+
+#ifdef __STDC__
+#ifdef OW_I18N
+static paint_batch(int op, int rop, Xv_Window pw, struct rect *rect, Run *run, int run_length, struct rect *bounds, Xv_Font font);
+#else
+static paint_batch(int op, int rop, Xv_Window pw, struct rect *rect, Run *run, int run_length, struct rect *bounds, Pixfont *font);
+#endif
+#else
+static paint_batch();
+#endif
+
 
 /* Used in ei_plain_text_process. Init adv.y = 0 once and for all. */
 static struct pixchar dummy_for_tab;
@@ -193,7 +195,7 @@ ei_plain_text_set_tab_widths(eih, widths, adjust_for_font)
  */
 {
     register Eipt_handle private = ABS_TO_REP(eih);
-    register int i, factor;
+    register        i, factor;
 /*    XFontStruct		*x_font_info;*/
 
     if (widths && widths[0] > 0) {
@@ -795,7 +797,7 @@ Skip_pc_pr_tests:
     return (result);
 }
 
-static void
+static
 paint_batch(op, rop, pw, rect, run, run_length, bounds, font)
     int             op, rop;
     Xv_Window       pw;
@@ -841,7 +843,7 @@ paint_batch(op, rop, pw, rect, run, run_length, bounds, font)
     }
     /* this outputs all the stuff! */
     for (temp = 0; temp < run_length; temp++, run++)
-	 /* jcb */ tty_newtext(pw, run->x, run->y, rop, (Xv_opaque)font,
+	 /* jcb */ tty_newtext(pw, run->x, run->y, rop, font,
 			       run->chars, run->len);
 
     if (op & EI_OP_LIGHT_GRAY)
@@ -883,11 +885,11 @@ ei_plain_text_get(eih, attribute)
 
     switch (attribute) {
       case EI_CONTROL_CHARS_USE_FONT:
-	return ((caddr_t)(long)(private->state & CONTROL_CHARS_USE_FONT));
+	return ((caddr_t) (private->state & CONTROL_CHARS_USE_FONT));
       case EI_FONT:
 	return ((caddr_t) private->font);
       case EI_TAB_WIDTH:
-	return ((caddr_t)(long)(private->tab_width));
+	return ((caddr_t) (private->tab_width));
 #ifdef OW_I18N
       case EI_LOCALE_IS_ALE:
 	return ((caddr_t) (private->locale_is_ale));
@@ -903,7 +905,6 @@ ei_plain_text_get(eih, attribute)
 
 /* XXX */
 /* static int */
-int
 ei_plain_text_set(eih, attributes)
     Ei_handle       eih;
     Attr_attribute  *attributes;
@@ -930,14 +931,9 @@ ei_plain_text_set(eih, attributes)
 	  case EI_TAB_WIDTH:
 	    ei_plain_text_set_tab_width(eih, (int) attributes[1]);
 	    break;
-	  case EI_TAB_WIDTHS: {
-	    /*ei_plain_text_set_tab_widths(eih, &attributes[1], FALSE);*/
-	    int i, widths[ATTR_STANDARD_SIZE] = {0};
-    	for (i = 0; attributes[i] > 0; i++)
-    	    widths[i] = attributes[i];
-	    ei_plain_text_set_tab_widths(eih, &widths[1], FALSE);
+	  case EI_TAB_WIDTHS:
+	    ei_plain_text_set_tab_widths(eih, &attributes[1], FALSE);
 	    break;
-	  }
 	  default:
 	    break;
 	}
@@ -1016,7 +1012,7 @@ ei_classes_initialize()
 				       "Text.DelimiterChars", DELIMITERS );
 
     /* print the string into an array to parse the potential octal/special characters */
-    sprintf( delim_chars, "%s", delims );
+    sprintf( delim_chars, delims );
 
     /* set all and then remove the delimiters specified */
     FILL_SET(setp);

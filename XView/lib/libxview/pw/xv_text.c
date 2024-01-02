@@ -14,13 +14,15 @@ static char     sccsid[] = "@(#)xv_text.c 20.26 89/07/31";
  * Xv_text.c: Implements pw_char/text functions of the pixwin.h interface for
  * X server.
  */
-#include <xview_private/xv_text_.h>
-#include <xview_private/pf_.h>
-#include <xview_private/xv_rop_.h>
+#include <xview_private/pw_impl.h>
 #include <xview/window.h>
 #include <pixrect/pixfont.h>
 
 PIXFONT        *xv_pf_sys;
+
+extern          xv_pf_ttext(), xv_pf_text();
+extern struct pr_size xv_pf_textwidth();
+Pixfont * xv_pf_open();
 
 Xv_public int
 pw_char(pw, xw, yw, op, pixfont, c)
@@ -32,11 +34,11 @@ pw_char(pw, xw, yw, op, pixfont, c)
     char            str[2];
 
     str[0] = c;
-    str[1] = '\0';
+    str[1] = NULL;
     (void) xv_text(pw, xw, yw, op, (Xv_opaque)pixfont, str);
 }
 
-Xv_public void
+Xv_public int
 xv_ttext(window, xbasew, ybasew, op, pixfont, str)
     Xv_opaque       window;
     int             op;
@@ -75,7 +77,7 @@ xv_ttext(window, xbasew, ybasew, op, pixfont, str)
     XDrawString(display, d, gc, xbasew, ybasew, str, len);
 }
 
-Xv_public void
+Xv_public int
 xv_text(window, xbasew, ybasew, op, pixfont, str)
     Xv_opaque       window;
     int             op;
@@ -151,7 +153,7 @@ xv_glyph_char(window, x, y, width, height, pixfont, c, color_index)
     display = xv_display(info);
     d = (Drawable) xv_xid(info);
     s[0] = c;
-    s[1] = '\0';
+    s[1] = NULL;
     gc = xv_find_proper_gc(display, info, PW_TEXT);
     gc1 = xv_find_proper_gc(display, info, PW_ROP_NULL_SRC);
     /*

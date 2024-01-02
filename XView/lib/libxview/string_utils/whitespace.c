@@ -10,7 +10,7 @@ static char     sccsid[] = "@(#)whitespace.c 20.15 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/whitespace_.h>
+#include <xview/str_utils.h>
 
 /*
  * these two procedures are in a separate file because they are also defined

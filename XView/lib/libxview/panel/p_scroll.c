@@ -10,22 +10,19 @@ static char     sccsid[] = "@(#)p_scroll.c 20.14 89/07/31 Copyr 1984 Sun Micro";
  *	file for terms of the license.
  */
 
-#include <xview_private/p_scroll_.h>
-#include <xview_private/p_utl_.h>
+#include <xview_private/panel_impl.h>
+#include <xview/scrollbar.h>
 
-static int top_pair(Panel_info *panel, int target, Item_info **low_ip, Item_info **high_ip);
-static void normalize_top(Panel_info *panel, int *offset);
-static void normalize_bottom(Panel_info *panel, Xv_Window pw, int scrolling_up, int *offset);
-static int left_pair(Panel_info *panel, int target, Item_info **low_ip, Item_info **high_ip);
-static void normalize_left(Panel_info *panel, int *offset);
-static void normalize_right(Panel_info *panel, Xv_Window pw, int scrolling_up, int *offset);
+static void     normalize_top(), normalize_bottom(),
+                normalize_left(), normalize_right();
+static          top_pair(), left_pair();
 
 /****************************************************************************/
 /* panel_scroll                                                             */
 /****************************************************************************/
 
 
-Pkg_private int
+Pkg_private
 panel_normalize_scroll(sb, offset, motion, vs)
     Scrollbar       sb;
     long unsigned   offset;
@@ -39,7 +36,6 @@ panel_normalize_scroll(sb, offset, motion, vs)
     int             line_ht;
     int             align_to_max, scrolling_up, vertical;
     Item_info      *low_ip, *high_ip;
-    int offset2;
 
     vertical = (Scrollbar_setting) xv_get(sb, SCROLLBAR_DIRECTION)
 	== SCROLLBAR_VERTICAL;
@@ -105,16 +101,14 @@ panel_normalize_scroll(sb, offset, motion, vs)
     }
     if (vertical) {
 	if (align_to_max)
-	    normalize_bottom(panel, pw, scrolling_up, &offset2);
+	    normalize_bottom(panel, pw, scrolling_up, &offset);
 	else
-	    normalize_top(panel, &offset2);
-    offset = offset2;
+	    normalize_top(panel, &offset);
     } else {
 	if (align_to_max)
-	    normalize_right(panel, pw, scrolling_up, &offset2);
+	    normalize_right(panel, pw, scrolling_up, &offset);
 	else
-	    normalize_left(panel, &offset2);
-    offset = offset2;
+	    normalize_left(panel, &offset);
     }
     *vs = offset;
 
@@ -135,7 +129,7 @@ panel_normalize_scroll(sb, offset, motion, vs)
  * 
  * 
  */
-static int
+static
 top_pair(panel, target, low_ip, high_ip)
     Panel_info     *panel;
     int             target;
@@ -255,7 +249,7 @@ normalize_bottom(panel, pw, scrolling_up, offset)
     *offset = top;
 }
 
-static int
+static
 left_pair(panel, target, low_ip, high_ip)
     Panel_info     *panel;
     int             target;

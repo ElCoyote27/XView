@@ -10,7 +10,6 @@ static char     sccsid[] = "@(#)fmbs_get.c 1.28 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/fmbs_get_.h>
 #include <xview_private/fm_impl.h>
 #include <xview_private/frame_base.h>
 

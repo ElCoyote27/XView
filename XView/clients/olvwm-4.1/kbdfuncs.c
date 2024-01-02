@@ -24,7 +24,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "kbdfuncs.h"
 #include "i18n.h"
 #include "ollocale.h"
 #include "olwm.h"
@@ -38,14 +37,17 @@
 #include "usermenu.h"
 #include "states.h"
 #include "services.h"
-#include "st.h"
-#include "info.h"
-#include "wincolor.h"
-#include "winnofoc.h"
 
 /*
  * Externals
  */
+extern void ClientActivate();
+extern Client *ClientGetLastCurrent();
+extern void ClientLowerTransients();
+extern Client *ClientRaiseTransients();
+extern void ClientSetCurrent();
+
+WinGeneric * lookupWindow();
 
 /* ===== private functions ================================================ */
 
@@ -57,12 +59,6 @@ typedef struct {
     Client *next;
 } FindClosure;
 
-static Bool childUnderPointer(Display *dpy, XKeyEvent *ke, Window *wid, WinGeneric **info, Client **cli);
-static int compareClients(Client *c1, Client *c2, Bool prev);
-static void *findClient(Client *cli, FindClosure *closure);
-static void selectNextPrevWindow(Display *dpy, XKeyEvent *ke, Bool prev);
-static void selectNextPrevApp(Display *dpy, XKeyEvent *ke, Bool prev);
-static void *makeVisible(Client *cli, Time timestamp);
 
 /*
  * Given a keystroke event, find the window (and its client structure) that is
@@ -462,15 +458,14 @@ KeyBeep(dpy,ke)
 /*
  * Lock the colormap of the window under the pointer into the hardware.
  */
-Bool
+void
 KeyLockColormap(dpy, ke)
     Display *dpy;
     XKeyEvent *ke;
 {
     if (ke->type != KeyPress)
-	return False;
+	return;
     InstallPointerColormap(dpy, ke->root, ke->x_root, ke->y_root, True);
-    return True;
 }
 
 
@@ -896,7 +891,7 @@ KeyWindowMenu(dpy, ke)
     if (frameInfo == NULL || (frameInfo->core.client->wmDecors->menu_type == MENU_NONE))
 	KeyBeep(dpy, ke);
     else  {
-	ShowStandardMenu(frameInfo, (XEvent *)ke, False);
+	ShowStandardMenu(frameInfo, ke, False);
     }
 }
 
@@ -960,7 +955,7 @@ KeyMakeVisibleAll(dpy, ke)
     if (ke->type != KeyPress)
 	return;
 
-    ListApply(ActiveClientList, makeVisible, (void*)ke->time);
+    ListApply(ActiveClientList, makeVisible, ke->time);
 }
 
  /*

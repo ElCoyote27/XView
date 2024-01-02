@@ -9,9 +9,7 @@ static char     sccsid[] = "@(#)svr_data.c 1.15 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/server_.h>
-#include <xview_private/svr_get_.h>
-#include <xview_private/svr_set_.h>
+#include <xview_private/svr_impl.h>
 
 Xv_pkg          xv_server_pkg = {
     "Server",

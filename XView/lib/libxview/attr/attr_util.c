@@ -10,10 +10,7 @@ static char     sccsid[] = "@(#)attr_util.c 20.18 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/attr_util_.h>
 #include <xview_private/portable.h>
-#include <xview_private/attr_impl.h>
-#include <xview_private/attr_.h>
 #include <xview/attr.h>
 
 /*
@@ -22,9 +19,9 @@ static char     sccsid[] = "@(#)attr_util.c 20.18 93/06/28";
  */
 Attr_avlist
 #ifdef ANSI_FUNC_PROTO
-_attr_create_list(Attr_attribute attr1, ...)
+attr_create_list(Attr_attribute attr1, ...)
 #else
-_attr_create_list(attr1, va_alist)
+attr_create_list(attr1, va_alist)
     Attr_attribute attr1;
 va_dcl
 #endif

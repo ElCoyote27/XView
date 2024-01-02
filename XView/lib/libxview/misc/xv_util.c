@@ -10,7 +10,6 @@ static char     sccsid[] = "@(#)xv_util.c 1.6 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/xv_util_.h>
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
@@ -31,10 +30,13 @@ static char     sccsid[] = "@(#)xv_util.c 1.6 93/06/28";
 
 #ifdef ultrix
 static void *save;
+extern void *valloc(), *malloc(), *calloc(), *realloc();
 #else
 static char *save;
 #ifdef __linux__
 #include <stdlib.h>
+#else
+extern char *valloc(), *malloc(), *calloc(), *realloc();
 #endif
 #endif /* ultrix */
 

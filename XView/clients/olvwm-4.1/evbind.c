@@ -40,17 +40,11 @@
 #include "error.h"
 #include "virtual.h"
 #include "evbind.h"
-#include "winroot.h"
-#include "kbdfuncs.h"
-#include "virtual.h"
 
 
 /* ===== externs ========================================================== */
 
 extern List *ScreenInfoList;
-
-extern int CheckForKeyProg(Display *dpy, XEvent *ev);
-extern void ReInitOlvwmRC(Display *ldpy, char *path);
 
 /* ===== private data ===================================================== */
 
@@ -85,16 +79,6 @@ ModDescriptor ModDescriptorTable[] = {
 };
 #define NMODBINDINGS (sizeof(ModDescriptorTable)/sizeof(ModDescriptor))
 
-static void establishModBindings(Display* dpy, XrmDatabase newDB);
-static MouseMatchState searchMouseBindings(XButtonEvent *pe, SemanticAction *action);
-static Bool checkChording(Display* dpy, struct timeval timeout, XButtonEvent *pr);
-static void keySuspend(Display* dpy, XKeyEvent *ke);
-static void keyResume(Display* dpy, XKeyEvent *ke);
-static void keyQuoteNext(Display* dpy, XKeyEvent *ke);
-static int parseKeySpec(Display* dpy, char *specifier, modsym *syms);
-static void establishKeyBindings(Display* dpy, XrmDatabase rdb);
-static void grabRootKeys(Display* dpy, Window root, Bool grab, Bool virtual_only);
-static void grabRootButtons(Display* dpy, Window root, Bool grab);
 
 /*
  * establishModBindings
@@ -112,6 +96,7 @@ establishModBindings(dpy, newDB)
     XrmRepresentation rep;
     XrmValue value;
     ModDescriptor *d;
+    unsigned int polyStringToModifier();
 
     classlist[0] = OpenWinQ;
     classlist[1] = modClassQ;
@@ -398,6 +383,12 @@ ResolveMouseBinding(dpy, pevent, ignoremask)
 
 #define NULLFUNC ((void (*)())0)
 
+extern void HandleHelpKey();
+
+static void keySuspend();
+static void keyResume();
+static void keyQuoteNext();
+
 static unsigned long mouselessMaskTable[] = { KD_SUNVIEW, KD_BASIC, KD_FULL };
 
 KeyDescriptor KeyDescriptorTable[] = {
@@ -590,142 +581,148 @@ KeyDescriptor KeyDescriptorTable[] = {
  * to the no focus window which moves the vdm
  *
  */
-   {    "VirtualUp",		    "Up+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualUp",		    "Up+Meta",		KeyMoveVDM,
 	ACTION_UP_V,		    KD_VIRTUAL				},
    {    "HalfUp",		    "Up+Shift",		NULLFUNC,
 	ACTION_HALF_UP,	    	    KD_VIRTUAL				},
-   {    "VirtualHalfUp",	    "Up+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualHalfUp",	    "Up+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_UP,		    KD_VIRTUAL				},
-   {    "VirtualJumpUp",	    "Up+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualJumpUp",	    "Up+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_UP,		    KD_VIRTUAL				},
 
-   {    "VirtualDown",		    "Down+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualDown",		    "Down+Meta",	KeyMoveVDM,
 	ACTION_DOWN_V,		    KD_VIRTUAL				},
    {    "HalfDown",		    "Down+Shift",	NULLFUNC,
 	ACTION_HALF_DOWN,    	    KD_VIRTUAL				},
-   {    "VirtualHalfDown",	    "Down+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualHalfDown",	    "Down+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_DOWN,	    KD_VIRTUAL				},
-   {    "VirtualJumpDown",	    "Down+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualJumpDown",	    "Down+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_DOWN,	    KD_VIRTUAL				},
 
-   {    "VirtualLeft",		    "Left+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualLeft",		    "Left+Meta",	KeyMoveVDM,
 	ACTION_LEFT_V,		    KD_VIRTUAL				},
    {    "HalfLeft",		    "Left+Shift",	NULLFUNC,
 	ACTION_HALF_LEFT,	    KD_VIRTUAL				},
-   {    "VirtualHalfLeft",	    "Left+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualHalfLeft",	    "Left+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_LEFT,	    KD_VIRTUAL				},
-   {    "VirtualJumpLeft",	    "Left+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualJumpLeft",	    "Left+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_LEFT,	    KD_VIRTUAL				},
 
-   {    "VirtualRight",		    "Right+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualRight",		    "Right+Meta",	KeyMoveVDM,
 	ACTION_RIGHT_V,		    KD_VIRTUAL				},
    {    "HalfRight",		    "Right+Shift",	NULLFUNC,
 	ACTION_HALF_RIGHT,	    KD_VIRTUAL				},
-   {    "VirtualHalfRight",	    "Right+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualHalfRight",	    "Right+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_RIGHT,	    KD_VIRTUAL				},
-   {    "VirtualJumpRight",	    "Right+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualJumpRight",	    "Right+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_RIGHT,	    KD_VIRTUAL				},
 
    {    "UpLeft",		    "R7",		NULLFUNC,
 	ACTION_UPLEFT,	    	    KD_VIRTUAL				},
-   {    "VirtualUpLeft",	    "R7+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualUpLeft",	    "R7+Meta",		KeyMoveVDM,
 	ACTION_UPLEFT_V,	    KD_VIRTUAL				},
    {    "JumpUpLeft",		    "R7+Ctrl",		NULLFUNC,
 	ACTION_JUMP_UPLEFT,	    KD_VIRTUAL				},
-   {	"VirtualJumpUpLeft",	    "R7+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {	"VirtualJumpUpLeft",	    "R7+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_UPLEFT,	    KD_VIRTUAL				},
    {    "HalfUpLeft",		    "R7+Shift",		NULLFUNC,
 	ACTION_HALF_UPLEFT,	    KD_VIRTUAL				},
-   {	"VirtualHalfUpLeft",	    "R7+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {	"VirtualHalfUpLeft",	    "R7+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_UPLEFT,	    KD_VIRTUAL				},
 
-   {    "VirtualUpRight",	    "R9+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualUpRight",	    "R9+Meta",		KeyMoveVDM,
 	ACTION_UPRIGHT_V,	    KD_VIRTUAL				},
    {    "UpRight",		    "R9",		NULLFUNC,
 	ACTION_UPRIGHT,		    KD_VIRTUAL				},
    {    "JumpUpRight",		    "R9+Ctrl",		NULLFUNC,
 	ACTION_JUMP_UPRIGHT,	    KD_VIRTUAL				},
-   {    "VirtualJumpUpRight",	    "R9+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualJumpUpRight",	    "R9+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_UPRIGHT,	    KD_VIRTUAL				},
    {    "HalfUpRight",		    "R9+Shift",		NULLFUNC,
 	ACTION_HALF_UPRIGHT,	    KD_VIRTUAL				},
-   {    "VirtualHalfUpRight",	    "R9+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualHalfUpRight",	    "R9+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_UPRIGHT,	    KD_VIRTUAL				},
 
    {	"DownLeft",		    "R13",		NULLFUNC,
 	ACTION_DOWNLEFT,	    KD_VIRTUAL				},
-   {    "VirtualDownLeft",	    "R13+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualDownLeft",	    "R13+Meta",		KeyMoveVDM,
 	ACTION_DOWNLEFT_V,	    KD_VIRTUAL				},
    {    "JumpDownLeft",		    "R13+Ctrl",		NULLFUNC,
 	ACTION_JUMP_DOWNLEFT,	    KD_VIRTUAL				},
-   {    "VirtualJumpDownLeft",	    "R13+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualJumpDownLeft",	    "R13+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_DOWNLEFT,	    KD_VIRTUAL				},
    {    "HalfDownLeft",		    "R13+Shift",	NULLFUNC,
 	ACTION_HALF_DOWNLEFT,	    KD_VIRTUAL				},
-   {    "VirtualHalfDownLeft",	    "R13+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualHalfDownLeft",	    "R13+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_DOWNLEFT,	    KD_VIRTUAL				},
 
-   {    "VirtualDownRight",	    "R15+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualDownRight",	    "R15+Meta",		KeyMoveVDM,
 	ACTION_DOWNRIGHT_V,	    KD_VIRTUAL				},
    {    "DownRight",		    "R15",		NULLFUNC,
 	ACTION_DOWNRIGHT,	    KD_VIRTUAL				},
    {    "JumpDownRight",	    "R15+Ctrl",		NULLFUNC,
 	ACTION_JUMP_DOWNRIGHT,	    KD_VIRTUAL				},
-   {    "VirtualJumpDownRight",	    "R15+Ctrl+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualJumpDownRight",	    "R15+Ctrl+Meta",	KeyMoveVDM,
 	ACTION_JUMP_DOWNRIGHT,	    KD_VIRTUAL				},
    {    "HalfDownRight",	    "R15+Shift",	NULLFUNC,
 	ACTION_HALF_DOWNRIGHT,	    KD_VIRTUAL				},
-   {    "VirtualHalfDownRight",	    "R15+Shift+Meta",	(void(*)())KeyMoveVDM,
+   {    "VirtualHalfDownRight",	    "R15+Shift+Meta",	KeyMoveVDM,
 	ACTION_HALF_DOWNRIGHT,	    KD_VIRTUAL				},
 
-   {    "VirtualHome",	    	    "R11+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualHome",	    	    "R11+Meta",		KeyMoveVDM,
 	ACTION_HOME_V,	    	    KD_VIRTUAL				},
    {    "GoHome",		    "R11",		NULLFUNC,
 	ACTION_HOME,		    KD_VIRTUAL				},
 
-   {    "VirtualScreen1",	    "F1+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen1",	    "F1+Meta",		KeyMoveVDM,
 	ACTION_GOTO_1,		    KD_VIRTUAL				},
    {    "Screen1",	    	    "F1",		NULLFUNC,
 	ACTION_GOTO_1,		    KD_VIRTUAL				},
-   {    "VirtualScreen2",	    "F2+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen2",	    "F2+Meta",		KeyMoveVDM,
 	ACTION_GOTO_2,		    KD_VIRTUAL				},
    {    "Screen2",	    	    "F2",		NULLFUNC,
 	ACTION_GOTO_2,		    KD_VIRTUAL				},
-   {    "VirtualScreen3",	    "F3+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen3",	    "F3+Meta",		KeyMoveVDM,
 	ACTION_GOTO_3,		    KD_VIRTUAL				},
    {    "Screen3",	    	    "F3",		NULLFUNC,
 	ACTION_GOTO_3,		    KD_VIRTUAL				},
-   {    "VirtualScreen4",	    "F4+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen4",	    "F4+Meta",		KeyMoveVDM,
 	ACTION_GOTO_4,		    KD_VIRTUAL				},
    {    "Screen4",	    	    "F4",		NULLFUNC,
 	ACTION_GOTO_4,		    KD_VIRTUAL				},
-   {    "VirtualScreen5",	    "F5+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen5",	    "F5+Meta",		KeyMoveVDM,
 	ACTION_GOTO_5,		    KD_VIRTUAL				},
    {    "Screen5",	    	    "F5",		NULLFUNC,
 	ACTION_GOTO_5,		    KD_VIRTUAL				},
-   {    "VirtualScreen6",	    "F6+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen6",	    "F6+Meta",		KeyMoveVDM,
 	ACTION_GOTO_6,		    KD_VIRTUAL				},
    {    "Screen6",	    	    "F6",		NULLFUNC,
 	ACTION_GOTO_6,		    KD_VIRTUAL				},
-   {    "VirtualScreen7",	    "F7+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen7",	    "F7+Meta",		KeyMoveVDM,
 	ACTION_GOTO_7,		    KD_VIRTUAL				},
    {    "Screen7",	    	    "F7",		NULLFUNC,
 	ACTION_GOTO_7,		    KD_VIRTUAL				},
-   {    "VirtualScreen8",	    "F8+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen8",	    "F8+Meta",		KeyMoveVDM,
 	ACTION_GOTO_8,		    KD_VIRTUAL				},
    {    "Screen8",	    	    "F8",		NULLFUNC,
 	ACTION_GOTO_8,		    KD_VIRTUAL				},
-   {    "VirtualScreen9",	    "F9+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen9",	    "F9+Meta",		KeyMoveVDM,
 	ACTION_GOTO_9,		    KD_VIRTUAL				},
    {    "Screen9",	    	    "F9",		NULLFUNC,
 	ACTION_GOTO_9,		    KD_VIRTUAL				},
-   {    "VirtualScreen10",	    "F10+Meta",		(void(*)())KeyMoveVDM,
+   {    "VirtualScreen10",	    "F10+Meta",		KeyMoveVDM,
 	ACTION_GOTO_10,		    KD_VIRTUAL				},
    {    "Screen10",	    	    "F10",		NULLFUNC,
 	ACTION_GOTO_10,		    KD_VIRTUAL				},
 };
 
 #define NUMKEYDESCRIPTORS (sizeof(KeyDescriptorTable)/sizeof(KeyDescriptor))
+
+typedef struct {
+    KeySym sym;
+    unsigned int mod;
+} modsym;
+
 
 #define KEYBINDING_TABLE_SIZE 60
 #define KEYBINDING_TABLE_INCR 20
@@ -1584,6 +1581,7 @@ SetProgKeys(dpy, start_sym, end_sym, modstate, off)
 {
     KeyBinding *k;
     KeySym keysym;
+    extern CheckForKeyProg();
 
     for(k=KeyBindingTable; k < KeyBindingTable+bindingTableCount; ++k) {
       if (k->desc->action == ACTION_VIRTUAL) {

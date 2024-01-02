@@ -8,8 +8,6 @@
 
 void
 do_it(item, event)
-Xv_opaque item;
-Event event;
 {
     Rect *r;
     Panel panel = xv_get(item, PANEL_PARENT_PANEL);
@@ -32,7 +30,7 @@ char *argv[];
     Canvas       canvas;
     Xv_Cursor    cursor;
 
-    xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, NULL);
+    xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv);
 
     /*
      * create a cursor based on the image just created

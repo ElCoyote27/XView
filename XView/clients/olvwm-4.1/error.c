@@ -204,8 +204,6 @@ static ErrorEntry errorTable[] = {
 	{0,	BAll,	0}	/* 127, X_NoOperation */
 }; /* errorTable */
 
-static void printError(Display *dpy, XErrorEvent *err, char *tag);
-static void handleExtensionError(Display *dpy, XErrorEvent *event);
 
 /*
  * printError
@@ -230,9 +228,9 @@ printError(dpy, err, tag)
 	err->request_code, buf);
     FPRINTF(stderr, GetString("  request minor code:  %d\n"),
 	err->minor_code);
-    FPRINTF(stderr, GetString("  resource ID in failed request:  0x%lx\n"),
+    FPRINTF(stderr, GetString("  resource ID in failed request:  0x%x\n"),
 	err->resourceid);
-    FPRINTF(stderr, GetString("  serial number of failed request:  %ld\n"),
+    FPRINTF(stderr, GetString("  serial number of failed request:  %d\n"),
 	err->serial);
 /*    FPRINTF(stderr, GetString("  current request serial number:  %d\n"),
 	dpy->request);*/

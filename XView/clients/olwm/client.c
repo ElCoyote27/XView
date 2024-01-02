@@ -34,11 +34,6 @@
 #include "resources.h"
 #include "client.h"
 
-static void setComposeLed(Display *dpy, int mode);
-static void initClientState(Display *dpy);
-static void addClient(Client *cli);
-static void removeClient(Client *cli);
-
 /***************************************************************************
 * global data
 ***************************************************************************/
@@ -87,6 +82,22 @@ extern Atom AtomLeftIMStatus;
 extern Atom AtomRightIMStatus;
 #endif
 
+extern void RecursiveRefresh();
+extern void PushPinChangeState();
+extern void FrameUpdateHeader();
+extern void FrameUpdateFooter();
+extern void IconUpdateName();
+extern void ColorUpdateColorMapWindows();
+extern void StateUpdateWinAttr();
+extern void StateUpdateDecorAdd();
+extern void StateUpdateDecorDel();
+extern void StateUpdateWMNormalHints();
+extern void StateUpdateWMHints();
+extern void StateUpdateWMProtocols();
+#ifdef OW_I18N_L4
+extern void FrameUpdateIMStatus();
+#endif
+
 /***************************************************************************
 * private data
 ***************************************************************************/
@@ -132,6 +143,8 @@ static XrmQuark menuAccelCQ;		/* quark for "MenuAccelerators" */
 /***************************************************************************
 * private functions
 ***************************************************************************/
+
+static void clientSetBusy();
 
 /*
  * setComposeLed - sets the compose led to the new mode iff different than
@@ -344,8 +357,6 @@ ClientKill(cli,pforce)
 Client *cli;
 Bool pforce;
 {
-    extern Time	LastEventTime;
-
 	if (cli->framewin == NULL)
 		return NULL;
 
@@ -394,6 +405,7 @@ void *junk;
 	WinPane 	*paneInfo;
 	Display		*dpy = cli->dpy;
 	Window 		pane;
+	void 		ClientSetWMState();	/* local forward */
 
 	/* if no framewin then it's probably a root window */
 	if (frameInfo == NULL)
@@ -560,6 +572,7 @@ Client *cli;
 	ScreenInfo  *scrInfo = cli->scrInfo;
 	List	    *l;
 	Client	    *tcli;
+	extern void PreenColormapInhibit();
 
 	UnTrackSubwindows(cli, True);
 	if (IsSelected(cli))
@@ -1577,18 +1590,6 @@ typedef struct {
 	Atom	*propAtom;
 	void	(*updateFunc)();
 } ClientPropUpdate; 
-
-extern void FrameUpdateHeader();
-extern void FrameUpdateFooter();
-extern void IconUpdateName();
-extern void ColorUpdateColorMapWindows();
-extern void StateUpdateWMProtocols();
-extern void StateUpdateWMNormalHints();
-extern void StateUpdateWMHints();
-extern void ClientUpdateBusy();
-extern void StateUpdateWinAttr();
-extern void StateUpdateDecorAdd();
-extern void StateUpdateDecorDel();
 
 static ClientPropUpdate propUpdateTable[] =  {
 	&AtomWMName,			FrameUpdateHeader,

@@ -14,9 +14,7 @@ static char     sccsid[] = "@(#)wmgr_rect.c 20.20 93/06/28 Copyr 1985 Sun Micro"
  * Window mgr move, stretch and refresh.
  */
 
-#include <xview_private/wmgr_rect_.h>
-#include <xview_private/win_geom_.h>
-#include <xview_private/win_global_.h>
+#include <xview/wmgr.h>
 #include <xview/win.h>
 
 Xv_public void

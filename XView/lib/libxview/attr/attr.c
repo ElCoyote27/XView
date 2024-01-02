@@ -10,10 +10,6 @@ static char     sccsid[] = "@(#)attr.c 20.24 90/12/04";
  *	file for terms of the license.
  */
 
-#include <xview_private/attr_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/help_file_.h>
-#include <xview_private/xv_.h>
 #include <stdio.h>
 #include <xview_private/i18n_impl.h>
 #include <xview/pkg_public.h>
@@ -23,6 +19,8 @@ static char     sccsid[] = "@(#)attr.c 20.24 90/12/04";
 #include <stdlib.h> 
 #endif /* SVR4 */
 
+
+Xv_private FILE *xv_help_find_file();
 
 #define ANBUFSIZE 64
 static char     attr_name_buf[ANBUFSIZE];	/* to hold name of attribute */
@@ -44,15 +42,15 @@ Xv_private char *
 attr_name(attr)
     Attr_attribute attr;
 {
-    Attr_attribute attr_value;
+    int		    attr_value;
     FILE	   *file_ptr;
     int		    found = FALSE;
 
     attr_name_buf[0] = 0;
     file_ptr = xv_help_find_file("attr_names");
     if (file_ptr) {
-	while (fscanf(file_ptr, "%lx %s\n", &attr_value, attr_name_buf) != EOF) {
-	    if (found = (attr_value == attr))
+	while (fscanf(file_ptr, "%x %s\n", &attr_value, attr_name_buf) != EOF) {
+	    if (found = (attr_value == (int)attr))
 		break;
 	}
 	fclose(file_ptr);
@@ -106,11 +104,11 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
       avlist = avlist_tmp;
 
    if( attr1 )
-      attr = attr1;
+      attr = (int)attr1;
    else
-      attr = va_arg( valist, Attr_attribute );
+      attr = (int)va_arg( valist, Attr_attribute );
 
-   while( attr )
+   while( (int)attr )
    {
       if( ++arg_count > arg_count_max )
       {
@@ -122,7 +120,7 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
       }
       cardinality = ATTR_CARDINALITY(attr);
 
-      switch (ATTR_LIST_TYPE(attr))
+      switch ((int)ATTR_LIST_TYPE(attr))
       {
          case ATTR_NONE:       /* not a list */
             *avlist++ = attr;
@@ -182,7 +180,7 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
 
          case ATTR_NULL:       /* null terminated list */
             *avlist++ = attr; 
-            switch (ATTR_LIST_PTR_TYPE(attr))
+            switch ((int)ATTR_LIST_PTR_TYPE(attr))
             {
                case ATTR_LIST_IS_INLINE:
                   /*
@@ -235,7 +233,7 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
                         *avlist++ = va_arg( valist, Attr_attribute );
 #endif
 		      }
-                  } while (*(avlist - 1));
+                  } while ((int)*(avlist - 1));
                   break;
 
                case ATTR_LIST_IS_PTR:
@@ -254,7 +252,7 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
 
          case ATTR_COUNTED:    /* counted list */
             *avlist++ = attr;
-            switch (ATTR_LIST_PTR_TYPE(attr)) {
+            switch ((int)ATTR_LIST_PTR_TYPE(attr)) {
                case ATTR_LIST_IS_INLINE:
                {
                   register unsigned count;
@@ -335,7 +333,7 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
              if (cardinality != 0)       /* don't strip it */
                 *avlist++ = attr;
 
-             switch (ATTR_LIST_PTR_TYPE(attr))
+             switch ((int)ATTR_LIST_PTR_TYPE(attr))
              {
                 case ATTR_LIST_IS_INLINE:
                    (void) copy_va_to_av(valist, avlist, (Attr_attribute)NULL);
@@ -373,7 +371,7 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
 	default:
 	    break;
       }
-      attr = va_arg( valist, Attr_attribute );
+      attr = (int)va_arg( valist, Attr_attribute );
    }    
 
    *avlist = (Attr_attribute)NULL;
@@ -407,9 +405,9 @@ attr_copy_avlist(dest, avlist)
     register Attr_attribute attr;
     register unsigned cardinality;
 
-    while ((attr = avlist_get(avlist)) != (Attr_attribute)NULL) {
+    while ((attr = (int)avlist_get(avlist)) != (Attr_attribute)NULL) {
 	cardinality = ATTR_CARDINALITY(attr);
-	switch (ATTR_LIST_TYPE(attr)) {
+	switch ((int)ATTR_LIST_TYPE(attr)) {
 	  case ATTR_NONE:	/* not a list */
 	    *dest++ = attr;
 	    avlist_copy_values(avlist, dest, cardinality);
@@ -417,7 +415,7 @@ attr_copy_avlist(dest, avlist)
 
 	  case ATTR_NULL:	/* null terminated list */
 	    *dest++ = attr;
-	    switch (ATTR_LIST_PTR_TYPE(attr)) {
+	    switch ((int)ATTR_LIST_PTR_TYPE(attr)) {
 	      case ATTR_LIST_IS_INLINE:
 		/*
 		 * Note that this only checks the first four bytes for the
@@ -437,7 +435,7 @@ attr_copy_avlist(dest, avlist)
 
 	  case ATTR_COUNTED:	/* counted list */
 	    *dest++ = attr;
-	    switch (ATTR_LIST_PTR_TYPE(attr)) {
+	    switch ((int)ATTR_LIST_PTR_TYPE(attr)) {
 	      case ATTR_LIST_IS_INLINE:{
 		    register unsigned count;
 
@@ -457,7 +455,7 @@ attr_copy_avlist(dest, avlist)
 	    if (cardinality != 0)	/* don't strip it */
 		*dest++ = attr;
 
-	    switch (ATTR_LIST_PTR_TYPE(attr)) {
+	    switch ((int)ATTR_LIST_PTR_TYPE(attr)) {
 	      case ATTR_LIST_IS_INLINE:
 		dest = attr_copy_avlist(dest, avlist);
 		if (cardinality != 0)	/* don't strip it */
@@ -512,24 +510,24 @@ attr_count_avlist(avlist, last_attr)
     register unsigned num;
     register unsigned cardinality;
 
-    while (attr = *avlist++) {
+    while (attr = (int)*avlist++) {
 	count++;		/* count the attribute */
 	cardinality = ATTR_CARDINALITY(attr);
 	last_attr = attr;
-	switch (ATTR_LIST_TYPE(attr)) {
+	switch ((int)ATTR_LIST_TYPE(attr)) {
 	  case ATTR_NONE:	/* not a list */
 	    count += cardinality;
 	    avlist += cardinality;
 	    break;
 
 	  case ATTR_NULL:	/* null terminated list */
-	    switch (ATTR_LIST_PTR_TYPE(attr)) {
+	    switch ((int)ATTR_LIST_PTR_TYPE(attr)) {
 	      case ATTR_LIST_IS_INLINE:
 		/*
 		 * Note that this only checks the first four bytes for the
 		 * null termination.
 		 */
-		while (*avlist++)
+		while ((int)*avlist++)
 		    count++;
 		count++;	/* count the null terminator */
 		break;
@@ -542,7 +540,7 @@ attr_count_avlist(avlist, last_attr)
 	    break;
 
 	  case ATTR_COUNTED:	/* counted list */
-	    switch (ATTR_LIST_PTR_TYPE(attr)) {
+	    switch ((int)ATTR_LIST_PTR_TYPE(attr)) {
 	      case ATTR_LIST_IS_INLINE:
 		num = ((unsigned) (*avlist)) * cardinality + 1;
 		count += num;
@@ -599,27 +597,27 @@ attr_skip_value(attr, avlist)
     register Attr_attribute attr;
     register Attr_avlist avlist;
 {
-    switch (ATTR_LIST_TYPE(attr)) {
+    switch ((int)ATTR_LIST_TYPE(attr)) {
       case ATTR_NULL:
-	if (ATTR_LIST_PTR_TYPE(attr) == ATTR_LIST_IS_PTR)
+	if ((int)ATTR_LIST_PTR_TYPE(attr) == ATTR_LIST_IS_PTR)
 	    avlist++;
 	else
-	    while (*avlist++);
+	    while ((int)*avlist++);
 	break;
 
       case ATTR_RECURSIVE:
-	if (ATTR_LIST_PTR_TYPE(attr) == ATTR_LIST_IS_PTR)
+	if ((int)ATTR_LIST_PTR_TYPE(attr) == ATTR_LIST_IS_PTR)
 	    avlist++;
 	else
-	    while (attr = *avlist++)
+	    while (attr = (int)*avlist++)
 		avlist = attr_skip_value(attr, avlist);
 	break;
 
       case ATTR_COUNTED:
-	if (ATTR_LIST_PTR_TYPE(attr) == ATTR_LIST_IS_PTR)
+	if ((int)ATTR_LIST_PTR_TYPE(attr) == ATTR_LIST_IS_PTR)
 	    avlist++;
 	else
-	    avlist += (*avlist) * ATTR_CARDINALITY(attr) + 1;
+	    avlist += ((int) *avlist) * ATTR_CARDINALITY(attr) + 1;
 	break;
 
       case ATTR_NONE:

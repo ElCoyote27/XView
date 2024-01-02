@@ -16,7 +16,12 @@ static char     sccsid[] = "@(#)flist_data.c 1.3 93/06/28";
  */
 
 #include <xview/xview.h>
-#include <xview_private/file_list_.h>
+#include <xview_private/flist_impl.h>
+
+extern int 		file_list_init();
+extern Xv_opaque	file_list_set();
+extern Xv_opaque	file_list_get();
+extern int 		file_list_destroy();
 
 Xv_pkg file_list_pkg = {
     "File_list",

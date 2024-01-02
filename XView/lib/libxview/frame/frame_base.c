@@ -10,11 +10,6 @@ static char     sccsid[] = "@(#)frame_base.c 1.31 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/frame_base_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/screen_.h>
-#include <xview_private/wmgr_decor_.h>
-#include <xview_private/xv_.h>
 #include <X11/Xlib.h>
 #include <xview_private/fm_impl.h>
 #include <xview_private/frame_base.h>
@@ -29,6 +24,8 @@ static char     sccsid[] = "@(#)frame_base.c 1.31 93/06/28";
 /* 3.x - 4.0 libc transition code; old (pre-4.0) code must define the symbol */
 #define jcsetpgrp(p)  setpgrp((p),(p))
 #endif
+
+extern Attr_avlist attr_find();
 
 /* ARGSUSED */
 Pkg_private int
@@ -69,7 +66,7 @@ frame_base_init(owner, frame_public, avlist)
     /* Wmgr default to have resize corner for cmd frame */
     status_set(frame, show_resize_corner, TRUE);
 
-    for (attrs = avlist; *attrs; attrs = attr_next(attrs)) {
+    for (attrs = avlist; (int)*attrs; attrs = attr_next(attrs)) {
 	switch ((int)*attrs) {
 
 	  case FRAME_SCALE_STATE:
@@ -112,7 +109,7 @@ frame_base_init(owner, frame_public, avlist)
     return XV_OK;
 }
 
-Xv_private void
+Xv_private
 frame_handle_props(frame_public)
     Frame           frame_public;
 {

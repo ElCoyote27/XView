@@ -11,12 +11,6 @@
 #include <xview/font.h>
 #include <xview/sel_pkg.h>
 
-int sel_post_req(Selection_requestor sel);
-void MakeRequest(Panel_item item, Event* event);
-void SelectionError(Selection_requestor sel, Atom target, int errorCode);
-void RequestChoice(Panel_item item, unsigned int value, Event* event);
-void SelectionReplyProc(Selection_requestor sel, Xv_opaque target, Atom type, Atom value, unsigned long length, int format);
-
 Frame 		frame;
 Textsw  	textsw;
 Xv_Server	server;
@@ -36,11 +30,13 @@ Selection_requestor  sel;
 
 #define ATOM(server, name)	(Atom)xv_get(server, SERVER_ATOM, name)
 
-void
 main(argc, argv)
     int    argc;
     char **argv;
 {
+    void	MakeRequest(),
+		SelectionReplyProc(),
+		RequestChoice();
     Xv_Font	font;
 
     server = xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, 0);
@@ -202,16 +198,16 @@ SelectionReplyProc(sel, target, type, value, length, format)
 	    }
 	} while(length);
     } else if (target == ATOM(server, "TIMESTAMP")) {
-	char buf[32];
+	char buf[10];
 
 	textsw_insert(textsw, "TIMESTAMP of acquisition: ", 26); 
 	sprintf(buf, "%lu\n", *(unsigned long *)value);
 	textsw_insert(textsw, buf, strlen(buf));
     } else if (target == ATOM(server, "LENGTH")) {
-	char buf[32];
+	char buf[10];
 
 	textsw_insert(textsw, "Length of selection: ", 21); 
-	sprintf(buf, "%d\n", length > 0 ? *(int *)value : 0);
+	sprintf(buf, "%d\n", *(int *)value);
 	textsw_insert(textsw, buf, strlen(buf));
     } else if (target == ATOM(server, "STRING")) {
 	static int	incr = False;
@@ -232,7 +228,6 @@ SelectionReplyProc(sel, target, type, value, length, format)
     textsw_insert(textsw, LINE, strlen(LINE));
 }
 
-void
 SelectionError(sel, target, errorCode)
     Selection_requestor	 sel;
     Atom	 	 target;

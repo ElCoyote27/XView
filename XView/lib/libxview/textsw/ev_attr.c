@@ -12,16 +12,13 @@ static char     sccsid[] = "@(#)ev_attr.c 20.27 93/06/28";
 /*
  * Attribute set/get routines for entity views.
  */
-#include <xview_private/ev_attr_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/ev_display_.h>
-#include <xview_private/finger_tbl_.h>
+#include <xview/pkg.h>
 #include <xview/attrol.h>
 #include <xview_private/primal.h>
+#include <xview_private/ev_impl.h>
 
-static void ev_adjust_start(register Ev_chain chain, register Ev_handle only_view, register Es_index to, int incremental);
-static Ev_status ev_set_internal(register Ev_handle view, Ev_chain chain, register Attr_avlist attrs);
-static void ev_set_rect(register Ev_handle view, register struct rect *rect, register struct rect *intersect_rect);
+static Ev_status ev_set_internal();
+static void     ev_set_rect();
 
 
 #define SET_BOOL_FLAG(flags, to_test, flag)				\
@@ -122,9 +119,9 @@ ev_get(view, attribute, args1, args2, args3)
 
 Pkg_private          Ev_status
 #ifdef ANSI_FUNC_PROTO
-_ev_set(Ev_handle view, ...)
+ev_set(Ev_handle view, ...)
 #else
-_ev_set(view, va_alist)
+ev_set(view, va_alist)
     Ev_handle       view;
 va_dcl
 #endif
@@ -408,9 +405,9 @@ ev_set_internal(view, chain, attrs)
 
 Pkg_private void
 #ifdef ANSI_FUNC_PROTO
-_ev_notify(Ev_handle view, ...)
+ev_notify(Ev_handle view, ...)
 #else
-_ev_notify(view, va_alist)
+ev_notify(view, va_alist)
     register Ev_handle view;
 va_dcl
 #endif
@@ -436,6 +433,7 @@ ev_set_rect(view, rect, intersect_rect)
     register Ev_handle view;
     register struct rect *rect, *intersect_rect;
 {
+    Pkg_private struct rect ev_rect_for_line();
     int             lines;
     register int    old_lines = view->line_table.last_plus_one;
     struct rect     clear_rect;

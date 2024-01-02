@@ -20,11 +20,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <signal.h>
                      
 #ifndef __GLIBC__
 /* #define __LIBRARY__ */
@@ -37,16 +32,15 @@
 #endif
 
 #ifdef __GLIBC__
-extern int __select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *utimeout);
 
 int linux_select(int width, fd_set *readfds, fd_set *writefds,
-                 fd_set *exceptfds, struct timeval *utimeout) {
+                 fd_set *exceptfds, struct timeval *timeout) {
   static struct timeval tout_copy;
 
-  if (utimeout != NULL) {
-    tout_copy = *utimeout;
+  if (timeout != NULL) {
+    tout_copy = *timeout;
   }
-  return __select(width, readfds, writefds, exceptfds, utimeout ? &tout_copy : NULL);
+  return __select(width, readfds, writefds, exceptfds, timeout ? &tout_copy : NULL);
 }
 
 #else /* __GLIBC__ */

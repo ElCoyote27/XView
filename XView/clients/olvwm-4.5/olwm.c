@@ -673,9 +673,10 @@ handleChildSignal()
 void
 ReapChildren()
 {
-#ifdef SYSV
+#if defined(SYSV) || defined(__linux__)
         pid_t pid;
         int status;
+	int oldmask;
 #else
 	int oldmask;
 	int pid;
@@ -695,7 +696,7 @@ ReapChildren()
 
 	while (1) {
 
-#ifdef SYSV
+#if defined(SYSV) || defined(__linux__)
                 pid = waitpid(-1, &status, WNOHANG);
 #else
                 pid = wait3(&status, WNOHANG, (struct rusage *)0);

@@ -14,7 +14,6 @@
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <sys/ioctl.h>
-#include <xview/pkg.h>
 #include <xview/notify.h>
 #ifdef SVR4
 #include <sys/filio.h>

@@ -195,7 +195,6 @@ fprintf(stderr, "mbstowcsdup: mbs [%s] -> wcs [%ws]\n", mbs, wcs);
 
 
 #if DEBUG > 4
-void
 ascii_dump(s)
 register unsigned char	*s;
 {

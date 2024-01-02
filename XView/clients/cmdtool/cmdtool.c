@@ -21,18 +21,22 @@ static  char sccsid[] = "@(#)cmdtool.c 15.61 93/06/28";
 #endif /* SVR4 */
 
 #include <sys/types.h>
-#include <xview/pkg.h>
+#include <xview/attr.h>
 #include <xview/defaults.h>
 #include <xview/xview.h>
 #include <xview/scrollbar.h>
 #include <xview/tty.h>
 #include <xview/termsw.h>
 #include <xview/textsw.h>
-#include <xview/ttysw.h>
 #include <stdlib.h>		/* getenv() */
 
-extern char *dgettext(char *domain_name, char *msg_id);
-extern void xv_usage(char *name);
+#ifdef __STDC__
+extern char *getenv(const char *);
+extern char *dgettext(char *, char *);
+#else
+extern char *getenv();
+extern char *dgettext();
+#endif
 
 #define	TEXTDOMAIN	"cmdtool"
 #define	MSG(msg)	dgettext(TEXTDOMAIN, msg)
@@ -96,7 +100,6 @@ print_usage(am_cmdtool, toolname)
 	}
 }
 
-void
 main(argc,argv)
 	int argc;
 	char **argv;
@@ -292,7 +295,7 @@ main(argc,argv)
 	}
 
 	/* If FRAME_LABEL wasn't set by cmdline argument, set it */
-	if ((tmp_label1 = (char *)xv_get(base_frame, FRAME_LABEL, NULL)) == NULL) {
+	if ((tmp_label1 = (char *)xv_get(base_frame, FRAME_LABEL)) == NULL) {
 		(void)strncpy(frame_label,
 		  am_cmdtool ? cmd_label : shell_label, sizeof(frame_label));
 		if (become_console) {
@@ -304,8 +307,8 @@ main(argc,argv)
 		(void)strncat(frame_label, *argv, sizeof(frame_label));
 		(void)xv_set(base_frame, FRAME_LABEL, frame_label, NULL);
 	}
-	tool_icon = (Icon)xv_get(base_frame, FRAME_ICON, NULL);
-	if (((tmp_label2 = (char *) xv_get(tool_icon, ICON_LABEL, NULL)) == NULL) ||
+	tool_icon = (Icon)xv_get(base_frame, FRAME_ICON);
+	if (((tmp_label2 = (char *) xv_get(tool_icon, ICON_LABEL)) == NULL) ||
 	    *tmp_label2 == 0177) {
 	    if (tmp_label1) {
 		(void)strncpy(icon_label, tmp_label1, sizeof(icon_label));
@@ -354,7 +357,7 @@ main(argc,argv)
 			  NULL);
 	}
 	
-	tty_pid = (int)xv_get(ttysw, TTY_PID, NULL);
+	tty_pid = (int)xv_get(ttysw, TTY_PID);
 #ifdef DEBUG
 	(void)fprintf(stderr, "child pid = %d\n", tty_pid);
 #endif /* DEBUG */

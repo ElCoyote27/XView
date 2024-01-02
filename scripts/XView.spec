@@ -1,8 +1,8 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20231231
+%define BaseRelease 20240101
 Version: 3.2p1.4
-Release: 26.4%{?dist}
+Release: 25.26%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -65,6 +65,12 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Mon Jan 1 2024 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.26
+- Fix man_db.conf handling
+
+* Mon Jan 1 2024 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.25
+- Revert to 3.2p1.4-25.24 codebase as some OWacomp no longer compiles with xview-64bit-ggod
+
 * Sun Dec 31 2023 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-26.4
 - Yet another bump.
 
@@ -385,9 +391,15 @@ find $RPM_BUILD_ROOT/usr/openwin/share/src/xview -name "*.o" -exec rm -fv {} \;
 
 %post
 if [ -f /etc/man_db.conf ]; then
-	if ! %{__grep} '^MANPATH /usr/openwin/man' /etc/man_db.conf > /dev/null; then
-		echo "MANPATH /usr/openwin/man" >> /etc/man_db.conf
+	if ! %{__grep} '^MANPATH_MAP[[:space:]]*/usr/openwin/bin' /etc/man_db.conf > /dev/null; then
+		echo -e "MANPATH_MAP\t/usr/openwin/bin\t/usr/openwin/man" >> /etc/man_db.conf
 		%{__chmod} 644 /etc/man_db.conf
+		test -x /usr/bin/mandb && /usr/bin/mandb
+	fi
+	if ! %{__grep} '^MANDB_MAP[[:space:]]*/usr/openwin/man' /etc/man_db.conf > /dev/null; then
+		echo -e "MANDB_MAP\t/usr/openwin/man\t/var/cache/man/openwin" >> /etc/man_db.conf
+		%{__chmod} 644 /etc/man_db.conf
+		test -x /usr/bin/mandb && /usr/bin/mandb
 	fi
 fi
 

@@ -30,9 +30,6 @@
 #include "win.h"
 #include "menu.h"
 #include "globals.h"
-#include "winmenu.h"
-#include "info.h"
-#include "virtual.h"
 
 /***************************************************************************
 * private data
@@ -45,13 +42,6 @@ static ClassMenu classMenu;
 #define MENU_ATTR_EVENT_MASK    (ButtonPressMask|ExposureMask)
 
 #define MENU_SHADOW_OFFSET	(10)
-
-static int eventButtonPress(Display *dpy, XEvent *event, WinMenu *winInfo);
-static int eventButtonRelease(Display *dpy, XEvent *event, WinMenu *winInfo);
-static int eventKeyPress(Display *dpy, XEvent *event, WinMenu *winInfo);
-static int eventKeyRelease(Display *dpy, XEvent *event, WinMenu *winInfo);
-static int eventMotionNotify(Display *dpy, XEvent *event, WinMenu *winInfo);
-static int destroyMenu(Display *dpy, WinMenu *winInfo);
 
 /***************************************************************************
 * private functions
@@ -199,7 +189,7 @@ MakeMenu(dpy, winInfo)
 			&attributes);
 	w->core.self = win;
 
-	WIInstallInfo((WinGeneric *)w);
+	WIInstallInfo(w);
 
 #ifdef SHADOW
 	/* REMIND - there is no pixmapGray - what to use really??? */
@@ -240,9 +230,9 @@ MapMenuWindow(dpy,winInfo,menuInfo)
 	changes.y = winInfo->core.y;
 	changes.width = winInfo->core.width;
 	changes.height = winInfo->core.height;
-	ConfigureWindow(dpy,(WinGeneric *)winInfo,
+	ConfigureWindow(dpy,winInfo,
 		CWX|CWY|CWWidth|CWHeight,&changes);
-	MapRaised((WinGeneric *)winInfo);
+	MapRaised(winInfo);
 
 #ifdef SHADOW
 
@@ -270,7 +260,7 @@ UnmapMenuWindow(dpy,winInfo)
 	Display		*dpy;
 	WinMenu		*winInfo;
 {
-	UnmapWindow((WinGeneric *)winInfo);
+	UnmapWindow(winInfo);
 #ifdef SHADOW
 	XUnmapWindow(dpy,winInfo->shadow);
 #endif /* SHADOW */
@@ -294,7 +284,7 @@ MenuEventExpose(dpy, event, winInfo)
     if (mInfo == NULL) /*not yet reparented*/
 	WinEventExpose(dpy, event, winInfo);
     else {
-	SetMenuRedrawHints(dpy, (XExposeEvent *)event, mInfo);
+	SetMenuRedrawHints(dpy, event, mInfo);
 
 	if (event->xexpose.count == 0)
 	    DrawMenuWithHints(dpy, mInfo);

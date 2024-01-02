@@ -10,12 +10,6 @@ static char     sccsid[] = "@(#)fs_set.c 20.31 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/fs_set_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/fs_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/win_compat_.h>
-#include <xview_private/win_global_.h>
 #include <xview_private/draw_impl.h>
 #include <xview/cursor.h>
 #include <xview/window.h>
@@ -23,8 +17,9 @@ static char     sccsid[] = "@(#)fs_set.c 20.31 93/06/28";
 #include <xview_private/fs_impl.h>
 #include <xview_private/i18n_impl.h>
 
+Xv_private char *fullscreen_translate_report_code();
 
-static void fullscreen_allow_events(Display *display, int event_mode);
+static void     fullscreen_allow_events();
 
 Pkg_private Xv_opaque
 fullscreen_set_avlist(fullscreen_public, avlist)
@@ -280,7 +275,7 @@ fullscreen_set_avlist(fullscreen_public, avlist)
 	    } else if (fullscreen->grab_kbd) 
 		fullscreen_allow_events(display, SyncKeyboard);
 	} else {
-	    xv_error(0,
+	    xv_error(NULL,
 		     ERROR_STRING, 
 		     XV_MSG("Attempt to allow synchronous event processing without first being in synchronous mode. Attribute ignored!"),
 		     ERROR_PKG, FULLSCREEN,

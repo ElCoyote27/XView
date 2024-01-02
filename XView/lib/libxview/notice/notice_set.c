@@ -9,13 +9,6 @@ static char     sccsid[] = "@(#)notice_set.c 1.21 93/06/28";
  *	pending in the U.S. and foreign countries. See LEGAL NOTICE 
  *	file for terms of the license.
  */
-#include <xview_private/notice_set_.h>
-#include <xview_private/attr_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/notice_.h>
-#include <xview_private/notice_ol_.h>
-#include <xview_private/notice_pt_.h>
-#include <xview_private/xv_.h>
 #include <stdio.h>
 #include <string.h>
 #include <X11/Xlib.h>
@@ -29,6 +22,10 @@ static char     sccsid[] = "@(#)notice_set.c 1.21 93/06/28";
 #include <xview/win_input.h>
 #include <xview/cms.h>
 
+Pkg_private Xv_opaque	notice_generic_set();
+#ifdef  OW_I18N
+static CHAR     **notice_string_set();
+#endif
 
 Pkg_private Xv_opaque
 notice_set_avlist(notice_public, avlist)
@@ -74,11 +71,11 @@ notice_generic_set(notice, avlist, is_object)
 	 * - Attributes used by ALL NOTICES
 	 */
         case NOTICE_LOCK_SCREEN:
-	    notice->lock_screen = ((Bool)(long)value != FALSE);
+	    notice->lock_screen = ((Bool)value != FALSE);
 	break;
 
         case NOTICE_BLOCK_THREAD:
-	    notice->block_thread = ((Bool)(long)value != FALSE);
+	    notice->block_thread = ((Bool)value != FALSE);
 	break;
 
 #ifdef OW_I18N
@@ -407,7 +404,7 @@ notice_generic_set(notice, avlist, is_object)
         break;
 
         case NOTICE_NO_BEEPING:
-            if ((long) value)  {
+            if ((int) value)  {
                 notice->dont_beep = 1;
             }
             else  {
@@ -432,7 +429,7 @@ notice_generic_set(notice, avlist, is_object)
             break;
 
         case NOTICE_TRIGGER:
-            notice->default_input_code = (int)(long) value;
+            notice->default_input_code = (int) value;
             trigger_set = 1;
         break;
 
@@ -490,7 +487,7 @@ notice_generic_set(notice, avlist, is_object)
 		/*
 		 * End list with NULL
 		 */
-		busy_frames[count] = 0;
+		busy_frames[count] = NULL;
 
 		notice->busy_frames = busy_frames;
 	    }
@@ -506,15 +503,15 @@ notice_generic_set(notice, avlist, is_object)
 	     * If the notice is already in the state we want to set it to,
 	     * skip
 	     */
-	    if ( ((Bool)(long)value && notice->show)  || 
-		(!(Bool)(long)value && !(notice->show)) )  {
+	    if ( ((Bool)value && notice->show)  || 
+		(!(Bool)value && !(notice->show)) )  {
 		break;
 	    }
 
 	    /*
 	     * Set flag apprpriately
 	     */
-	    notice->show = ((Bool)(long)value != FALSE);
+	    notice->show = ((Bool)value != FALSE);
 	    show_seen = TRUE;
 
 	    break;

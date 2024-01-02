@@ -14,20 +14,6 @@ static char     sccsid[] = "@(#)tty_init.c 20.71 93/06/28";
  * Ttysw initialization, destruction and error procedures
  */
 
-#include <xview_private/tty_init_.h>
-#include <xview_private/cim_size_.h>
-#include <xview_private/csr_init_.h>
-#include <xview_private/csr_change_.h>
-#include <xview_private/defaults_.h>
-#include <xview_private/font_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/pf_.h>
-#include <xview_private/ttyansi_.h>
-#include <xview_private/tty_gtty_.h>
-#include <xview_private/tty_main_.h>
-#include <xview_private/tty_mapkey_.h>
-#include <xview_private/ttyselect_.h>
-#include <xview_private/xv_parse_.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -35,7 +21,6 @@ static char     sccsid[] = "@(#)tty_init.c 20.71 93/06/28";
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
-#include <time.h>
 
 #include <xview_private/portable.h>	/* for XV* defines and termios */
 
@@ -87,6 +72,7 @@ static char     sccsid[] = "@(#)tty_init.c 20.71 93/06/28";
 
 #include <xview/win_input.h>
 #include <xview_private/win_keymap.h>
+#include <xview/defaults.h>
 #include <xview/ttysw.h>
 #include <xview/font.h>
 #include <xview/cursor.h>
@@ -106,7 +92,12 @@ static char     sccsid[] = "@(#)tty_init.c 20.71 93/06/28";
 
 #ifdef __linux__
 #include <unistd.h>
+#else
+extern off_t    lseek();
 #endif
+char           *textsw_checkpoint_undo();
+
+/* static */ void ttysw_parseargs();
 
 #ifndef SVR4
 #ifndef TIOCUCNTL
@@ -118,9 +109,21 @@ static char     sccsid[] = "@(#)tty_init.c 20.71 93/06/28";
 #endif				/* TIOCTCNTL */
 #endif	/* !SVR4 */
 
-static int ttyinit(Ttysw *ttysw);
+
+
+char           *getenv();
+
+extern Xv_opaque xv_pf_open();
+Xv_private char *xv_font_monospace();
 
 extern int      ttysel_use_seln_service;
+
+
+struct ttysw_createoptions {
+    int             becomeconsole;	/* be the console */
+    char          **argv;	/* args to be used in exec */
+    char           *args[4];	/* scratch array if need to build argv */
+};
 
 Xv_Cursor       ttysw_cursor;	/* default (text) cursor) */
 Xv_Cursor       ttysw_stop_cursor;	/* stop sign cursor (i.e., CTRL-S) */
@@ -146,6 +149,14 @@ static Defaults_pairs inverse_and_underline_mode[] = {
     "Same_as_bold", TTYSW_SAME_AS_BOLD,
     NULL, -1
 };
+
+static int ttyinit(Ttysw *ttysw);
+
+#ifdef __STDC__
+static int ttyinit(Ttysw *ttysw);
+#else
+static int ttyinit();
+#endif
 
 Pkg_private int
 ttysw_lookup_boldstyle(str)
@@ -229,8 +240,9 @@ Pkg_private     Xv_opaque
 ttysw_init_folio_internal(tty_public)
     Tty             tty_public;
 {
+    extern          ttysw_eventstd();
     Ttysw_folio     ttysw;
-    Xv_opaque       font = (Xv_opaque)NULL;
+    Xv_opaque       font = NULL;
     int             is_client_pane;
     char            *font_name = NULL;
 
@@ -313,7 +325,7 @@ ttysw_init_folio_internal(tty_public)
 
     /* initialize selection service code */
     (void) ttysw_setopt(ttysw, TTYOPT_SELSVC, ttysel_use_seln_service);
-    if (ttysw_getopt((Ttysw_folio) ttysw, TTYOPT_SELSVC)) {
+    if (ttysw_getopt((caddr_t) ttysw, TTYOPT_SELSVC)) {
 	ttysel_init_client(ttysw);
     }
     (void) ttysw_mapsetim(ttysw);
@@ -358,7 +370,7 @@ ttysw_init_folio_internal(tty_public)
 #else
     font_name = xv_font_monospace();
     if (font_name)
-	font = (Xv_opaque)xv_pf_open(font_name);
+	font = xv_pf_open(font_name);
     else
 	font = (Xv_opaque) 0;
 
@@ -420,7 +432,7 @@ ttysw_init_folio_internal(tty_public)
     ttysw->implicit_commit = 0;
 #endif
 
-    xv_new_tty_chr_font((Pixfont*)font);
+    xv_new_tty_chr_font(font);
 
     /* Set WIN_ROW_HEIGHT so that xv_set of WIN_ROWS will work when
      * Text.LineSpacing is set to a nonzero value.
@@ -474,6 +486,9 @@ ttysw_fork_it(ttysw0, argv, wfd)
     struct sigvec   vec, ovec;
 #else
     struct sigaction	vec, ovec;
+#ifndef __linux__
+    extern char *ptsname();
+#endif
 
 #define BSD_TTY_COMPAT /* yank this if csh ever gets ported properly */
 
@@ -715,7 +730,6 @@ ttyinit(ttysw)
     int		    tmpfd;
     int		    pty = 0, tty = 0;
     int             on = 1;
-    int result;
 #ifdef __linux__
     if (openpty(&pty, &tty, ttysw->tty_name, NULL, NULL) == -1) {
 	fprintf(stderr, XV_MSG("All pty's in use\n"));
@@ -761,6 +775,7 @@ gotpty:
 	goto needpty;
     }
 #else /* SVR4 */
+    extern char *ptsname();
      
     /*
      * Open /dev/ptmx to get master clone device, go through the
@@ -949,10 +964,10 @@ gotpty:
 #ifndef SVR4  /* SunOS4.x code */
     tmpfd = dup(0);
     (void) close(0);
-    result = dup(tty);
+    (void) dup(tty);
     ttysw->ttysw_ttyslot = updateutmp((char *) 0, 0, tty);
     (void) close(0);
-    result = dup(tmpfd);
+    (void) dup(tmpfd);
     (void) close(tmpfd);
 #else  /* SVR4 code */
     ttysw->ttysw_ttyslot = 0;
@@ -1005,8 +1020,10 @@ updateutmp(username, ttyslotuse, ttyfd)
     struct utmpx     utmp;
 #endif
     struct passwd  *passwdent;
+    extern struct passwd *getpwuid();
     int             f;
     char           *ttyn;
+    extern char    *ttyname();
 
     if (!username) {
 	/*
@@ -1081,6 +1098,7 @@ updateutmp(username, ttyslotuse, ttyfd)
     struct passwd  *passwdent;
     int             f;
     char           *ttyn;
+    extern char    *ttyname();
 
     memset(&utmp, 0, sizeof(utmp));
     utmp.ut_type = USER_PROCESS;

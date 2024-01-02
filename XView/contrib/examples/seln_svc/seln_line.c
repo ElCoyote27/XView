@@ -89,7 +89,7 @@ Event *event; /* unused */
          * convert data into the line number 
          */
         sprintf(msg, "Selection: line %ld",
-            *(long *)(buffer->data + 3 * sizeof(Seln_attribute))+1);
+            *(long *)(buffer->data + 3 * sizeof(Seln_attribute)));
         xv_set(frame,
             FRAME_RIGHT_FOOTER, msg,
             NULL);

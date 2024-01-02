@@ -28,32 +28,20 @@
 #include "i18n.h"
 #include <olgx/olgx.h>
 
-#include "win.h"
-#include "client.h"
 #include "ollocale.h"
 #include "events.h"
 #include "mem.h"
 #include "olwm.h"
+#include "win.h"
 #include "group.h"
 #include "globals.h"
 #include "dsdm.h"
 #include "resources.h"
 #include "virtual.h"
+#include "client.h"
 #include "selection.h"
-#include "properties.h"
-#include "st.h"
-#include "info.h"
-#include "services.h"
 #include "states.h"
-#include "wincolor.h"
-#include "winframe.h"
-#include "winicon.h"
-#include "winpush.h"
-#include "moveresize.h"
-#include "winnofoc.h"
-
-extern Time LastEventTime;
-extern Bool BoolString(char *s, Bool dflt);
+#include "properties.h"
 
 /***************************************************************************
 * global data
@@ -103,6 +91,22 @@ extern Atom AtomLeftIMStatus;
 extern Atom AtomRightIMStatus;
 #endif
 
+extern void RecursiveRefresh();
+extern void PushPinChangeState();
+extern void FrameUpdateHeader();
+extern void FrameUpdateFooter();
+extern void IconUpdateName();
+extern void ColorUpdateColorMapWindows();
+extern void StateUpdateWinAttr();
+extern void StateUpdateDecorAdd();
+extern void StateUpdateDecorDel();
+extern void StateUpdateWMNormalHints();
+extern void StateUpdateWMHints();
+extern void StateUpdateWMProtocols();
+#ifdef OW_I18N_L4
+extern void FrameUpdateIMStatus();
+#endif
+
 /***************************************************************************
 * private data
 ***************************************************************************/
@@ -144,10 +148,6 @@ static XrmQuark clientIQ;               /* quark for "client" (an instance) */
 static XrmQuark menuAccelIQ;            /* quark for "menuAccelerators" */
 static XrmQuark menuAccelCQ;            /* quark for "MenuAccelerators" */
 
-static void setComposeLed(Display *dpy, int mode);
-static void initClientState(Display *dpy);
-static void addClient(Client *cli);
-static void removeClient(Client *cli);
 
 /***************************************************************************
 * private functions
@@ -411,6 +411,7 @@ void *junk;
 	WinPane *paneInfo;
 	Display	*dpy = cli->dpy;
 	Window pane;
+	void	ClientSetWMState();
 
 	/* if no framewin then it's probably a root window */
 	if (frameInfo == NULL)
@@ -576,6 +577,7 @@ Client *cli;
 	ScreenInfo  *scrInfo = cli->scrInfo;
 	List	    *l;
 	Client	    *tcli;
+	extern void PreenColormapInhibit();
 
 	UnTrackSubwindows(cli, True);
 	if (IsSelected(cli))
@@ -929,7 +931,7 @@ Client	*cli;
 {
     MakeSticky(cli, !cli->sticky);
     if (cli->groupmask == GROUP_LEADER)
-	GroupApply(cli->groupid, (GroupFunc)MakeSticky, (void*)(long)cli->sticky, GROUP_DEPENDENT);
+	GroupApply(cli->groupid, MakeSticky, cli->sticky, GROUP_DEPENDENT);
 }
 
 /*

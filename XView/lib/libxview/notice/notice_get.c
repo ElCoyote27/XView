@@ -10,7 +10,6 @@ static char     sccsid[] = "@(#)notice_get.c 1.4 90/12/03";
  *	file for terms of the license.
  */
 
-#include <xview_private/notice_get_.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <xview_private/draw_impl.h>

@@ -14,10 +14,19 @@
 
 #include <X11/Xlib.h>
 
-void ErrorSensitive(char *s);
-void ErrorInsensitive(Display *dpy);
-int ErrorHandler(Display *dpy, XErrorEvent *event);
-void ErrorGeneral(char *txt);
-void ErrorWarning(char *txt);
+#ifdef __STDC__
+extern void ErrorSensitive(char *s);
+extern void ErrorInsensitive(Display *dpy);
 
+extern int  ErrorHandler(Display *dpy, XErrorEvent *event);
+extern void ErrorGeneral(char *txt);
+extern void ErrorWarning(char *txt);
+#else
+extern void ErrorSensitive();
+extern void ErrorInsensitive();
+
+extern int  ErrorHandler();
+extern void ErrorGeneral();
+extern void ErrorWarning();
+#endif
 #endif /* _OLWM_ERROR_H */

@@ -13,7 +13,6 @@
 #else
 #include <sys/ioctl.h>
 #endif /* SVR4 */
-#include <xview/pkg.h>
 #include <xview/notify.h>
 
 main(argc, argv)

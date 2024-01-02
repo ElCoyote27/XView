@@ -30,6 +30,12 @@
 #define LC_MESSAGES LC_RESPONSE
 #endif
 
+#ifdef __STDC__
+extern char	*dgettext(char *, char *);
+#else
+extern char	*dgettext();
+#endif
+
 #define XV_I18N_MSG(d,s)	(dgettext(d,s))
 
 #ifndef XV_14_CHARS_FILE_NAME
@@ -48,7 +54,7 @@
 #define	xv_domain		XV_TEXT_DOMAIN
 #else  /* XGETTEXT */
 /* Initial value assigned at xv_init.c */
-Xv_private_data extern CONST char	*xv_domain;
+Xv_private_data CONST char	*xv_domain;
 #endif /* XGETTEXT */
 
 #define XV_MSG(s)		(dgettext(xv_domain, s))

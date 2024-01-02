@@ -15,6 +15,9 @@ static char     sccsid[] = "@(#)hlp_rodata.c 1.4 93/06/28";
  * of the shared library. So,this data is strictly read-only.
  */
 
+#include <xview/xview.h>
+#include <xview/svrimage.h>
+
 const unsigned short    mglass_data[] = {
 #include <images/mglass.icon>
 };

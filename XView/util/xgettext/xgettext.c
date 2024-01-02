@@ -5,9 +5,6 @@ static char     sccsid[] = "@(#)xgettext.c 1.10 91/09/14";
 #endif
 
 #include "xgettext.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
 
 /*
  * gettext - extract strings from gettext() calls in a C language
@@ -16,36 +13,22 @@ static char     sccsid[] = "@(#)xgettext.c 1.10 91/09/14";
  *           file template.
  */
 
-void print_usage(void);
-void print_help(void);
-void init_lists(void); 
-char *build_path(char *domain, char pathbuf[]);
-int get_arguments(int *argc, char ***argv, char **envp);
-void process(void);
-char *consume_comment(char *buf);
-char *consume_symbol(char *buf);
-char *consume_quoted_string(char *buf);
-char *consume_blankspace(char *buf);
-char *consume_whitespace(char *buf);
-char *consume_delim(char *buf);
-int is_symbol(char **lptr, char *label_id);
-int exclude_string(char *test_string);
-char *get_nextline(void);
-char *extract_comment(char **cpp);
-char *sort_comment(char *cp);
-void add_comment_to_domain(char *domain, char *commentbuf);
-char *write_comment(char *cp);
-int write_args(char **cpp);
-int write_psffm(char *msgkey, char *domain);
-struct list_head *get_list(char *domain); 
-int sort_message(char *domain, char *msgid, char *msgstr, short new);
-int write_sorted_psffm(void);
-void read_psffm(char *domain);
+int	write_args(), get_arguments(),  sort_message(),
+	write_sorted_psffm();
+char	*calloc(), *malloc(), *realloc();
+char	*strcat(), *strcpy(), *strdup();
+
+void	process(), print_usage(), init_lists(), add_comment_to_domain(),
+	read_psffm();
+char	*consume_whitespace(), *consume_symbol(), *consume_comment(),
+	    *consume_quoted_string(), *consume_delim();
+char	*get_nextline(), *write_comment(), *sort_comment();
 
 FILE 	*defaultfp = NULL;
 FILE	*currentfp = NULL;
 FILE	*exclude_stream = NULL;
 
+struct  list_head *get_list();
 struct  list_head lists, *last_list;
 
 char	*comment_cookie;
@@ -78,8 +61,7 @@ char	cfilename [MAXPATHLEN+1];
 
 char	linebuf[LINEBUF_SIZ];
 char	default_filepath[MAXPATHLEN+1];
-
-void
+
 main(argc, argv, envp)
     int argc;
     char **argv, **envp;
@@ -106,8 +88,7 @@ main(argc, argv, envp)
 
 	strcpy(cfilename, *argv);
 	linenum = 0;
-        /*process(*argv);*/
-	    process();
+        process(*argv);
 
         argc--; argv++;
     }
@@ -118,7 +99,7 @@ main(argc, argv, envp)
 
     exit(0);
 }
-
+
 void
 print_usage()
 {
@@ -130,7 +111,6 @@ print_usage()
 	"       xgettext -h (HELP)\n");
 }
 
-void
 print_help()
 {
     fprintf(stderr, "\n");
@@ -181,7 +161,7 @@ build_path(domain, pathbuf)
     strcat(pathbuf, ".po");
     return (pathbuf);
 }
-
+
 int
 get_arguments(argc, argv, envp)
     int *argc;
@@ -231,7 +211,7 @@ get_arguments(argc, argv, envp)
 		exit (1);
 	    }
 
-	    if (*(++cp) != '\x0') {
+	    if (*(++cp) != NULL) {
 	    	comment_cookie = strdup(cp);
 	    } else {
 		comment_cookie = strdup(**argv);
@@ -254,7 +234,7 @@ get_arguments(argc, argv, envp)
 		  "NULL message tag, try -m<tag>, exiting ...\n");
 		exit (1);
 	    }
-	    if (*(++cp) != '\x0') {
+	    if (*(++cp) != NULL) {
 	    	message_string = strdup(cp);
 	    } else {
 		message_string = strdup(**argv);
@@ -278,7 +258,7 @@ get_arguments(argc, argv, envp)
 		exit (1);
 	    }
 
-	    if (*(++cp) != '\x0') {
+	    if (*(++cp) != NULL) {
 	    	default_domain = strdup(cp);
 	    } else {
 		default_domain = strdup(**argv);
@@ -297,7 +277,7 @@ get_arguments(argc, argv, envp)
 		exit (1);
 	    }
 
-	    if (*(++cp) != '\x0') {
+	    if (*(++cp) != NULL) {
 	    	file_path = strdup(cp);
 	    } else {
 		file_path = strdup(**argv);
@@ -328,7 +308,7 @@ get_arguments(argc, argv, envp)
 		  "NULL exclude file, try -x<xfile>, exiting ...\n");
 		exit (1);
 	    }
-	    if (*(++cp) != '\x0') {
+	    if (*(++cp) != NULL) {
 	    	exclude_file = strdup(cp);
 	    } else {
 		exclude_file = strdup(**argv);
@@ -374,7 +354,7 @@ get_arguments(argc, argv, envp)
     build_path(default_domain, default_filepath);
     return (1);
 }
-
+
 void
 process()
 {
@@ -531,7 +511,7 @@ out:
 	exit(0);
     }
 }
-
+
 char *
 consume_comment(buf)
     char *buf;
@@ -578,7 +558,7 @@ consume_symbol(buf)
     }    
     return (bufptr);
 }
-
+
 char *
 consume_quoted_string(buf)
     char *buf;
@@ -630,7 +610,7 @@ consume_quoted_string(buf)
     fprintf(stderr, "ERROR ==> end of quoted string never reached\n");
     return (--bufptr);
 }
-
+
 char *
 consume_blankspace(buf)
     char *buf;
@@ -655,7 +635,7 @@ consume_blankspace(buf)
     }    
     return (0);
 }
-
+
 char *
 consume_whitespace(buf)
     char *buf;
@@ -704,7 +684,7 @@ consume_delim(buf)
     }    
     return (0);
 }
-
+
 int
 is_symbol(lptr, label_id)
     char **lptr, *label_id;
@@ -752,7 +732,7 @@ exclude_string(test_string)
  
         return (0);
 }
-
+
 char *
 get_nextline()
 {
@@ -782,7 +762,7 @@ get_nextline()
 
     return (linebuf);
 }
-
+
 char *
 extract_comment(cpp)
     char **cpp;
@@ -790,7 +770,7 @@ extract_comment(cpp)
 
     register char c, *dp, *cp = *cpp;
     static char *commentbuf = NULL; 
-    static int bufsiz = 0; 
+    static bufsiz = 0; 
     int offset;
 
     if (!commentbuf) {
@@ -843,7 +823,7 @@ extract_comment(cpp)
     fprintf(stderr, "ERROR, end of comment never reached\n");
     return (cp);
 }
-
+
 char *
 sort_comment(cp)
     char *cp;
@@ -892,7 +872,7 @@ add_comment_to_domain(domain, commentbuf)
     }
     head->last_comment->str = strdup(commentbuf);
 }
-
+
 char *
 write_comment (cp)
     char *cp;
@@ -925,7 +905,7 @@ write_comment (cp)
 	if ((commentfp = fopen(comment_path, "a+")) == NULL) {
 	    perror("xgettext");
             fprintf(stderr,
-                "FATAL ERROR, can't open comment file: %s\n", comment_path);
+                "FATAL ERROR, can't open comment file: %s\n", commentfp);
             exit(2);
         }  
     } else {
@@ -935,10 +915,10 @@ write_comment (cp)
 
     comment = extract_comment(&cp);
     fprintf(commentfp, "%s\n", comment);
-    fclose (commentfp);
+    close (commentfp);
     return (cp);
 }
-
+
 int
 write_args(cpp)
     char **cpp;
@@ -1047,7 +1027,7 @@ out:
 	return (write_psffm(NULL, domain));
     }
 }
-
+
 int
 write_psffm(msgkey, domain)
 char *msgkey, *domain;
@@ -1154,7 +1134,7 @@ char *msgkey, *domain;
     fflush(psffmfp);
     return (ferror(psffmfp));
 }
-
+
 struct list_head *
 get_list(domain) 
     char *domain;
@@ -1165,7 +1145,7 @@ get_list(domain)
  * make new list if domain not found
 */
  
-    if (domain[0] != '\x0') {
+    if (domain[0] != NULL) {
         register struct list_head *head = &lists;
 	register int found;
 
@@ -1189,7 +1169,7 @@ get_list(domain)
 	return (&lists);
     }
 }
-
+
 int
 sort_message(domain, msgid, msgstr, new)
     char *domain, *msgid, *msgstr;
@@ -1272,7 +1252,7 @@ add_comments:
 
     return (0);
 }
-
+
 int
 write_sorted_psffm()
 {
@@ -1337,7 +1317,7 @@ write_sorted_psffm()
 	list = list->next_list;
     }
 }
-
+
 void
 read_psffm(domain)
     char *domain;

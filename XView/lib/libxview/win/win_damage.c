@@ -16,10 +16,6 @@ static char     sccsid[] = "@(#)win_damage.c% 20.35 93/06/28";
  */
 
 #define xview_other_rl_funcs
-#include <xview_private/win_damage_.h>
-#include <xview_private/gettext_.h>
-#include <xview_private/win_treeop_.h>
-#include <xview_private/screen_.h>
 #include <stdio.h>
 #include <xview_private/i18n_impl.h>
 #include <xview_private/draw_impl.h>
@@ -30,9 +26,7 @@ static char     sccsid[] = "@(#)win_damage.c% 20.35 93/06/28";
 #include <xview/rectlist.h>
 #include <xview/xv_xrect.h>
 
-#ifdef COLLAPSE_MULTIPLE_EXPOSURE_GROUPS
-static int win_do_expose_event_predicate(Display *display, XEvent *event, char *args);
-#endif
+extern Xv_object win_data();
 
 static Rectlist damaged;
 static XID      damaged_drawable;	/* = 0 == None */

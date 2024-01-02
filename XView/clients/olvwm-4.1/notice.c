@@ -18,7 +18,6 @@
 #include <X11/Xos.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/Intrinsic.h>
 
 #include "i18n.h"		/* needed before olgx.h */
 #include <olgx/olgx.h>
@@ -30,11 +29,10 @@
 #include "mem.h"
 #include "events.h"
 #include "error.h"
-#include "menu.h"
-#include "evbind.h"
-#include "kbdfuncs.h"
 
 
+extern int		PointInRect();
+extern SemanticAction 	FindKeyboardAction();
 
 /* difference between inside beveled box and outside beveled box */
 #define BORDER_WIDTH		5	
@@ -46,17 +44,48 @@
 #define MIN_STRING_VSPACE	5		/* space above/below strings */
 #define OUTLINE_WIDTH		2		/* thickness of 2D border */
 
+typedef struct {
+	int		x;
+	int		y;
+	unsigned int	width;		/* space taken up by text */
+	unsigned int	fullWidth;	/* width including endcaps */
+	char		accelerator;	/* mouseless accelerator key */
+} noticeButtonDetails;
 
-static void calculateBoxDimensions(NoticeBox *noticeBox, noticeBoxDetails *boxDetails);
-static void drawLocationCursor(noticeBoxDetails *details, int btn, Bool erase);
-static void drawButton(NoticeBox *noticeBox, noticeBoxDetails *details, int btn, int btnState);
-static void drawNoticeBox(NoticeBox *noticeBox, noticeBoxDetails *boxDetails);
-static void setButtonFocus(noticeBoxDetails *details, int newFocus);
-static void moveButtonFocus(noticeBoxDetails *details, int dir);
-static Bool keyAccelerator(XKeyEvent *key, noticeBoxDetails *details, int *button);
-static Bool pointInButton(XButtonEvent *event, noticeBoxDetails *details, int btn);
-static int noticeInterposer(Display *dpy, XEvent *event, void *win, noticeBoxDetails *details);
-static void noticeDone(Display *dpy, noticeBoxDetails *boxDetails);
+typedef struct {
+	Display			*dpy;
+	ScreenInfo		*scrInfo;
+	NoticeBox		*noticeBox;
+	int			numStrings;
+	Text			**stringText;
+	Window			window;
+	unsigned int		buttonHeight;
+	unsigned int		fontHeight;
+	unsigned int		boxHeight;
+	unsigned int		boxWidth;
+	int			x;
+	int			y;
+	int			totalButtonWidth;
+	noticeButtonDetails	*buttonInfo;
+	int			buttonSelected;
+	int			buttonFocus;
+	int			buttonDown;
+	int			buttonDrawnDown;
+	void			(*noticeCallback)();
+	int			pointerX,pointerY;
+	Bool			ignoreExpose;
+	Bool			warped;
+} noticeBoxDetails;
+
+static void 		calculateBoxDimensions();
+static void 		drawNoticeBox();
+static void		noticeDone();
+static int		noticeInterposer();
+
+noticeBoxDetails	*CreateNoticeBox();
+void			DestroyNoticeBox();
+void			ShowNoticeBox();
+
 
 /******************************************************************
  *			Private Draw Functions
@@ -460,7 +489,7 @@ noticeBoxDetails	*details;
 
 		/* if on one of the notice buttons, depress it */
 		for ( ii = 0 ; ii < noticeBox->numButtons ; ii++ ) {
-			if (pointInButton((XButtonEvent *)event,details,ii)) {
+			if (pointInButton(event,details,ii)) {
 				details->buttonDown = ii;
 				details->buttonDrawnDown = True;
 				drawButton(noticeBox,details,ii,OLGX_INVOKED);
@@ -474,7 +503,7 @@ noticeBoxDetails	*details;
 			break;
 
 		/* only a depressed button can be selected */
-		if (pointInButton((XButtonEvent *)event,details,details->buttonDown)) {
+		if (pointInButton(event,details,details->buttonDown)) {
 			details->buttonSelected = details->buttonDown;
 			noticeDone(dpy,details);
 
@@ -492,7 +521,7 @@ noticeBoxDetails	*details;
 			break;
 
 		/* if moved out of depressed button erase it and cancel */
-		if (!pointInButton((XButtonEvent *)event,details,details->buttonDown)) {
+		if (!pointInButton(event,details,details->buttonDown)) {
 			drawButton(noticeBox,details,
 				   details->buttonDown,OLGX_ERASE);
 			details->buttonDown = -1;
@@ -506,7 +535,7 @@ noticeBoxDetails	*details;
 
 		/* If not in full mouseless, then only process default action */
 		if (GRV.Mouseless != KbdFull && action != ACTION_EXEC_DEFAULT) {
-			KeyBeep(dpy, (XKeyEvent *)event);
+			KeyBeep(dpy,event);
 			return DISPOSE_USED;
 		}
 			
@@ -539,10 +568,10 @@ noticeBoxDetails	*details;
 			setButtonFocus(details,noticeBox->numButtons-1);
 			break;
 		default:
-			if (keyAccelerator((XKeyEvent *)event,details,&button))
+			if (keyAccelerator(event,details,&button))
 				setButtonFocus(details,button);
 			else
-				KeyBeep(dpy, (XKeyEvent *)event);
+				KeyBeep(dpy,event);
 			break;
 		}
 	case KeyRelease:

@@ -14,17 +14,18 @@ static char     sccsid[] = "@(#)ei_attr.c 20.20 93/06/28";
  * Attribute support for entity interpreters.
  */
 
-#include <xview_private/ei_attr_.h>
 #include <sys/types.h>
 #include <xview/attrol.h>
 #include <xview/pkg.h>
 #include <xview_private/primal.h>
 
+#include <xview_private/ei.h>
+
 Pkg_private int
 #ifdef ANSI_FUNC_PROTO
-_ei_set(Ei_handle eih, ...)
+ei_set(Ei_handle eih, ...)
 #else
-_ei_set(eih, va_alist)
+ei_set(eih, va_alist)
     register Ei_handle eih;
 va_dcl
 #endif

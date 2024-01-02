@@ -10,7 +10,12 @@ static char     sccsid[] = "@(#)p_ntx_data.c 20.8 93/06/28";
  *	file for terms of the license.
  */
 
-#include <xview_private/p_num_txt_.h>
+#include <xview_private/panel_impl.h>
+
+Pkg_private int         panel_num_text_init();
+Pkg_private Xv_opaque   panel_num_text_set_avlist();
+Pkg_private Xv_opaque   panel_num_text_get_attr();
+Pkg_private int         panel_num_text_destroy();
 
 Xv_pkg xv_panel_num_text_pkg = {
     "Numeric Text Item", ATTR_PKG_PANEL,

@@ -11,8 +11,6 @@ static char     sccsid[] = "@(#)notice_dstry.c 1.7 93/06/28";
  */
 
 
-#include <xview_private/notice_dstry_.h>
-#include <xview_private/notice_.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <xview_private/draw_impl.h>

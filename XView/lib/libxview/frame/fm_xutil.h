@@ -36,4 +36,7 @@ typedef struct {
 #define SaveYourselfMessage (1L << 2)
 #define FocusMessage (1L << 3)
 
+/* frame_xutil.c */
+Xv_private void		frame_setwmhints();
+
 #endif /* frame_xutil_h_already_included */

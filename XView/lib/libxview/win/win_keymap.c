@@ -16,8 +16,6 @@ static char     sccsid[] = "@(#)win_keymap.c 20.20 93/06/28";
 
 #define win_keymap_c
 
-#include <xview_private/win_keymap_.h>
-#include <xview_private/defaults_.h>
 #include <stdio.h>
 #include <ctype.h>
 
@@ -28,6 +26,7 @@ static char     sccsid[] = "@(#)win_keymap.c 20.20 93/06/28";
 
 #include <xview/base.h>
 #include <xview/generic.h>
+#include <xview/defaults.h>
 #include <xview/win_input.h>
 #include <xview_private/bitmask.h>
 #include <xview_private/win_keymap.h>

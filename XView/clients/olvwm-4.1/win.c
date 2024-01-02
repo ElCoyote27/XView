@@ -27,16 +27,6 @@
 #include "mem.h"
 #include "st.h"
 #include "notice.h"
-#include "virtual.h"
-#include "info.h"
-#include "helpsend.h"
-
-static enum st_retval doRedrawOneWindow(Window w, WinGeneric *win, void *c);
-static void callSelectTree(Display *dpy, WinGeneric *win, Bool sel);
-static void callDestroyTree(Display *dpy, WinGeneric *win);
-static void setTreeConfig(Display *dpy, WinGeneric *win);
-static void callFocusTree(WinGeneric *win, Bool focus);
-static void callDrawTree(WinGeneric *win);
 
 /***************************************************************************
 * local functions
@@ -158,9 +148,9 @@ Client *cli;
 Bool sel;
 {
 	if (cli->wmState == NormalState)
-		callSelectTree(cli->dpy, (WinGeneric *)cli->framewin, sel);
+		callSelectTree(cli->dpy, cli->framewin, sel);
 	else if (cli->wmState == IconicState)
-		callSelectTree(cli->dpy, (WinGeneric *)cli->iconwin, sel);
+		callSelectTree(cli->dpy, cli->iconwin, sel);
 }
 
 /* WinCallFocus - call a client's focus functions for the frame tree.
@@ -175,7 +165,7 @@ Bool focus;
 		return;
 	win->core.client->isFocus = focus;
 	callFocusTree(win, focus);
-	VirtualChangeFocus((WinGenericFrame *)win, focus);
+	VirtualChangeFocus(win, focus);
 }
 	
 /* WinCallDestroy - call a client's destroy functions for both the icon and
@@ -189,8 +179,8 @@ Client *cli;
 	WinPaneFrame *framewin = cli->framewin;
 	WinIconFrame *iconwin = cli->iconwin;
 
-	callDestroyTree(dpy, (WinGeneric *)framewin);
-	callDestroyTree(dpy, (WinGeneric *)iconwin);
+	callDestroyTree(dpy, framewin);
+	callDestroyTree(dpy, iconwin);
 }
 
 /* WinCallConfig - initiate a configuration change, starting at some

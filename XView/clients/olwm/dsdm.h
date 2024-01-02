@@ -22,8 +22,8 @@
 
 /* public functions */
 
-void DragDropStartDSDM(Display *dpy);
-void DragDropStopDSDM(Display *dpy);
-void DragDropInit(void);
+extern void DragDropStartDSDM();
+extern void DragDropStopDSDM();
+extern void DragDropInit();
 
 #endif /* _OLWM_DSDM_H */

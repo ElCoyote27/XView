@@ -808,8 +808,6 @@ IconShow(cli, winIcon)
     Client *cli;
     WinIconFrame *winIcon;
 {
-    extern Time LastEventTime;
-    
     WinIconPane *pane = (WinIconPane *)winIcon->fcore.panewin;
     extern Client *CurrentClient;
 

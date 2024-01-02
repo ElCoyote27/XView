@@ -31,11 +31,6 @@
 #include "menu.h"
 #include "globals.h"
 #include "client.h"
-#include "winpinmenu.h"
-#include "wincolor.h"
-#include "info.h"
-#include "states.h"
-#include "winmenu.h"
 
 /***************************************************************************
 * global data
@@ -60,16 +55,6 @@ extern Atom AtomCompoundText;
 
 /* function vector for menu windows */
 static ClassPinMenu classPinMenu;
-
-static void afterMenuShow(WinPinMenu *win);
-static void eventButtonPress(Display *dpy, XEvent *event, WinPinMenu *winInfo);
-static void eventKeyEvent(Display *dpy, XEvent *event, WinPinMenu *winInfo);
-static int eventClientMessage(Display *dpy, XEvent *event, WinPinMenu *winInfo);
-static int eventEnterNotify(Display *dpy, XEvent *event, WinPinMenu *winInfo);
-static int focusMenuFunc(Display *dpy, WinPinMenu *winInfo, Bool focus);
-static int destroyMenu(Display *dpy, WinPinMenu *winInfo);
-static int newconfigMenu(WinPinMenu *win, XConfigureRequestEvent *pxcre);
-static int menuSetParent(WinGeneric *winInfo, Client *cli, WinGenericFrame *par);
 
 /***************************************************************************
 * private functions
@@ -100,7 +85,7 @@ afterMenuShow(win)
 /* 
  * eventButtonPress  - a button has gone down.
  */
-static void
+static int
 eventButtonPress(dpy, event, winInfo)
     Display		*dpy;
     XEvent		*event;
@@ -115,7 +100,7 @@ eventButtonPress(dpy, event, winInfo)
 }
 
 
-static void
+static int
 eventKeyEvent(dpy, event, winInfo)
     Display		*dpy;
     XEvent		*event;
@@ -154,7 +139,7 @@ XEvent		*event;
 WinPinMenu	*winInfo;
 {
     if (event->xany.type == EnterNotify)
-        ColorWindowCrossing(dpy, event, (WinGeneric *)winInfo);
+        ColorWindowCrossing(dpy, event, winInfo);
 }
 
 
@@ -400,10 +385,10 @@ PinMenuInit(dpy)
 Display *dpy;
 {
 	classPinMenu.core.kind = WIN_PINMENU;
-	classPinMenu.core.xevents[ButtonPress] = (FuncPtr)eventButtonPress;
+	classPinMenu.core.xevents[ButtonPress] = eventButtonPress;
 	classPinMenu.core.xevents[ClientMessage] = eventClientMessage;
-	classPinMenu.core.xevents[KeyPress] = (FuncPtr)eventKeyEvent;
-	classPinMenu.core.xevents[KeyRelease] = (FuncPtr)eventKeyEvent;
+	classPinMenu.core.xevents[KeyPress] = eventKeyEvent;
+	classPinMenu.core.xevents[KeyRelease] = eventKeyEvent;
 	classPinMenu.core.xevents[EnterNotify] = eventEnterNotify;
 	classPinMenu.core.xevents[Expose] = MenuEventExpose;
 	classPinMenu.core.focusfunc = focusMenuFunc;

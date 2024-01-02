@@ -15,7 +15,6 @@ static char     sccsid[] = "@(#)curs_cmpat.c 20.24 93/06/28";
  * 
  */
 
-#include <xview_private/curs_cmpat_.h>
 #include <xview_private/curs_impl.h>
 #include <xview_private/portable.h>
 #include <xview/notify.h>
@@ -24,9 +23,9 @@ static char     sccsid[] = "@(#)curs_cmpat.c 20.24 93/06/28";
 
 Xv_Cursor
 #ifdef ANSI_FUNC_PROTO
-_cursor_create(Attr_attribute attr1, ...)
+cursor_create(Attr_attribute attr1, ...)
 #else
-_cursor_create(attr1, va_alist)
+cursor_create(attr1, va_alist)
     Attr_attribute attr1;
 va_dcl
 #endif
@@ -64,9 +63,9 @@ cursor_get(cursor_public, which_attr)
 
 int
 #ifdef ANSI_FUNC_PROTO
-_cursor_set(Xv_Cursor cursor_public, ...)
+cursor_set(Xv_Cursor cursor_public, ...)
 #else
-_cursor_set(cursor_public, va_alist)
+cursor_set(cursor_public, va_alist)
     Xv_Cursor       cursor_public;
 va_dcl
 #endif

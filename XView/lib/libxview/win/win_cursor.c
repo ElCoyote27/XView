@@ -14,7 +14,6 @@ static char     sccsid[] = "@(#)win_cursor.c 20.24 93/06/28";
  * Win_cursor.c: Implement the mouse cursor operation functions of the
  * win_struct.h interface.
  */
-#include <xview_private/win_cursor_.h>
 #include <xview/rect.h>
 #include <xview/server.h>
 #include <xview/win_struct.h>
@@ -40,7 +39,7 @@ win_setmouseposition(window, x, y)
 void
 win_setmouseposition_internal(display, xid, x, y)
     Display        *display;
-    XID    xid;
+    unsigned int    xid;
     short           x, y;
 {
 

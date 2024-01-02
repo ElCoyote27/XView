@@ -45,7 +45,11 @@
 	(table->hash == ST_NUMHASH) ? ((int) (key) % table->num_bins) :\
 	(*table->hash)((key), table->num_bins))*/
 
-static void rehash(register st_table *table);
+#ifdef __STDC__
+static void rehash(st_table *table);
+#else
+static void rehash();
+#endif
 
 st_table *st_init_table_with_params(compare, hash, size, density, grow_factor,
 				    reorder_flag)
