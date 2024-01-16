@@ -2187,7 +2187,7 @@ int val;
     }
 }
 
-static char expbuf[256];
+/* static char expbuf[256]; */
 regex_t regex;
 
 static int
