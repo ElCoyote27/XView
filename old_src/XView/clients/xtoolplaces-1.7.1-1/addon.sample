@@ -1,4 +1,0 @@
-# Sample addon file to add the '.work' argument to the end of the xrolo
-# command line
-
-xrolo: $HOME/.work
