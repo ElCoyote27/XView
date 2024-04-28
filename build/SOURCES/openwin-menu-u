@@ -4,12 +4,12 @@
 #	OpenWindows default root menu file - Utilities submenu
 #
 
-"Refresh"	    	DEFAULT	REFRESH
+"Refresh"			DEFAULT	REFRESH
 "Reset Input"			exec kbd_mode -u
-"Xclipboard" 			exec /usr/X11R6/bin/xclipboard
+"Xclipboard"			exec /usr/bin/xclipboard
 "Function Keys"			exec vkbd
 "Window Controls" MENU
-	"Open/Close"	DEFAULT	OPEN_CLOSE_SELN
+	"Open/Close"		DEFAULT	OPEN_CLOSE_SELN
 	"Full/Restore Size"     FULL_RESTORE_SIZE_SELN
 	"Back"                  BACK_SELN
 	"Quit"                  QUIT_SELN

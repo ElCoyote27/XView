@@ -1,6 +1,6 @@
 # X11 legacy compat
 if [ "X${X11HOME}" = "X" ]; then
-	X11HOME="/usr/X11R6"
+	X11HOME="/usr"
 fi
 
 if [ "X${PATH_SOCKET}" = "X" ]; then

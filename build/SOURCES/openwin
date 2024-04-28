@@ -32,7 +32,7 @@ if [ ! -d "$OPENWINHOME" ]; then
 	printerr "$OPENWINHOME does not exist - cannot run"
 fi
 
-X11HOME="${X11HOME-/usr/X11R6}"
+X11HOME="${X11HOME-/usr}"
 if [ ! -d "$X11HOME" ]; then
 	printerr "${X11HOME} does not exist - cannot run"
 fi

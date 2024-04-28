@@ -30,7 +30,7 @@
 
 SEPARATOR
 
-"X11R6 Programs "	DIRMENU	/usr/X11R6/bin
+"Xorg Programs "	DIRMENU	/usr/bin
 
 "XView Programs "	DIRMENU	$OPENWINHOME/bin
 
