@@ -1,6 +1,6 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20240101
+%define BaseRelease 20240428
 Version: 3.2p1.4
 Release: 25.26%{?dist}
 Distribution: RHEL 8 (Ootpa)
@@ -47,6 +47,8 @@ Patch4: xview_scroll_mouse.patch
 Patch5: xview_build.patch
 Patch6: xview_glibc28_regexp.patch
 Patch7: xview_3.2p1.4-25_amd64.diff
+Patch8: virtual_c-regexp-fix.patch 
+Patch9: xview-sysv-wait-and-signals.patch
 License: Distributable
 Group: X11/Libraries
 ExclusiveArch: i386 i686 x86_64

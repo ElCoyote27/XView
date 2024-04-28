@@ -14,7 +14,7 @@ diff -rcb xview-3.2p1.4.orig/Build-LinuxXView.bash xview-3.2p1.4/Build-LinuxXVie
     INCLUDES      := -I`pwd`/build/include $IMAKE_EXTRA_INCLUDES -I$OWDEST/include \$(INCLUDES)
     LOCAL_LDFLAGS := -L`pwd`/lib/libolgx -L`pwd`/lib/libxview $IMAKE_EXTRA_LOCAL_LDFLAGS -L$OWDEST/lib \$(LOCAL_LDFLAGS)
     MAKEOVERRIDES  =
-!   CFLAGS        += -g \$(EXTRA_CFLAGS)
+!   CFLAGS        += -g -std=gnu11 \$(EXTRA_CFLAGS)
   # End of variable-definitions appended by imake-wrapper
   
   EOF
