@@ -2,7 +2,7 @@ Summary: XView libraries for X11
 Name: xview
 %define BaseRelease 20240428
 Version: 3.2p1.4
-Release: 25.27%{?dist}
+Release: 25.28%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -47,7 +47,7 @@ Patch4: xview_scroll_mouse.patch
 Patch5: xview_build.patch
 Patch6: xview_glibc28_regexp.patch
 Patch7: xview_3.2p1.4-25_amd64.diff
-Patch8: virtual_c-regexp-fix.patch
+Patch8: virtual_c-regexp-fix.patch 
 Patch9: xview-sysv-wait-and-signals.patch
 License: Distributable
 Group: X11/Libraries
@@ -67,6 +67,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sun Apr 28 2024 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.28
+- Revert some of the previous patches (SIGSEV in olvwm when switching)
+
 * Sun Apr 28 2024 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.27
 - Add some extra patches.
 

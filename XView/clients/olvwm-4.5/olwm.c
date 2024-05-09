@@ -686,7 +686,7 @@ ReapChildren()
 	if (!deadChildren)
 		return;
 
-#if defined(SYSV) || defined(__linux__)
+#ifdef SYSV
 	sighold(SIGCHLD);
 #else
 	oldmask = sigblock(sigmask(SIGCHLD));
@@ -723,7 +723,7 @@ ReapChildren()
 
 	deadChildren = False;
 
-#if defined(SYSV) || defined(__linux__)
+#ifdef SYSV
 	sigrelse(SIGCHLD);
 #else
         (void) sigsetmask(oldmask);

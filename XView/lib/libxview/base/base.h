@@ -74,14 +74,14 @@
 #if !defined(SUNOS41) && !defined(__linux__)
 #define XV_OS_SVR4
 #define XV_USE_TTCOMPAT
-#define SYSV_WAIT
-#define SYSV_UCONTEXT
-#define XV_USE_XVFCNTL
+#define SYSV_WAIT 
+#define SYSV_UCONTEXT 
+#define XV_USE_XVFCNTL 
 #elif defined(__linux__)
 #define XV_OS_SVR4
 #undef XV_USE_TTCOMPAT
-#define SYSV_UCONTEXT
-#define XV_USE_XVFCNTL
+#define SYSV_UCONTEXT 
+#define XV_USE_XVFCNTL 
 #endif
  
 /*

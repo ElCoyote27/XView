@@ -2194,11 +2194,7 @@ static int
 rexMatch(string)
     char *string;
 {
-#ifdef _REGEX_H
-    return regexec(&regex, string, (size_t) 0, NULL, 0);
-#else
-    return regexec(expbuf, string);
-#endif
+    return regexec(&regex, string, 0, NULL, 0);
 }
 
 static void
