@@ -65,10 +65,18 @@ fi
 
 # start some nice programs
 if [ -x ${HOME}/.openwin-init ]; then
-	${HOME}/.openwin-init
+	if [ -x /usr/bin/dbus-launch ]; then
+		/usr/bin/dbus-launch --exit-with-session ${HOME}/.openwin-init
+	else
+		${HOME}/.openwin-init
+	fi
 else
 	if [ -x ${OPENWINHOME}/lib/openwin-init ]; then
-		${OPENWINHOME}/lib/openwin-init
+		if [ -x /usr/bin/dbus-launch ]; then
+			/usr/bin/dbus-launch --exit-with-session ${OPENWINHOME}/lib/openwin-init
+		else
+			${OPENWINHOME}/lib/openwin-init
+		fi
 	fi
 fi
 

@@ -1,8 +1,8 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20240428
+%define BaseRelease 20250403
 Version: 3.2p1.4
-Release: 25.28%{?dist}
+Release: 25.29%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -67,6 +67,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Thu Apr 03 2025 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.29
+- Update /usr/openwin/lib/Xinitrc for debug-launch
+
 * Sun Apr 28 2024 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.28
 - Revert some of the previous patches (SIGSEV in olvwm when switching)
 
