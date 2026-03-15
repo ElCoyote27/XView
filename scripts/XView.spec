@@ -69,6 +69,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sun Mar 15 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.30
+- RHEL9 ports
+
 * Thu Apr 03 2025 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.29
 - Update /usr/openwin/lib/Xinitrc for debug-launch
 
