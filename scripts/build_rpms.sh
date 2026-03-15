@@ -8,6 +8,12 @@ RPM_BASE_DIR=${BASE_DIR}/build
 RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
 RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
 
+SIGN_RPMS=""
+if [ "x$1" = "x--sign" ]; then
+	SIGN_RPMS="--sign"
+	shift
+fi
+
 VERSION="$(lsb_release -sr|cut -f1 -d'.')"
 ARCH="$(uname -i)"
 DIST=".el${VERSION}"
@@ -76,7 +82,7 @@ fi
 
 # Build 64bit
 #/usr/bin/rpmbuild -ba \
-#	${rpmextras} --sign \
+#	${rpmextras} ${SIGN_RPMS} \
 #	--target x86_64 \
 #	--define "dist ${DIST}" \
 #	--define "_topdir ${RPM_BASE_DIR}" \
@@ -86,7 +92,7 @@ fi
 
 # Build 32bit for backward compatibility
 /usr/bin/linux32 /usr/bin/rpmbuild -ba \
-	${rpmextras} --sign \
+	${rpmextras} ${SIGN_RPMS} \
 	--target i686 \
 	--define "dist ${DIST}" \
 	--define "_topdir ${RPM_BASE_DIR}" \
