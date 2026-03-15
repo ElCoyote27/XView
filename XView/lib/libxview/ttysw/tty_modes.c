@@ -52,7 +52,7 @@ static char     sccsid[] = "@(#)tty_modes.c 20.54 93/06/28";
 #include <xview_private/txt_impl.h>
 #include <xview/defaults.h>
 
-int             ttysw_waiting_for_pty_input;
+extern int      ttysw_waiting_for_pty_input;
 Xv_private Menu_item ttysw_get_scroll_cmd_from_menu_for_ttysw();
 Xv_private Menu_item ttysw_get_scroll_cmd_from_menu_for_textsw();
 /* static */ void ttysw_cooked_echo();

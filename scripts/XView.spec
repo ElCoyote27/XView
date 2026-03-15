@@ -59,8 +59,10 @@ BuildRequires: libX11-devel, libXext-devel, libXt-devel
 BuildRequires: libXpm-devel
 BuildRequires: bison
 BuildRequires: flex
-%if "%{?dist}" == ".fc17"
-Requires: flex-static
+%if 0%{?rhel} >= 9
+BuildRequires: libfl-static
+%else
+BuildRequires: flex-devel
 %endif
 BuildRequires: ncurses-devel
 Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x11-utils, xorg-x11-fonts-100dpi, xorg-x11-fonts-75dpi, xorg-x11-fonts-misc
