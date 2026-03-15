@@ -16,15 +16,14 @@
  * ---------------------------------------------------------------------*/
 
 #include <stdio.h>
-#ifdef SYSV
+#include <stdlib.h>
+#if defined(SYSV) || defined(__linux__)
 #include <string.h>
 #else
 #include <strings.h>
 #endif
 #include "cmdstream.h"
 #include "mem.h"
-
-extern	char	*strtok();
 
 /* ----------------------------------------------------------------------
  *      Local Data Structures
@@ -52,11 +51,10 @@ static	CmdInfo		cmdInfo = {
 /* ----------------------------------------------------------------------
  *      Local Forward Declarations
  * ---------------------------------------------------------------------*/
-
-static Command	*MatchCommand();
-static CmdAttr	*MatchAttr();
-static int	EncodeAttrValue();
-static int	DecodeAttrValue();
+static Command *MatchCommand(char *keyword);
+static CmdAttr *MatchAttr(Command *cmd, char *name);
+static int EncodeAttrValue(CmdAttr *attr, FILE *stream);
+static int DecodeAttrValue(CmdAttr *attr, char *valuestr);
 
 /* ----------------------------------------------------------------------
  *      SetCmdStream
@@ -142,7 +140,7 @@ ParseCmd(line)
 	static Command	*cmd = (Command *)NULL;
 	static CmdAttr	*attr = (CmdAttr *)NULL;
 
-	for (token=strtok(line,sep); token; token=strtok(0,sep)) { 
+	for (token=strtok(line,sep); token; token=strtok(0,sep)) {
 		if (cmd == (Command *)NULL) {
 			if ((cmd = MatchCommand(token)) == (Command *)NULL)
 				return FALSE;

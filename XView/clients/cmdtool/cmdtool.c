@@ -28,15 +28,11 @@ static  char sccsid[] = "@(#)cmdtool.c 15.61 93/06/28";
 #include <xview/tty.h>
 #include <xview/termsw.h>
 #include <xview/textsw.h>
+#include <xview/ttysw.h>
 #include <stdlib.h>		/* getenv() */
 
-#ifdef __STDC__
-extern char *getenv(const char *);
-extern char *dgettext(char *, char *);
-#else
-extern char *getenv();
-extern char *dgettext();
-#endif
+extern char *dgettext(char *domain_name, char *msg_id);
+extern void xv_usage(char *name);
 
 #define	TEXTDOMAIN	"cmdtool"
 #define	MSG(msg)	dgettext(TEXTDOMAIN, msg)
@@ -74,7 +70,7 @@ print_usage(am_cmdtool, toolname)
 	char	*mode_spec = (am_cmdtool)
 				? MSG("-P frequency") :
 				MSG("-B boldstyle");
-	
+
 	(void)fprintf(stderr,
 		MSG("syntax: %s [-C] [-I initial_cmd] [%s] [program [args]]\n"),
 		toolname, mode_spec);
@@ -100,6 +96,7 @@ print_usage(am_cmdtool, toolname)
 	}
 }
 
+void
 main(argc,argv)
 	int argc;
 	char **argv;
@@ -131,7 +128,7 @@ main(argc,argv)
 	char	cmdline2[50];
 	Server_image  cmd_pixmap, cmd_mask_pixmap;
 
-	
+
 #ifdef GPROF
 	if (argc > 1 && strcmp(argv[argc-1], "-gprof") == 0) {
 	    moncontrol(1);
@@ -142,13 +139,13 @@ main(argc,argv)
 	    moncontrol(0);
 	}
 #endif
-	
+
 #ifdef DEBUG
-	malloc_debug(0);   
-#endif	
-	
-	/* This is required to initialize correctly */	
-	xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, 
+	malloc_debug(0);
+#endif
+
+	/* This is required to initialize correctly */
+	xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv,
 		XV_USE_LOCALE, TRUE, 0);
 
 	shell_label = MSG("shelltool");
@@ -173,8 +170,8 @@ main(argc,argv)
         cmd_pixmap = (Server_image)xv_create((Xv_object)NULL, SERVER_IMAGE,
                    	                     XV_WIDTH,  64,
 		                             XV_HEIGHT, 64,
-		                             SERVER_IMAGE_BITS,      
-		                             become_console ? console_image : 
+		                             SERVER_IMAGE_BITS,
+		                             become_console ? console_image :
                                              am_cmdtool ? cmd_image : tty_image,
 		                             NULL);
 
@@ -182,13 +179,13 @@ main(argc,argv)
 		                                 XV_WIDTH,  64,
 		                                 XV_HEIGHT, 64,
 		                                 SERVER_IMAGE_BITS,
-		                                 become_console ? console_mask_image : 
-                                                 am_cmdtool ? cmd_mask_image : 
+		                                 become_console ? console_mask_image :
+                                                 am_cmdtool ? cmd_mask_image :
                                                               tty_mask_image,
 		                                 NULL);
 
 	tool_icon = (Icon)xv_create((Xv_object)NULL, ICON,
-            WIN_RETAINED, TRUE,				    
+            WIN_RETAINED, TRUE,
             ICON_IMAGE, cmd_pixmap,
             ICON_MASK_IMAGE, cmd_mask_pixmap,
             ICON_LABEL, icon_label,
@@ -199,11 +196,11 @@ main(argc,argv)
 			FRAME_ICON, tool_icon,
 		        HELP_STRING_FILENAME,	"manpage_synopsis_help_index",
 			NULL);
-			
+
 	if (base_frame == (Frame)NULL) {
 	    fprintf(stderr, MSG("Cannot create base frame.  Process aborted.\n"));
 	    exit(1);
-	}		
+	}
 
 	/* Get ttysw related args */
 	sh_argv[0] = NULL;
@@ -226,7 +223,7 @@ main(argc,argv)
 			cmdline[cmdline_count++] = "-C";
 			break;
  		case 'h':
- 		case '-':	
+ 		case '-':
 		case 'H':
 		case '?':
 			print_usage(am_cmdtool, tool_name);
@@ -277,7 +274,7 @@ main(argc,argv)
 		cmdline[cmdline_count++] = "-I";
 		cmdline[cmdline_count++] = init_cmd;
 	    }
-	    xv_set(base_frame, FRAME_WM_COMMAND_ARGC_ARGV, 
+	    xv_set(base_frame, FRAME_WM_COMMAND_ARGC_ARGV,
 			cmdline_count, cmdline, NULL);
 	}
 
@@ -295,7 +292,7 @@ main(argc,argv)
 	}
 
 	/* If FRAME_LABEL wasn't set by cmdline argument, set it */
-	if ((tmp_label1 = (char *)xv_get(base_frame, FRAME_LABEL)) == NULL) {
+	if ((tmp_label1 = (char *)xv_get(base_frame, FRAME_LABEL, NULL)) == NULL) {
 		(void)strncpy(frame_label,
 		  am_cmdtool ? cmd_label : shell_label, sizeof(frame_label));
 		if (become_console) {
@@ -307,8 +304,8 @@ main(argc,argv)
 		(void)strncat(frame_label, *argv, sizeof(frame_label));
 		(void)xv_set(base_frame, FRAME_LABEL, frame_label, NULL);
 	}
-	tool_icon = (Icon)xv_get(base_frame, FRAME_ICON);
-	if (((tmp_label2 = (char *) xv_get(tool_icon, ICON_LABEL)) == NULL) ||
+	tool_icon = (Icon)xv_get(base_frame, FRAME_ICON, NULL);
+	if (((tmp_label2 = (char *) xv_get(tool_icon, ICON_LABEL, NULL)) == NULL) ||
 	    *tmp_label2 == 0177) {
 	    if (tmp_label1) {
 		(void)strncpy(icon_label, tmp_label1, sizeof(icon_label));
@@ -320,7 +317,7 @@ main(argc,argv)
 	    (void)xv_set(tool_icon, ICON_LABEL, icon_label, NULL);
 	    xv_set(tool_icon, ICON_LABEL, icon_label, NULL);
 	}
-	
+
 
 	ttysw = (Tty)xv_create(base_frame, TERMSW,   WIN_IS_CLIENT_PANE,
 		  TTY_ARGV,			argv,
@@ -332,12 +329,12 @@ main(argc,argv)
 	      defaults_exists("window.height", "window.height") ||
 	      defaults_exists("window.geometry", "Window.Geometry"))) {
 	    int cols, rows;
-	    
-	    cols = defaults_get_integer_check("window.columns", "Window.Columns", 
+
+	    cols = defaults_get_integer_check("window.columns", "Window.Columns",
 					      80, 1, 999);
 	    rows = defaults_get_integer_check("window.rows", "Window.Rows",
 					      35, 1, 999);
-	    
+
 	    xv_set(ttysw,
 		   WIN_COLUMNS, cols,
 		   WIN_ROWS, rows,
@@ -356,15 +353,15 @@ main(argc,argv)
 			  TEXTSW_WRAPAROUND_SIZE, edit_log_wraps_at,
 			  NULL);
 	}
-	
-	tty_pid = (int)xv_get(ttysw, TTY_PID);
+
+	tty_pid = (int)xv_get(ttysw, TTY_PID, NULL);
 #ifdef DEBUG
 	(void)fprintf(stderr, "child pid = %d\n", tty_pid);
 #endif /* DEBUG */
 	if (tty_pid == -1) {
 	    strcpy(err_msg, (am_cmdtool) ? MSG("Command") : MSG("Shell"));
 	    strcat(err_msg, MSG(" Tool: Out of swap space.  Cannot continue.\n"));
-	    (void) ttysw_output(ttysw, err_msg, strlen(err_msg));        
+	    (void) ttysw_output(ttysw, err_msg, strlen(err_msg));
 	} else if (init_cmd && ((len = strlen(init_cmd)) > 0)) {
 	    if (init_cmd[len-1] != '\n') {
 		init_cmd[len] = '\n';
@@ -374,7 +371,7 @@ main(argc,argv)
 	}
 
 	xv_main_loop(base_frame);
-	
+
 	exit(0);
 }
 

@@ -1,8 +1,8 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20250403
+%define BaseRelease 20260315
 Version: 3.2p1.4
-Release: 25.29%{?dist}
+Release: 25.30%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip

@@ -11,6 +11,8 @@
 
 [ $# -gt 0 ] && set -e
 
+JOBS=${JOBS:-$(nproc)}
+
 ARCH=$(uname -p)
 if [ "x${ARCH}" = "xx86_64" ]; then
 	EXTRAFLAGS="-Wimplicit -D_XV_API_BROKEN_64BIT"
@@ -84,7 +86,7 @@ while [ $# -gt 0 ]; do
         imake -DUseInstalled $IMAKEINCLUDE
       ) || exit $?
       imake -DUseInstalled $IMAKEINCLUDE
-      make World
+      make -j$JOBS World
       ;;
     instlibs)
       install -d $OWDEST $X11DEST
@@ -92,17 +94,17 @@ while [ $# -gt 0 ]; do
       make SUBDIRS=doc install
       ;;
     clients)
-      make Clients
+      make -j$JOBS Clients
       ;;
     contrib)
-      make Contrib
+      make -j$JOBS Contrib
       ;;
     olvwm)
       (
         cd clients/olvwm-4.1
         imake -DUseInstalled $IMAKEINCLUDE
         make depend
-        make
+        make -j$JOBS
       ) || exit $?
       ;;
     instclients)

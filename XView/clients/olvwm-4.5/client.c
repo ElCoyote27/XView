@@ -1,10 +1,10 @@
-/* 
+/*
  *      (c) Copyright 1989, 1990 Sun Microsystems, Inc. Sun design patents
  *      pending in the U.S. and foreign countries. See LEGAL_NOTICE
  *      file for terms of the license.
  */
 
-/* client.c - functions relating to clients as a whole 
+/* client.c - functions relating to clients as a whole
  */
 
 #ifdef IDENT
@@ -48,7 +48,7 @@
 ***************************************************************************/
 
 /*
- * List of currently active clients.  All frames and icons and the no-focus 
+ * List of currently active clients.  All frames and icons and the no-focus
  * window are reachable by traversing this list.
  */
 List *ActiveClientList;
@@ -187,7 +187,7 @@ Display	*dpy;
 
 	DoingWindowState = False;
 
-	/* 
+	/*
 	 * Get the _SUN_LED_MAP property from the default root window
 	 */
 	ledMap = GetWindowProperty(dpy,DefaultRootWindow(dpy),AtomSunLedMap,
@@ -209,8 +209,8 @@ Display	*dpy;
 		}
 	}
 
-	/* 
-	 * Turn off the compose led 
+	/*
+	 * Turn off the compose led
 	 */
 	if (DoingWindowState)
 		setComposeLed(dpy,LedModeOff);
@@ -374,7 +374,7 @@ Bool pforce;
 			if (GRV.Beep == BeepAlways)
 				XBell(cli->dpy, 100);
 	}
-	return NULL;	
+	return NULL;
 }
 
 /* ClientShutdown - a client must be shut down.  Force the client
@@ -426,12 +426,12 @@ void *junk;
 
 	FrameUnparentPane(cli, frameInfo, paneInfo);
 
-	if (cli->wmState == DontCareState) 
-	{ 
+	if (cli->wmState == DontCareState)
+	{
 		if (!(cli->flags & CLOlwmOwned))
 		    XChangeSaveSet(dpy, pane, SetModeDelete);
-	} 
-	else 
+	}
+	else
 	{
 		XMapWindow(dpy,pane);
 	}
@@ -495,7 +495,7 @@ ClientCreate(dpy,screen)
 	int     screen;
 {
 Client *cli = MemNew(Client);
-   
+
 	cli->wmState = DontCareState;
 	cli->dpy = dpy;
 	cli->screen = screen;
@@ -515,7 +515,7 @@ Client *cli = MemNew(Client);
  *      Olwm.Client.<class>.<attribute-class>
  *      <argv0>.client.<name>.<attribute-name>
  *
- * REMIND: this should be table-driven (like in Xt) eventually, but right now  
+ * REMIND: this should be table-driven (like in Xt) eventually, but right now
  * we set up instance variables in open code.
  */
 void
@@ -555,10 +555,10 @@ ClientSetInstanceVars(cli)
 }
 
 
-/* 
- * DestroyClient -- destroy all resources associated with this client, and 
- * remove external references to this client.  If this is the current client, 
- * and we are in click-to-type, set the focus to the topmost client *after* 
+/*
+ * DestroyClient -- destroy all resources associated with this client, and
+ * remove external references to this client.  If this is the current client,
+ * and we are in click-to-type, set the focus to the topmost client *after*
  * having destroyed this client.
  *
  * REMIND: there is an architectural problem here, because this routine needs
@@ -568,7 +568,7 @@ ClientSetInstanceVars(cli)
  * client (such as an XID) should be used, so that references can go stale
  * without causing fatal problems.
  */
-void 
+void
 DestroyClient(cli)
 Client *cli;
 {
@@ -593,7 +593,7 @@ Client *cli;
 	}
 
 	/* Clean up references in the focus inhibit record */
-		 
+
 	if (fir.inhibited && cli == fir.cli)
 	    fir.cli = NULL;
 
@@ -604,7 +604,7 @@ Client *cli;
 	removeClient(cli);
 
 	/*
-	 * Run through the remaining clients and remove any references to this 
+	 * Run through the remaining clients and remove any references to this
 	 * client from their warp-back records.
 	 */
 	l = ActiveClientList;
@@ -730,7 +730,7 @@ ClientSetWMState(cli,wmState)
 /* ===== Drag-and-Drop Interest Property ================================== */
 
 /*
- * Get the next word from the `data' array, indexed by `cur'.  If this causes 
+ * Get the next word from the `data' array, indexed by `cur'.  If this causes
  * us to go beyond `nitems', return silently.
  */
 #define NEXTWORD(dest) do {						\
@@ -931,7 +931,7 @@ Client	*cli;
 {
     MakeSticky(cli, !cli->sticky);
     if (cli->groupmask == GROUP_LEADER)
-	GroupApply(cli->groupid, MakeSticky, cli->sticky, GROUP_DEPENDENT);
+	GroupApply(cli->groupid, (GroupFunc)MakeSticky, (void*)(long)cli->sticky, GROUP_DEPENDENT);
 }
 
 /*
@@ -981,13 +981,13 @@ ClientResize(cli,trigger,which,callback,cbarg)
 /*
  * ClientRaiseTransients
  *
- * Raise any transient windows associated with this client.  Return the 
- * client for the bottommost transient window.  This is useful so that the 
- * parent window can be restacked just below the bottommost transient.  If 
+ * Raise any transient windows associated with this client.  Return the
+ * client for the bottommost transient window.  This is useful so that the
+ * parent window can be restacked just below the bottommost transient.  If
  * there are no transient windows, returns NULL.
  *
- * REMIND raises all transient windows in the order they are encountered in 
- * the active client list, and returns the first one found.  Ideally, this 
+ * REMIND raises all transient windows in the order they are encountered in
+ * the active client list, and returns the first one found.  Ideally, this
  * should preserve the stacking order of the transients.
  */
 Client *
@@ -1015,11 +1015,11 @@ ClientRaiseTransients(cli)
 /*
  * ClientLowerTransients
  *
- * Restack any transient windows associated with this client to be just above 
+ * Restack any transient windows associated with this client to be just above
  * this client's frame.
  *
- * REMIND this lowers all transient windows in the order they are encountered 
- * in the active client list.  Ideally, this should preserve the stacking 
+ * REMIND this lowers all transient windows in the order they are encountered
+ * in the active client list.  Ideally, this should preserve the stacking
  * order of the transients.
  */
 void
@@ -1046,7 +1046,7 @@ ClientLowerTransients(cli)
 
 /*
  * ClientFront
- * 
+ *
  * Moves the appropriate client window to the front of the window hierarchy.
  * If this window has any transient windows, move them in front first.
  */
@@ -1080,12 +1080,12 @@ Client	*cli;
 
 /*
  * ClientBack
- * 
+ *
  * Moves the appropriate client window to the back of the window hierarchy.
- * If this is a transient window, move its parent window to the back first, 
+ * If this is a transient window, move its parent window to the back first,
  * and then move this window just in front of it.
  *
- * REMIND this isn't optimal behavior for transient windows, but it does 
+ * REMIND this isn't optimal behavior for transient windows, but it does
  * ensure that transient windows always remain in front of their parents.
  */
 void
@@ -1127,9 +1127,9 @@ Client	*cli;
 /*
  * ClientToggleStacking
  *
- * Moves the appropriate client window to the front of the window hierarchy if 
- * it is obscured, otherwise move it to the back of the hierarchy if it 
- * obscures any other window.  REMIND: doesn't deal with transient windows at 
+ * Moves the appropriate client window to the front of the window hierarchy if
+ * it is obscured, otherwise move it to the back of the hierarchy if it
+ * obscures any other window.  REMIND: doesn't deal with transient windows at
  * all.
  */
 void
@@ -1204,7 +1204,7 @@ Client *cli;
  * ClientFlashOwner
  *	Find group leader frame, bring it to the top and then
  *	flash its title bar.
- * 
+ *
  *	REMIND:  make sure transient windows get treated properly
  *		 before or after (which? not sure) the leader is raised.
  */
@@ -1221,7 +1221,7 @@ Client	*cli;
 }
 
 /*
- * Toggle the pushpin of this client's window.  Returns False if this client's 
+ * Toggle the pushpin of this client's window.  Returns False if this client's
  * window has no pin, otherwise, returns True.
  */
 Bool
@@ -1270,10 +1270,10 @@ ClientInBoxClosure *cclose;
 		w = cli->framewin->core.width;
 		h = cli->framewin->core.height;
 		break;
-	
+
 	case InvisibleState:
 		return NULL;
-	
+
 	}
 
 	if ((x >= cclose->bx) &&
@@ -1305,7 +1305,7 @@ ClientUpdateBusy(cli,event)
 
 	if (event->state == PropertyNewValue) {
 	    newBusyPtr = GetWindowProperty(cli->dpy, PANEWINOFCLIENT(cli),
-		AtomWindowBusy, 0L, LONG_LENGTH(*newBusyPtr), 
+		AtomWindowBusy, 0L, LONG_LENGTH(*newBusyPtr),
 		XA_INTEGER, 32, &nItems, &remain);
 
 	    if (newBusyPtr == NULL) {
@@ -1326,7 +1326,7 @@ ClientUpdateBusy(cli,event)
 	    newBusy = 0;
 	}
 
-	/* 
+	/*
 	 * Losing busy
 	 */
         if (cli->isBusy && (newBusy == 0)) {
@@ -1472,7 +1472,7 @@ Time evtime;
  * implicitly (when a globally active client takes the focus).  Therefore, if
  * ClientActivate activates a globally active client, this function will be
  * called twice.
- * 
+ *
  * Eventually, this may change to be a "ring-buffer" history of clients.
  *
  * REMIND: the notion of the current client may be a vestige from the time
@@ -1507,7 +1507,7 @@ ClientGetLastCurrent()
 
 /*
  * Client Activation.
- * 
+ *
  * Activate the named client.  The difference between this and ClientSetFocus
  * is that this function selects and raises the client's window in addition to
  * setting the focus.  Further, this function works on iconic clients as well
@@ -1515,8 +1515,8 @@ ClientGetLastCurrent()
  * rely on the resulting focus change to set the current client, except that
  * a globally active client may decline the focus when it is asked to take it.
  *
- * REMIND this shouldn't have to deal with selections at all.  However, 
- * icons and headerless windows currently have no way to indicate that they 
+ * REMIND this shouldn't have to deal with selections at all.  However,
+ * icons and headerless windows currently have no way to indicate that they
  * have the focus.  Therefore, select them.
  */
 void
@@ -1526,14 +1526,14 @@ ClientActivate(dpy, cli, timestamp)
     Time timestamp;
 {
     /*
-     * If the current client is selected, assume it was selected because it 
+     * If the current client is selected, assume it was selected because it
      * was made the active client, and deselect it.  (See REMIND above.)
      */
     if (CurrentClient != NULL && CurrentClient->isSelected)
 	ClearSelections(dpy);
 
     /*
-     * If we are being asked to activate a NULL client, or a client without a 
+     * If we are being asked to activate a NULL client, or a client without a
      * frame (i.e. a root client), activate the NoFocus client.
      */
     if (cli == NULL) {
@@ -1544,7 +1544,7 @@ ClientActivate(dpy, cli, timestamp)
 	ClientSetFocus(cli, True, timestamp);
 
 	/*
-	 * If the client is iconic or has no header, select it to show that it 
+	 * If the client is iconic or has no header, select it to show that it
 	 * is the active client.  (See REMIND above.)
 	 */
 	if (cli->wmState == IconicState ||
@@ -1611,7 +1611,7 @@ ClientFocusTopmost(dpy, scrinfo, timestamp)
 typedef struct {
 	Atom	*propAtom;
 	void	(*updateFunc)();
-} ClientPropUpdate; 
+} ClientPropUpdate;
 
 static ClientPropUpdate propUpdateTable[] =  {
 	&AtomWMName,			FrameUpdateHeader,
