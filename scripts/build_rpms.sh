@@ -9,12 +9,19 @@ RPM_BUILD_DIR=${RPM_BASE_DIR}/BUILD/$(uname -n)
 RPM_TMP_PATH=${RPM_BASE_DIR}/tmp/$(uname -n)
 
 SIGN_RPMS=""
+SIGN_AFTER=""
 if [ "x$1" = "x--sign" ]; then
 	SIGN_RPMS="--sign"
 	shift
 fi
 
 VERSION="$(lsb_release -sr|cut -f1 -d'.')"
+
+# RHEL 9+: rpmbuild --sign is gone, use rpmsign after the build
+if [ ${VERSION} -ge 9 ] && [ -n "${SIGN_RPMS}" ]; then
+	SIGN_RPMS=""
+	SIGN_AFTER=1
+fi
 ARCH="$(uname -i)"
 DIST=".el${VERSION}"
 rpmextras=""
@@ -99,4 +106,12 @@ fi
 	--define "_builddir ${RPM_BUILD_DIR}" \
 	--define "_tmppath ${RPM_TMP_PATH}" \
 	${SPEC_FILE}
+
+# Sign RPMs after build (RHEL 9+)
+if [ -n "${SIGN_AFTER}" ] && [ -x /usr/bin/rpmsign ]; then
+	echo "Signing RPMs with rpmsign..."
+	/usr/bin/rpmsign --addsign \
+		${RPM_BASE_DIR}/SRPMS/*${DIST}.src.rpm \
+		${RPM_BASE_DIR}/RPMS/i?86/*${DIST}.i?86.rpm
+fi
 
