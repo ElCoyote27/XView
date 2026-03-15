@@ -9,4 +9,5 @@ alt_src
 old_src
 XView.compare
 README*
-.vscode
+.vscode/
+.cursor/
