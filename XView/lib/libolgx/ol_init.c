@@ -1243,7 +1243,8 @@ olgx_destroy(info)
     for (i = 0; i < OLGX_NUM_GCS; i++)
 	olgx_destroy_gcrec(per_displ_res_ptr, info->gc_rec[i]);
 
-
+    if (info->drawable[0])
+	XFreePixmap(info->dpy, info->drawable[0]);
     free(info);
     info = NULL;
 
@@ -1598,14 +1599,13 @@ olgx_destroy_gcrec(perdisp_res_ptr, gcrec)
     if (cur->ref_count > 1)
 	cur->ref_count -= 1;
     else {
-
 	if (prev != NULL) {
 	    prev->next = cur->next;
-	    free(gcrec);
 	} else {
 	    perdisp_res_ptr->gc_list_ptr = cur = cur->next;
-	    free(gcrec);
 	}
+	XFreeGC(perdisp_res_ptr->dpy, gcrec->gc);
+	free(gcrec);
     }
 }
 
@@ -1698,7 +1698,7 @@ olgx_set_color_smart(info, perdispl_res_ptr, gcrec, fg_flag, pixval, flag)
 
 		if (existing_gcrec != gcrec) {
 		    olgx_destroy_gcrec(perdispl_res_ptr, gcrec);
-		    existing_gcrec += 1;
+		    existing_gcrec->ref_count += 1;
 		    gcrec = existing_gcrec;
 		}
 	    }

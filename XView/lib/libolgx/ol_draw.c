@@ -13,6 +13,61 @@
 
 #include "olgx_impl.h"
 
+/* Returns a font-dependent base offset for labels instead of using
+   info->base_off directly.  Important for OLIT where label font
+   may differ significantly from the glyph font. */
+int
+olgx_calc_font_offset(info, height, state)
+     Graphics_info *info;
+     int height;
+     int state;
+{
+    int offset = info->base_off;
+    int direction, ascent, descent;
+    XCharStruct overall;
+
+    if ((state & OLGX_LABEL_IS_PIXMAP) || (state & OLGX_LABEL_IS_XIMAGE)) {
+	return offset;
+    }
+#ifdef OW_I18N
+    if (Olgx_Flags(info) & OLGX_FONTSET) {
+	XFontSetExtents *fx;
+	fx = XExtentsOfFontSet(info->textfontset);
+	if ((int)(offset - fx->max_logical_extent.y) >= (int)height) {
+	    offset = height -
+		(int)(height - fx->max_logical_extent.height) / 2 +
+		fx->max_logical_extent.y;
+	    if (offset <= 1) {
+		offset = 2;
+	    }
+	}
+    } else {
+	XTextExtents(TextFont_Struct(info), NULL, 0,
+		     &direction, &ascent, &descent,
+		     &overall);
+	if ((ascent + offset - 2) >= height) {
+	    offset = descent -
+		(int)(ascent + descent - height) / 2;
+	    if (offset <= 1) {
+		offset = 2;
+	    }
+	}
+    }
+#else
+    XTextExtents(TextFont_Struct(info), NULL, 0,
+		 &direction, &ascent, &descent,
+		 &overall);
+    if ((ascent + offset - 2) >= height) {
+	offset = descent -
+	    (int)(ascent + descent - height) / 2;
+	if (offset <= 1) {
+	    offset = 2;
+	}
+    }
+#endif /* OW_I18N */
+    return offset;
+}
+
 int
 calc_add_ins(width, add_ins)
     int             width;
@@ -28,7 +83,7 @@ calc_add_ins(width, add_ins)
 	 this_log2 >= 0 && width && nchars < STRING_SIZE;
 	 this_bit = this_bit >> 1, this_log2--) {
 
-	while (width >= this_bit) {
+	while (width >= this_bit && nchars < STRING_SIZE) {
 	    width -= this_bit;
 	    add_ins[nchars++] = this_log2;
 
@@ -257,7 +312,9 @@ olgx_draw_choice_item(info, win, x, y, width, height, label, state)
 	     */
 			   x + ((info->button_height > 20) ?
 				info->base_off + 2 : info->base_off),
-			   y + height - info->base_off,
+			   y + height - olgx_calc_font_offset(info,
+							      height,
+							      state),
 			   width - ((info->button_height > 20) ?
 				    info->base_off + 2 : info->base_off),
 			   state & ~OLGX_INACTIVE); /* don't double grey out */

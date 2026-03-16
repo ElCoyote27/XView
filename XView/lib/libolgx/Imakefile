@@ -14,6 +14,8 @@ LIBTARGET = olgx
 SOREV = $(SOOLGXREV)
 TARGETDIR = ./
 
+DEFINES = -DOW_I18N
+
 #define SubdirHasTextObjs YES
 #define SubdirHasDataObjs NO
 #define SubdirHasPublicHeaders YES

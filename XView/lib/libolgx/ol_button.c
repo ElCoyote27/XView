@@ -26,9 +26,9 @@ void            olgx_draw_ximage_label();
 
 static void     olgx_draw_accel_label_internal();
 static void     olgx_draw_diamond_mark();
-/*
 static void     olgx_draw_label();
-*/
+
+extern int      olgx_calc_font_offset();
 
 void
 olgx_draw_button(info, win, x, y, width, height, label, state)
@@ -277,7 +277,10 @@ olgx_draw_button(info, win, x, y, width, height, label, state)
 	    olgx_draw_text(info, win, (char *) label,
 #endif /* OW_I18N */
 			   x + info->endcap_width,
-			   y + info->button_height - info->base_off,
+			   y + info->button_height
+			     - olgx_calc_font_offset(info,
+						     info->button_height,
+						     state),
 			   inside_width -
 			   ((state & OLGX_MENU_MARK) ?
 			    info->mm_width : 0),
@@ -833,7 +836,8 @@ olgx_draw_pixmap_label(info, win, pix, x, y, width, height, state)
     unsigned long   savebg2;
     Window              root;
     int                 x_dummy,y_dummy;
-    unsigned int        w_dummy,h_dummy,bw_dummy;
+    unsigned int        pixmap_width, pixmap_height;
+    unsigned int        bw_dummy;
     unsigned int        depth;
 
     if (!info->gc_rec[OLGX_TEXTGC])
@@ -856,18 +860,25 @@ olgx_draw_pixmap_label(info, win, pix, x, y, width, height, state)
     }
     /*
      * Performance Problem - RoundTrip request
-     * Depth should be passed as part of Pixlabel struct
+     * Depth should be passed as part of Pixlabel struct.
+     * However, since the actual pixmap width and height is not passed,
+     * (the button width and height is passed) we need to get
+     * the geometry of the pixmap anyway.
      */
- 
-    XGetGeometry(info->dpy,pix,&root,&x_dummy,&y_dummy,&w_dummy,
-                 &h_dummy,&bw_dummy,&depth);
+
+    XGetGeometry(info->dpy, pix, &root, &x_dummy, &y_dummy,
+                 &pixmap_width, &pixmap_height, &bw_dummy, &depth);
+
+    /* Clamp to actual pixmap dimensions to avoid tiling artifacts
+       from XCopyArea/XCopyPlane when button is larger than pixmap. */
     if (depth > 1)
         XCopyArea(info->dpy,
                   pix,          /* src */
                   win,          /* dest */
                   info->gc_rec[OLGX_TEXTGC]->gc,
                   0, 0,         /* src x,y */
-                  width, height,
+		  (width > pixmap_width) ? pixmap_width : width,
+		  (height > pixmap_height) ? pixmap_height : height,
                   x, y);
     else
         XCopyPlane(info->dpy,
@@ -875,7 +886,8 @@ olgx_draw_pixmap_label(info, win, pix, x, y, width, height, state)
 	           win,		/* dest */
 	           info->gc_rec[OLGX_TEXTGC]->gc,
 	           0, 0,		/* src x,y */
-	           width, height,
+		  (width > pixmap_width) ? pixmap_width : width,
+		  (height > pixmap_height) ? pixmap_height : height,
 	           x, y,
 	           (unsigned long) 1);	/* bit plane */
 
@@ -1275,7 +1287,7 @@ olgx_draw_accel_label_internal(info, win, texty, x, y, width, height,
 	    XCharStruct overall;
 	    void *string_label;
 	    Underlinelabel *ulabel, *hlabel;
-	    /*char *highlight_char;*/
+	    char *highlight_char;
 	    int has_highlight=0,has_underline=0;
 	    int highlightx_pos, highlight_length, highlighty_pos, 
 	        highlight_height;
@@ -1477,11 +1489,27 @@ olgx_draw_accel_label_internal(info, win, texty, x, y, width, height,
 		    if (state & OLGX_INACTIVE) {
 			XSetFillStyle(info->dpy,gc,FillStippled);
 		    }
-		    XDrawLine(info->dpy, win, 
+		    /* Clamp underline position when font is larger than
+		       glyph font to keep it within the button area. */
+		    if (label_y_pos >= (y + ((height) ?
+					     height :
+					     info->button_height) - 3)) {
+			int old_y_pos = label_y_pos;
+			label_y_pos = y + ((height) ?
+					   height :
+					   info->button_height) - 4;
+			if (label_y_pos < texty) {
+			    label_y_pos = old_y_pos;
+			}
+		    }
+		    if (label_y_pos <= y) {
+			label_y_pos = y + 1;
+		    }
+		    XDrawLine(info->dpy, win,
 			      gc,
-			      label_pixel_pos, 
+			      label_pixel_pos,
 			      label_y_pos,
-			      label_pixel_pos + 
+			      label_pixel_pos +
 			      label_length,
 			      label_y_pos);
 		    if (state & OLGX_INACTIVE) {
@@ -1564,10 +1592,15 @@ olgx_draw_accel_label_internal(info, win, texty, x, y, width, height,
 		       q_pos,texty,text_width,state);
     }
     if (mark_type) {
+	int mark_offset;
+	mark_offset = y + ((height) ?
+			   ((height + info->button_height) / 2 + 1) :
+			   info->button_height)
+	    - info->base_off;
 	if (mark_type & OLGX_DIAMOND_MARK) {
 	    olgx_draw_diamond_mark(info,win,
 				   mark_pos,
-				   texty,
+				   mark_offset,
 				   state);
 	} else if (mark_type & OLGX_MENU_MARK) {
 	    int fill_color;
@@ -1596,14 +1629,14 @@ olgx_draw_accel_label_internal(info, win, texty, x, y, width, height,
 		}
 		olgx_draw_menu_mark(info, win,
 				    mark_pos,
-				    texty-info->mm_height,
+				    mark_offset - info->mm_height,
 				    mark_type | state,
 				    (fill_color != OLGX_BG2));
 	    } else {
 		olgx_draw_menu_mark(info, win,
 				    mark_pos,
-				    texty-info->mm_height,
-				    mark_type | state,0);
+				    mark_offset - info->mm_height,
+				    mark_type | state, 0);
 	    }
 	}
     }
@@ -1678,16 +1711,20 @@ olgx_draw_accel_button(info, win, x, y, width, height,
     void           *background_pixmap;/* unsupported right now! */
     int             state;            /* state of the actual object */
 {
+    int             texty, newheight;
+    if (height) {
+	newheight = (height + info->button_height) / 2 + 1;
+    } else {
+	newheight = info->button_height;
+    }
+    texty = y + newheight - olgx_calc_font_offset(info, newheight, state);
+
     /* don't want to duplicate code, so draw a button with a null label,
        no menu mark, and not inactive (will be done later) */
     olgx_draw_button(info,win,x,y,width,height,(void *)NULL,
 		     state&~OLGX_MENU_MARK&~OLGX_INACTIVE);
     olgx_draw_accel_label_internal(info,win,
-				   y + 
-				   ((height) ? 
-				    ((height+info->button_height)/2 + 1) : 
-				    info->button_height) - 
-				   info->base_off,
+				   texty,
 				   x+ButtonEndcap_Width(info),
 				   y,
 				   width-2*ButtonEndcap_Width(info),
@@ -1699,7 +1736,7 @@ olgx_draw_accel_button(info, win, x, y, width, height,
 				   state & ~OLGX_INACTIVE,
 				   1);
     if (state & OLGX_INACTIVE) {
-	olgx_stipple_rect(info, win, x, y, width, 
+	olgx_stipple_rect(info, win, x, y, width,
                           (height) ? height + 1 : Button_Height(info));
     }
 }
@@ -1727,27 +1764,31 @@ olgx_draw_accel_choice_item(info, win, x, y, width, height,
     int             state;            /* state of the actual object */
 {
     int             flag = 0;
+    int             texty, newheight;
+    if (height) {
+	newheight = (height + info->button_height) / 2 + 1;
+    } else {
+	newheight = info->button_height;
+    }
+    texty = y + newheight - olgx_calc_font_offset(info, newheight, state);
+
     /* don't want to duplicate code, so draw a choice with a null label,
        no menu mark, and not inactive (will be done later) */
     olgx_draw_choice_item(info,win,x,y,width,height,NULL,
 			  state&~OLGX_MENU_MARK&~OLGX_INACTIVE);
-    
+
     /*
      * special case for choice invoked in drawing label where the
      * invoked state is changed to uninvoked and sent to the label
      * drawing routines
      */
-    
+
     if (state & OLGX_INVOKED) {
 	state ^= OLGX_INVOKED;
 	flag = 1;
     }
     olgx_draw_accel_label_internal(info,win,
-				   y + 
-				   ((height) ? 
-				    ((height+info->button_height)/2 + 1) : 
-				    info->button_height) - 
-				   info->base_off,
+				   texty,
 				   x + ((info->button_height > 20) ?
 				       info->base_off + 2 : info->base_off),
 				   y,

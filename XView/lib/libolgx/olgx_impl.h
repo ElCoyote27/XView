@@ -18,12 +18,17 @@
  * I18N_Portability: May need to change the following #include to
  * pickup the wchar_t and X11R5(-ish) Xlib functions definitions.
  */
+#ifdef __linux__
+#include <wchar.h>
+#include <wctype.h>
+#define wslen wcslen
+#else
 #include <widec.h>
+#endif
 #include <X11/Xlib.h>
-#if XlibSpecificationRelease != 5
+#if ! defined(XlibSpecificationRelease) || XlibSpecificationRelease < 5
 #include <X11/XlibR5.h>
-#endif /* XlibSpecificationRelease != 5 */
-
+#endif /* XlibSpecificationRelease */
 
 #endif
 #include <olgx/olgx.h>

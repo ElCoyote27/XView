@@ -540,7 +540,7 @@ typedef struct graphics_info {
 #define TextFont_Struct(info)           ((info)->textfont)
 #endif
 #define GlyphFont_Struct(info)          ((info)->glyphfont)
-#define AbbScrollbar_Height(ginfo)      ((info)->abbsb_height)
+#define AbbScrollbar_Height(ginfo)      ((ginfo)->abbsb_height)
 #define DropTarget_Width(info)          ((info)->dtarget_width)
 #define DropTarget_Height(info)         ((info)->dtarget_height)
 
