@@ -142,6 +142,7 @@ typedef struct _client
 	Bool		isShaped;
 #endif
 	Bool		menuAccelerators;
+	Bool		dndPropPresent;
 } Client;
 
 /*

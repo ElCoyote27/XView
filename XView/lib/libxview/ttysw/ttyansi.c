@@ -145,6 +145,21 @@ from_pty_to_textsw(textsw, cp, buf)
     status =
 	send_input_to_textsw(textsw, buf, (long) (cp - buf), cmd_start);
 
+    /* Bug 4141064: reset textsw when cmd_start approaches TEXTSW_INFINITY
+     * to prevent cmdtool from entering an infinite loop.
+     */
+    if (cmd_start > TEXTSW_INFINITY - 200000) {
+	char save_buf[100001];
+	int wraplimit = (int) xv_get(textsw, TEXTSW_WRAPAROUND_SIZE);
+	if (wraplimit > 100000 || wraplimit <= 0)
+	    wraplimit = 100000;
+	xv_get(textsw, TEXTSW_CONTENTS,
+	       (cmd_start - wraplimit), save_buf, wraplimit);
+	save_buf[wraplimit] = '\0';
+	textsw_reset_2(textsw, 0, 0, FALSE, FALSE);
+	xv_set(textsw, TEXTSW_CONTENTS, save_buf, NULL);
+    }
+
     ttysw_doing_pty_insert(textsw, termsw, FALSE);
 
     /* Restore user_mark, if cmd_started */

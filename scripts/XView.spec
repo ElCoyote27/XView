@@ -2,7 +2,7 @@ Summary: XView libraries for X11
 Name: xview
 %define BaseRelease 20260316
 Version: 3.2p1.4
-Release: 25.31%{?dist}
+Release: 25.32%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -69,6 +69,16 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Mon Mar 16 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.32
+- Backport Solaris WS_OLS10_SPARC security/stability fixes:
+- server.c: buffer overflow fixes (strcpy->strncpy, sprintf->snprintf)
+- server.c: NULL check for atomName before strcmp
+- defaults.c: snprintf for error messages, improved xv_XrmGetResource
+- svr_x.c: check both Meta_L and Meta_R, fix keycode_in_map return
+- ttyansi.c: Bug 4141064 cmdtool infinite loop prevention
+- olwm/client.c: DnD property cleanup, WM_STATE WithdrawnState fix
+- olwm/events.c: iterate all modifier map entries in ModifierToKeysym
+
 * Mon Mar 16 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.31
 - libolgx fixes from WS_OLS10_SPARC
 

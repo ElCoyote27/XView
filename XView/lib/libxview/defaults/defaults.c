@@ -24,8 +24,7 @@ static char     sccsid[] = "@(#)defaults.c 20.33 93/06/28";
 #include <xview/server.h>
 #endif
 #include <xview/xv_error.h>
-/* mbuck@debian.org */
-#if 1
+#if __linux__
 #include <X11/Xlibint.h>
 #else
 #include <X11/Xlib.h>
@@ -55,9 +54,11 @@ static char     defaults_returned_value[DEFAULTS_MAX_VALUE_SIZE];
 XrmDatabase defaults_rdb;/* merged defaults database */
 
 static Bool     symbol_equal();
+static void	defaults_error();
 #ifdef OW_I18N
 static Bool	xv_XrmGetResource();
 static char	*defaults_locale = NULL;
+static int	defaults_locale_length = 0;
 #endif /* OW_I18N */
 
 extern Display *xv_default_display;
@@ -136,18 +137,12 @@ defaults_get_boolean(name, class, default_bool)
     }
     value = (Bool) defaults_lookup(string_value, bools);
     if ((int) value == -1) {
-#if 1
 	char            buffer[4096];
-#else
-	char            buffer[64];
-#endif
 
-	(void) sprintf(buffer,
+	(void) snprintf(buffer, sizeof(buffer),
 	       XV_MSG("\"%s\" is an unrecognized boolean value (Defaults package)"),
 		       string_value);
-	xv_error(NULL,
-		 ERROR_STRING, buffer,
-		 0);
+	defaults_error(buffer);
 	value = default_bool;
     }
     return value;
@@ -171,18 +166,12 @@ defaults_get_character(name, class, default_char)
 	return default_char;
     }
     if (strlen(string_value) != 1) {
-#if 1
 	char            buffer[4096];
-#else
-	char            buffer[64];
-#endif
 
-	sprintf(buffer, 
-		XV_MSG("\"%s\" is not a character constant (Defaults package)"),
-		string_value);
-	xv_error(NULL,
-		 ERROR_STRING, buffer,
-		 0);
+	snprintf(buffer, sizeof(buffer),
+		 XV_MSG("\"%s\" is not a character constant (Defaults package)"),
+		 string_value);
+	defaults_error(buffer);
 	return default_char;
     }
     return string_value[0];
@@ -247,18 +236,12 @@ defaults_get_integer(name, class, default_integer)
 	chr = *cp++;
     }
     if (error) {
-#if 1
 	char            buffer[4096];
-#else
-	char            buffer[64];
-#endif
 
-	sprintf(buffer, 
-		XV_MSG("\"%s\" is not an integer (Defaults package)"), 
-		string_value);
-	xv_error(NULL,
-		 ERROR_STRING, buffer,
-		 0);
+	snprintf(buffer, sizeof(buffer),
+		 XV_MSG("\"%s\" is not an integer (Defaults package)"),
+		 string_value);
+	defaults_error(buffer);
 	return default_integer;
     }
     if (negative)
@@ -287,18 +270,12 @@ defaults_get_integer_check(name, class, default_int, minimum, maximum)
     if ((minimum <= value) && (value <= maximum))
 	return value;
     else {
-#if 1
 	char            buffer[4096];
-#else
-	char            buffer[128];
-#endif
 
-	sprintf(buffer, 
+	snprintf(buffer, sizeof(buffer),
 	XV_MSG("The value of name \"%s\" (class \"%s\") is %d,\nwhich is not between %d and %d. (Defaults package)"),
-		name, class, value, minimum, maximum);
-	xv_error(NULL,
-		 ERROR_STRING, buffer,
-		 0);
+		 name, class, value, minimum, maximum);
+	defaults_error(buffer);
 	return default_int;
     }
 }
@@ -329,23 +306,15 @@ defaults_get_string(instance, class, default_string)
 	return default_string;
 
 /*
- *  Strip all the preceding and trailing blanks of *value.addr 
+ *  Strip all the preceding and trailing blanks of *value.addr
  */
 
     word_ptr = defaults_returned_value;
     begin_ptr = value.addr;
-#ifdef OW_I18N
     while (isspace ((unsigned char)*begin_ptr)) ++begin_ptr;
-#else
-    while (isspace (*begin_ptr)) ++begin_ptr;
-#endif
     length = MIN(value.size - 1, DEFAULTS_MAX_VALUE_SIZE - 1);
     end_ptr = value.addr + length - 1;
-#ifdef OW_I18N
     while (isspace ((unsigned char)*end_ptr)) --end_ptr;
-#else
-    while (isspace (*end_ptr)) --end_ptr;
-#endif
     for (; begin_ptr <= end_ptr; begin_ptr++)
     {
 	*word_ptr = *begin_ptr;
@@ -430,34 +399,19 @@ defaults_load_db(filename)
     char           *filename;
 {
     XrmDatabase     new_db = NULL;
-    /* martin-2.buck@student.uni-ulm.de */
-    char            *xrmstr;
 
     if (filename)
 	new_db = XrmGetFileDatabase(filename);
     else {
 	if (!xv_default_display) {
-	    xv_error(0,
-		     ERROR_STRING,
-		       XV_MSG("Unable to load server Resource Manager property -\n\
-no server defined (Defaults package)"),
-		     0);
+	    defaults_error(
+		XV_MSG("Unable to load server Resource Manager property -\n\
+no server defined (Defaults package)"));
 	    return;
 	}
-#ifdef X11R6
-#if 1
-	/* martin-2.buck@student.uni-ulm.de */
-        if ((xrmstr = XResourceManagerString(xv_default_display)))
-            new_db = XrmGetStringDatabase(xrmstr);
-#else
-	/* lumpi@dobag.in-berlin.de */
-	if (XrmGetDatabase(xv_default_display))
-		new_db=NULL;
-#endif
-#else
-	if (xv_default_display->xdefaults)
-	    new_db = XrmGetStringDatabase(xv_default_display->xdefaults);
-#endif
+	if (XResourceManagerString(xv_default_display))
+	    new_db = XrmGetStringDatabase(
+		XResourceManagerString(xv_default_display));
     }
     if (new_db)
 	XrmMergeDatabases(new_db, &defaults_rdb);
@@ -479,13 +433,11 @@ defaults_store_db(filename)
     /* Write the database to the specified file. */
     XrmPutFileDatabase(defaults_rdb, filename);
 
-    /* Update the server Resource mManager property. */
+    /* Update the server Resource Manager property. */
     if (!xv_default_display) {
-	xv_error(0,
-		 ERROR_STRING,
-		   XV_MSG("Unable to update server Resource Manager property -\n\
-no server defined (Defaults package)"),
-		 0);
+	defaults_error(
+	    XV_MSG("Unable to update server Resource Manager property -\n\
+no server defined (Defaults package)"));
 	return;
     }
     if (stat(filename, &file_status))
@@ -509,10 +461,8 @@ store_db_cleanup:
     return;
 
 store_db_error:
-    xv_error(0,
-	     ERROR_STRING,
-     XV_MSG("Unable to update server Resource Manager property (Defaults package)"),
-	     0);
+    defaults_error(
+	XV_MSG("Unable to update server Resource Manager property (Defaults package)"));
     goto store_db_cleanup;
 }
 
@@ -551,6 +501,7 @@ defaults_set_locale(locale, locale_attr)
     if (defaults_locale != NULL) {
 	xv_free(defaults_locale);
 	defaults_locale = NULL;
+	defaults_locale_length = 0;
     }
 
     if (locale != NULL) {
@@ -560,6 +511,8 @@ defaults_set_locale(locale, locale_attr)
 		(char *) xv_get(xv_default_server, locale_attr)) != NULL)
 	    defaults_locale = xv_strsave(defaults_locale);
     }
+    if (defaults_locale != NULL)
+	defaults_locale_length = strlen(defaults_locale);
 }
 
 
@@ -598,6 +551,8 @@ symbol_equal(symbol1, symbol2)
 
 
 #ifdef OW_I18N
+#define	DFT_MAX_RESOURCE_NAME	256
+
 static Bool
 xv_XrmGetResource(rdb, name, class, type, value)
     XrmDatabase		  rdb;
@@ -606,16 +561,43 @@ xv_XrmGetResource(rdb, name, class, type, value)
     char		**type;
     XrmValue		 *value;
 {
-    char		 lc_name[1024];
-    char		 lc_class[1024];
+    char	 dft_lc_name[DFT_MAX_RESOURCE_NAME];
+    char	 dft_lc_class[DFT_MAX_RESOURCE_NAME];
+    int		 length;
+    char	*lc_name = dft_lc_name;
+    char	*lc_class = dft_lc_class;
+    Bool	 ret_val;
 
     if (defaults_locale != NULL) {
+	length = defaults_locale_length + strlen(name) + 2;
+	if (length > DFT_MAX_RESOURCE_NAME)
+	    lc_name = xv_malloc(length);
+	length = defaults_locale_length + strlen(class) + 2;
+	if (length > DFT_MAX_RESOURCE_NAME)
+	    lc_class = xv_malloc(length);
+
 	(void) sprintf(lc_name, "%s.%s", name, defaults_locale);
 	(void) sprintf(lc_class, "%s.%s", class, defaults_locale);
-	if (XrmGetResource(rdb, lc_name, lc_class, type, value))
-	    return True;
+
+	ret_val = XrmGetResource(rdb, lc_name, lc_class, type, value);
+
+	if (lc_name != dft_lc_name)
+	    xv_free(lc_name);
+	if (lc_class != dft_lc_class)
+	    xv_free(lc_class);
+
+	if (ret_val)
+	    return ret_val;
     }
 
     return XrmGetResource(rdb, name, class, type, value);
 }
 #endif /* OW_I18N */
+
+
+static void
+defaults_error(msg)
+    char	*msg;
+{
+    xv_error(0, ERROR_STRING, msg, NULL);
+}

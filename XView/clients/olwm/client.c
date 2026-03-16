@@ -613,6 +613,16 @@ Client *cli;
 	    }
 	}
 
+	/* Nuke stale drag-and-drop properties on frame and icon. */
+	if (cli->dndPropPresent) {
+	    if (cli->framewin)
+		XDeleteProperty(dpy, cli->framewin->core.self,
+				AtomSunDragDropInterest);
+	    if (cli->iconwin)
+		XDeleteProperty(dpy, cli->iconwin->core.self,
+				AtomSunDragDropInterest);
+	}
+
 	/* destroy the window resources associated with the client */
 	WinCallDestroy(cli);
 
@@ -716,6 +726,9 @@ ClientSetWMState(cli,wmState)
 	if (wmState == InvisibleState)
 		wmState = IconicState;
 
+	if (wmState == WithdrawnState)
+		icon = None;
+
 	PropSetWMState(cli->dpy,pane,wmState,icon);
 }
 
@@ -787,6 +800,7 @@ ClientProcessDragDropInterest(cli, state)
     if (state == PropertyDelete) {
 	XDeleteProperty(cli->dpy, cli->framewin->core.self,
 	    AtomSunDragDropInterest);
+	cli->dndPropPresent = False;
 	if (cli->iconwin != NULL)
 	    XDeleteProperty(cli->dpy, cli->iconwin->core.self,
 		AtomSunDragDropInterest);
@@ -841,6 +855,7 @@ ClientProcessDragDropInterest(cli, state)
 		AtomSunDragDropInterest, AtomSunDragDropInterest,
 		32, PropModeReplace,
 		(unsigned char *) &forwardingInterest, FI_LENGTH);
+	    cli->dndPropPresent = True;
 
 	    /* write the property on the icon */
 	    if (cli->iconwin != NULL) {

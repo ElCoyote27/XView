@@ -104,7 +104,7 @@ keycode_in_map(map, keycode)
 {
 	register int i, max;
 
-	if (!keycode) return(0);
+	if (!keycode) return(-1);
 
 	max = 8 * map->max_keypermod;
 	for (i = 0; i < max; i++) {
@@ -168,9 +168,11 @@ server_refresh_modifiers(server_public, update_map)
 			return;
 		}
 
-		/* See if META is already installed. */
-		if ((modifier = keycode_in_map(map,
-		     XKeysymToKeycode(display, XK_Meta_L))) == -1) {
+		/* See if META is already installed (check both L and R). */
+		if (((modifier = keycode_in_map(map,
+		     XKeysymToKeycode(display, XK_Meta_L))) == -1)
+		&& ((modifier = keycode_in_map(map,
+		     XKeysymToKeycode(display, XK_Meta_R))) == -1)) {
 		    /* Find a free row for META */
 		    if (update_map && (modifier = find_free_row(map)) != -1) {
 			updated = True;

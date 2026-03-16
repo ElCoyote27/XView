@@ -552,10 +552,17 @@ KeySym
 ModifierToKeysym(mod)
     unsigned int	mod;
 {
-    KeyCode		kc;
+    KeyCode		kc = 0;
+    int			i;
     extern Display	*DefDpy;
 
-    kc = ModMap->modifiermap[mod * ModMap->max_keypermod];
+    for (i = mod * ModMap->max_keypermod;
+	 i < (mod + 1) * ModMap->max_keypermod; ++i) {
+	kc = ModMap->modifiermap[i];
+	if (kc != 0)
+	    break;
+    }
+
     if (kc == 0)
 	return NoSymbol;
     return(XKeycodeToKeysym(DefDpy, kc, 0));

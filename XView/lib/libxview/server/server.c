@@ -24,8 +24,7 @@ static char     sccsid[] = "@(#)server.c 20.157 93/04/28";
 #include <xview/notify.h>
 #include <xview/win_notify.h>
 #include <xview/defaults.h>
-/* mbuck@debian.org */
-#if 1
+#if __linux__
 #include <X11/Xlibint.h>
 #else
 #include <X11/Xlib.h>
@@ -171,7 +170,8 @@ load_kbd_cmds(server, kb_table)
     for (i = 0; kb_table[i].action; i++) {
 	value = defaults_get_string(kb_table[i].name, kb_table[i].name,
 				    kb_table[i].value);
-	strcpy(buffer, value);
+	strncpy(buffer, value, sizeof(buffer) - 1);
+	buffer[sizeof(buffer) - 1] = '\0';
 	value = buffer;
 	mapping[0] = xv_strtok(value, ",");
 	for (j = 1; j < MAX_NBR_MAPPINGS; j++) {
@@ -264,7 +264,8 @@ server_yield_modifiers(server)
 
     if (!returned_string) return;
 
-    strcpy(modifier_string, returned_string);
+    strncpy(modifier_string, returned_string, sizeof(modifier_string) - 1);
+    modifier_string[sizeof(modifier_string) - 1] = '\0';
 
     modifier = xv_strtok(modifier_string, ", ");
     do {
@@ -374,8 +375,6 @@ server_init(parent, server_public, avlist)
 #endif
     char			*character_set;
     extern int			 _xv_use_locale;
-    /* martin-2.buck@student.uni-ulm.de */
-    char			*xrmstr;
 
     for (attrs = avlist; *attrs; attrs = attr_next(attrs)) {
 	switch ((int)attrs[0]) {
@@ -454,29 +453,18 @@ server_init(parent, server_public, avlist)
      */
 
     /* See if defaults have been loaded on server */
-#ifdef X11R6
-  	/* lumpi@dobag.in-berlin.de */
-#if 1
-    /* martin-2.buck@student.uni-ulm.de */
-    if ((xrmstr = XResourceManagerString((Display *)server->xdisplay))) {
-	server->db = XrmGetStringDatabase(xrmstr);
-#else
-    if (XrmGetDatabase((Display *)server->xdisplay)) {
+    if (XResourceManagerString((Display *)server->xdisplay)) {
 	server->db = XrmGetStringDatabase(
-				(XrmGetDatabase((Display *)server->xdisplay)));
-#endif
-#else
-    if (((Display *)server->xdisplay)->xdefaults) {
-	server->db = XrmGetStringDatabase(
-				((Display *)server->xdisplay)->xdefaults);
-#endif
+		XResourceManagerString((Display *)server->xdisplay));
     } else {
 	/* Get the resources from the users .Xdefaults file */
-        if (home = getenv("HOME"))
-	    (void) strcpy(filename, home);
-        else
+        if (home = getenv("HOME")) {
+	    (void) strncpy(filename, home, MAXPATHLEN - 1);
+	    filename[MAXPATHLEN - 1] = '\0';
+        } else
 	    filename[0] = '\0';
-        (void) strcat(filename, "/.Xdefaults");
+        (void) strncat(filename, "/.Xdefaults",
+		       MAXPATHLEN - strlen(filename) - 1);
         server->db = XrmGetFileDatabase(filename);
     }
 
@@ -636,12 +624,13 @@ server_init(parent, server_public, avlist)
 	    DIR			*dirp;
 
 	    bindtextdomain("", server->localedir);
-            (void) sprintf(pathname, "%s/%s/app-defaults/%s",
-			   server->localedir,
-			   server->ollc[OLLC_BASICLOCALE].locale,
-			   xv_app_name);
-	    strcpy(filename, pathname);
-	    strcat(filename, ".db");
+            (void) snprintf(pathname, MAXPATHLEN, "%s/%s/app-defaults/%s",
+			    server->localedir,
+			    server->ollc[OLLC_BASICLOCALE].locale,
+			    xv_app_name);
+	    strncpy(filename, pathname, MAXPATHLEN - 1);
+	    filename[MAXPATHLEN - 1] = '\0';
+	    strncat(filename, ".db", MAXPATHLEN - strlen(filename) - 1);
 
 	    if (new_db = XrmGetFileDatabase(filename)) {
 		XrmMergeDatabases(server->db, &new_db);
@@ -720,10 +709,10 @@ server_init(parent, server_public, avlist)
 #else
 	if ((home = getenv("OPENWINHOME")) != NULL)  {
 #endif
-            (void) sprintf(filename, "%s/%s/%s/xview/defaults",
-			   home,
-			   LIB_LOCALE,
-			   server->ollc[OLLC_BASICLOCALE].locale);
+            (void) snprintf(filename, MAXPATHLEN, "%s/%s/%s/xview/defaults",
+			    home,
+			    LIB_LOCALE,
+			    server->ollc[OLLC_BASICLOCALE].locale);
 	    if (new_db = XrmGetFileDatabase(filename))  {
 	        /*
 		 * Precedence order of this new_db is lowest!
@@ -783,13 +772,9 @@ server_init(parent, server_public, avlist)
      */
 
     /* Used by atom mgr */
-#if 1
-    /* Avoid crash with newer xcb-based xlibs. According to 
-     * http://lists.freedesktop.org/archives/xorg/2007-November/030388.html
-     * using XAllocID() this way only worked by chance so far, so use
-     * XAllocIDs() instead which should be safe.
-     *
-     * mbuck@debian.org
+#if __linux__
+    /* Avoid crash with newer xcb-based xlibs: XAllocID() only worked
+     * by chance; XAllocIDs() is the safe alternative.
      */
     XAllocIDs((Display *)server->xdisplay, server->atom_mgr, sizeof(server->atom_mgr) / sizeof(*server->atom_mgr));
 #else
@@ -1688,6 +1673,10 @@ server_get_atom_type(server_public, atom)
 		return (save_atom(server, atom, SERVER_WM_UNKNOWN_TYPE));
 
 	atomName = (char *)xv_get(server_public, SERVER_ATOM_NAME, atom);
+	if (atomName == NULL) {
+	    server_warning(XV_MSG("Could not get atom name"));
+	    return (save_atom(server, atom, SERVER_WM_UNKNOWN_TYPE));
+	}
 
 	for (tbl = Server_atom2type_tbl; tbl->name != NULL; tbl++) {
 	    if (strcmp(atomName, tbl->name) == 0) {
