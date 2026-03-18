@@ -1,6 +1,6 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20260316
+%define BaseRelease 20260318
 Version: 3.2p1.4
 Release: 25.33%{?dist}
 Distribution: RHEL 8 (Ootpa)
