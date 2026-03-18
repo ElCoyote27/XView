@@ -63,6 +63,12 @@ if [ -x /usr/bin/ssh-agent ]; then
 	eval `/usr/bin/ssh-agent`
 fi
 
+# GNOME Keyring for application secrets (Chrome, etc.)
+if [ -x /usr/bin/gnome-keyring-daemon ]; then
+	eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets)
+	export GNOME_KEYRING_CONTROL
+fi
+
 # start some nice programs
 if [ -x ${HOME}/.openwin-init ]; then
 	if [ -x /usr/bin/dbus-launch ]; then
@@ -80,15 +86,29 @@ else
 	fi
 fi
 
-# GNOME Volume Manager
-if [ -x /usr/bin/gnome-volume-manager ]; then
-        /usr/bin/gnome-volume-manager &
-fi
-
-# Polkit so users can run Gnome-Related tools
+# Polkit authentication agent for UDisks2 mounting and other privileged actions
 if [ -x /usr/libexec/polkit-gnome-authentication-agent-1 ]; then
 	/usr/libexec/polkit-gnome-authentication-agent-1 &
 fi
+
+# UDisks2 polkit rule for passwordless removable media mounting
+# Uncomment if your system requires an explicit polkit rule for
+# udisksctl mount/eject to work without authentication prompts.
+#ow_polkit_rule=/etc/polkit-1/rules.d/10-openwin-udisks2.rules
+#if [ ! -f ${ow_polkit_rule} ] && [ -d /etc/polkit-1/rules.d ]; then
+#	if [ -w /etc/polkit-1/rules.d ]; then
+#		cat > ${ow_polkit_rule} << 'POLKIT_EOF'
+#polkit.addRule(function(action, subject) {
+#    if ((action.id == "org.freedesktop.udisks2.filesystem-mount" ||
+#         action.id == "org.freedesktop.udisks2.filesystem-mount-other-seat" ||
+#         action.id == "org.freedesktop.udisks2.eject-media") &&
+#        subject.local && subject.active) {
+#        return polkit.Result.YES;
+#    }
+#});
+#POLKIT_EOF
+#	fi
+#fi
 
 # Window Manager
 if [ ! -z "$WINDOWMANAGER" ]; then

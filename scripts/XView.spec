@@ -2,7 +2,7 @@ Summary: XView libraries for X11
 Name: xview
 %define BaseRelease 20260316
 Version: 3.2p1.4
-Release: 25.32%{?dist}
+Release: 25.33%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -39,6 +39,7 @@ Source54: openwin-i386.conf
 Source55: openwin-x86_64.conf
 Source63: host_ia32.def
 Source64: host_x86_64.def
+Source71: 10-openwin-udisks2.rules
 Patch0: http://ftp.debian.org/debian/pool/main/x/xview/xview_3.2p1.4-24.diff
 Patch1: olvwm-4.4.patch
 Patch2: xview_xv_error.patch
@@ -69,6 +70,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Wed Mar 18 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.33
+- Enhance polkit handling on RHEL8/RHEL9
+
 * Mon Mar 16 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.32
 - Backport Solaris WS_OLS10_SPARC security/stability fixes:
 - server.c: buffer overflow fixes (strcpy->strncpy, sprintf->snprintf)
