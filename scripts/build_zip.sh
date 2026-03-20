@@ -17,6 +17,21 @@ else
 fi
 
 ZIP_NAME="${BASE_DIR}/build/SOURCES/XView-${CUR_VERSION}-${CUR_DATE}.zip"
+SPEC_FILE="${BASE_DIR}/scripts/XView.spec"
+
+# Update spec file with current version and date
+if [ -f "${SPEC_FILE}" ]; then
+	grep -q "^Version: ${CUR_VERSION}\$" "${SPEC_FILE}"
+	if [ $? -eq 1 ]; then
+		echo "Updating ${SPEC_FILE}: Version: ${CUR_VERSION}"
+		perl -pi -e "s@^Version: .*\$@Version: ${CUR_VERSION}@" "${SPEC_FILE}"
+	fi
+	grep -q "^%define BaseRelease ${CUR_DATE}\$" "${SPEC_FILE}"
+	if [ $? -eq 1 ]; then
+		echo "Updating ${SPEC_FILE}: BaseRelease: ${CUR_DATE}"
+		perl -pi -e "s@^%define BaseRelease .*\$@%define BaseRelease ${CUR_DATE}@" "${SPEC_FILE}"
+	fi
+fi
 
 echo "Building ${ZIP_NAME} from ${BASE_DIR}/${SRC_DIR} ..."
 OUT_DIR=$(dirname ${ZIP_NAME})
