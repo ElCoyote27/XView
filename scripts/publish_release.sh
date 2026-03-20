@@ -83,11 +83,11 @@ fi
 if ! git rev-parse "$TAG" >/dev/null 2>&1; then
     echo "Creating tag $TAG..."
     git tag -a "$TAG" -m "XView $VERSION release $RELEASE"
-    git push github "$TAG"
-    git push gitlab "$TAG" || true
-else
-    echo "Tag $TAG already exists"
 fi
+
+echo "Pushing tag $TAG..."
+git push github "$TAG" 2>&1 || echo "  (tag already exists on github)"
+git push gitlab "$TAG" 2>&1 || echo "  (tag already exists on gitlab, or remote unavailable)"
 
 if gh release view "$TAG" >/dev/null 2>&1; then
     echo "Release $TAG already exists, uploading new assets..."
