@@ -109,9 +109,10 @@ fi
 
 # Sign RPMs after build (RHEL 9+)
 if [ -n "${SIGN_AFTER}" ] && [ -x /usr/bin/rpmsign ]; then
-	echo "Signing RPMs with rpmsign..."
+	RPM_RELEASE=$(grep "^Release:" ${SPEC_FILE} | sed 's/Release: *//;s/%{?dist}//')
+	echo "Signing RPMs for release ${CUR_VERSION}-${RPM_RELEASE}..."
 	/usr/bin/rpmsign --addsign \
-		${RPM_BASE_DIR}/SRPMS/*${DIST}.src.rpm \
-		${RPM_BASE_DIR}/RPMS/i?86/*${DIST}.i?86.rpm
+		${RPM_BASE_DIR}/SRPMS/xview-*${CUR_VERSION}-${RPM_RELEASE}${DIST}.src.rpm \
+		${RPM_BASE_DIR}/RPMS/i?86/xview-*${CUR_VERSION}-${RPM_RELEASE}${DIST}.i?86.rpm
 fi
 
