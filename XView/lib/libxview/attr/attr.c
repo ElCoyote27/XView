@@ -85,13 +85,14 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
    int avlist_size;
    static va_list valist;
    static Attr_avlist avlist;
+   static Attr_avlist avlist_base;
    static int arg_count = 0, arg_count_max = ATTR_STANDARD_SIZE,
               recursion_count = 0;
 
    recursion_count++;
 
    /* These two variables are used instead of the paramters so that the
-      position in the lists is maintained after a recursive call. 
+      position in the lists is maintained after a recursive call.
    */
 #if (__GLIBC__ > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1)
    __va_copy(valist, valist1);
@@ -103,6 +104,8 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
    if( !avlist )
       avlist = avlist_tmp;
 
+   avlist_base = avlist;
+
    if( attr1 )
       attr = (int)attr1;
    else
@@ -110,13 +113,13 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
 
    while( (int)attr )
    {
-      if( ++arg_count > arg_count_max )
+      if( ++arg_count > arg_count_max ) {
+         goto overflow;
+      }
       {
-         xv_error( (Xv_object)NULL,
-                   ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                   NULL);
-         return( avlist1 );
+         unsigned pkg = (((unsigned)attr) >> 24) & 0xFF;
+         if( pkg == 0 || pkg > 127 )
+            break;
       }
       cardinality = ATTR_CARDINALITY(attr);
 
@@ -125,13 +128,8 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
          case ATTR_NONE:       /* not a list */
             *avlist++ = attr;
 
-            if(( arg_count += cardinality ) > arg_count_max )
-            {
-               xv_error( (Xv_object)NULL,
-                         ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                         NULL);
-               return( avlist1 );
+            if(( arg_count += cardinality ) > arg_count_max ) {
+               goto overflow;
             }
             for( i=0; i < cardinality; i++ ) {
 #ifdef _XV_API_BROKEN_64BIT
@@ -189,13 +187,8 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
                    * copied the null termination.
                    */
                   do {
-                      if(( arg_count += cardinality ) > arg_count_max )
-                      {
-                         xv_error( (Xv_object)NULL,
-                                   ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                                   NULL);
-                         return( avlist1 );
+                      if(( arg_count += cardinality ) > arg_count_max ) {
+                         goto overflow;
                       }
                       for( i=0; i < cardinality; i++ ) {
 #ifdef _XV_API_BROKEN_64BIT
@@ -232,18 +225,15 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
 #else
                         *avlist++ = va_arg( valist, Attr_attribute );
 #endif
+			if( i == 0 && *(avlist - 1) == NULL )
+			    break;
 		      }
                   } while ((int)*(avlist - 1));
                   break;
 
                case ATTR_LIST_IS_PTR:
-                  if( ++arg_count  > arg_count_max )
-                  {
-                     xv_error( (Xv_object)NULL,
-                               ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                               NULL);
-                     return( avlist1 );
+                  if( ++arg_count  > arg_count_max ) {
+                     goto overflow;
                   }
                   *avlist++ = va_arg( valist, Attr_attribute );
                   break;
@@ -257,24 +247,14 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
                {
                   register unsigned count;
 
-                  if( ++arg_count  > arg_count_max )
-                  {
-                     xv_error( (Xv_object)NULL,
-                               ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                               NULL);
-                     return( avlist1 );
+                  if( ++arg_count  > arg_count_max ) {
+                     goto overflow;
                   }
                   *avlist = va_arg( valist, Attr_attribute ); /*copy the count*/
                   count = ((unsigned) *avlist++) * cardinality;
 
-                  if(( arg_count += count ) > arg_count_max )
-                  {
-                     xv_error( (Xv_object)NULL,
-                               ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                               NULL);
-                     return( avlist1 );
+                  if(( arg_count += count ) > arg_count_max ) {
+                     goto overflow;
                   }
                   for( i=0; i < count; i++ ) {
 #ifdef _XV_API_BROKEN_64BIT
@@ -316,13 +296,8 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
                 break;
 
                 case ATTR_LIST_IS_PTR:
-                   if( ++arg_count  > arg_count_max )
-                   {
-                      xv_error( (Xv_object)NULL,
-                                ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                                NULL);
-                      return( avlist1 );
+                   if( ++arg_count  > arg_count_max ) {
+                      goto overflow;
                    }
                    *avlist++ = va_arg( valist, Attr_attribute );
                    break;
@@ -342,30 +317,24 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
                    break;
 
                 case ATTR_LIST_IS_PTR:
-                   if (cardinality != 0)   /* don't collapse inline */
+                   if (cardinality != 0)
                    {
-                      if( ++arg_count  > arg_count_max )
-                      {
-                         xv_error( (Xv_object)NULL,
-                                   ERROR_STRING, XV_MSG(
-              "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
-                                   NULL);
-                         return( avlist1 );
+                      if( ++arg_count  > arg_count_max ) {
+                         goto overflow;
                       }
                       *avlist++ = va_arg( valist, Attr_attribute );
                    }
-                   else
+                   else if (attr == (int)ATTR_LIST)
                    {
                       attr = va_arg( valist, Attr_attribute );
                       if (attr)
-                         /*
-                          * Copy the list inline -- don't move past the null
-                          * termintor. Here both the attribute and null
-                          * terminator will be stripped away.
-                          */
                          avlist = attr_copy_avlist(avlist, (Attr_avlist) attr);
-                  }
-                  break;
+                   }
+                   else
+                   {
+                      (void) va_arg( valist, Attr_attribute );
+                   }
+                   break;
             }
             break;
 	default:
@@ -388,6 +357,41 @@ Xv_private Attr_avlist copy_va_to_av( valist1, avlist1, attr1 )
       arg_count_max = ATTR_STANDARD_SIZE;
    }
 
+   return( avlist1 );
+
+overflow:
+   /*
+    * The A/V list exceeded ATTR_STANDARD_SIZE.  Properly terminate
+    * the partially-filled avlist so the caller gets a valid (if
+    * truncated) attribute list.
+    *
+    * Cap avlist so the NULL terminator stays within the buffer
+    * (avlist may have reached avlist_base + ATTR_STANDARD_SIZE).
+    */
+   if( avlist >= avlist_base + arg_count_max )
+      avlist = avlist_base + arg_count_max - 1;
+   *avlist = (Attr_attribute)NULL;
+   if( !avlist1 )
+   {
+      avlist_size = (( avlist - avlist_tmp ) + 1 ) * sizeof( Attr_attribute );
+      avlist1 = xv_malloc( avlist_size );
+      XV_BCOPY( avlist_tmp, avlist1, avlist_size );
+   }
+   if( --recursion_count == 0 )
+   {
+      /*
+       * Outermost call: reset counters first, then call xv_error().
+       * The reset makes it safe -- xv_error()'s internal
+       * copy_va_to_av() starts with arg_count=0 and its small
+       * attribute list won't overflow.
+       */
+      arg_count = 0;
+      arg_count_max = ATTR_STANDARD_SIZE;
+      xv_error( (Xv_object)NULL,
+                ERROR_STRING, XV_MSG(
+   "A/V list more than ATTR_STANDARD_SIZE elements long, extra elements ignored"),
+                NULL);
+   }
    return( avlist1 );
 }
 

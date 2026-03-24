@@ -91,7 +91,7 @@
 #define ATTR_PKG_LAST_VALUE		ATTR_PKG_FIRST + 14
 
 /*
- * ATTR_STANDARD_SIZE is large enough to allow for 
+ * ATTR_STANDARD_SIZE is large enough to allow for
  * most attribute-value lists.
  */
 #define	ATTR_STANDARD_SIZE		250

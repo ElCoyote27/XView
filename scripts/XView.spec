@@ -1,8 +1,8 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20260318
+%define BaseRelease 20260324
 Version: 3.2p1.4
-Release: 25.33%{?dist}
+Release: 25.34%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -70,6 +70,15 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Tue Mar 24 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.34
+- attr.c: fix infinite recursion in copy_va_to_av overflow handler
+  (xv_error re-entered copy_va_to_av with stale static arg_count)
+- attr.c: add package-byte validation to reject garbage attributes
+  read past missed NULL terminators (ASLR-triggered on Linux x86)
+- attr.c: guard ATTR_RECURSIVE+PTR dereference to only ATTR_LIST
+- attr.c: NULL-terminate avlist on overflow with buffer bounds check
+- attr.c: port Solaris early-out NULL check in ATTR_NULL inline loop
+
 * Wed Mar 18 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.33
 - Enhance polkit handling on RHEL8/RHEL9
 
