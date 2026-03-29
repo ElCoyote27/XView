@@ -1682,6 +1682,23 @@ beep:
 	}
     } else {
 	/* -- Mouse button event -- */
+	if (event_is_down(event) && dp->list_sb &&
+	    (event_action(event) == ACTION_SCROLL_UP ||
+	     event_action(event) == ACTION_SCROLL_DOWN)) {
+	    int view_start = (int) xv_get(dp->list_sb,
+		SCROLLBAR_VIEW_START);
+	    if (event_action(event) == ACTION_SCROLL_UP) {
+		if (view_start > 0)
+		    view_start--;
+	    } else {
+		if ((unsigned)view_start + dp->rows_displayed
+		    < dp->nrows)
+		    view_start++;
+	    }
+	    xv_set(dp->list_sb, SCROLLBAR_VIEW_START,
+		view_start, NULL);
+	    return;
+	}
 	/* Find row */
 	y_offset = event_y(event) - dp->list_box.r_top -
 	    LIST_BOX_BORDER_WIDTH - ROW_MARGIN;
@@ -1702,14 +1719,6 @@ beep:
 		if (event_is_up(event) || event_action(event) != ACTION_SELECT)
 		    return;
 	    } else if (!row->f.show) {
-	switch (event_action(event)) {
-	  case ACTION_SCROLL_UP:	/* USE_SCROLL_WHEEL */
-	    row = row->prev;
-	    break;
-	  case ACTION_SCROLL_DOWN:	/* USE_SCROLL_WHEEL */
-	    row = row->next;
-	    break;
-        }
 		/* Non-menu event is over text item in edit mode */
 		panel_handle_event(dp->text_item, event);
 		return;

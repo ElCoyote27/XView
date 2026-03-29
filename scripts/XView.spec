@@ -2,7 +2,7 @@ Summary: XView libraries for X11
 Name: xview
 %define BaseRelease 20260329
 Version: 3.2p1.4
-Release: 25.35%{?dist}
+Release: 25.36%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -70,6 +70,12 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sun Mar 29 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.36
+- p_list.c: add scroll wheel support for PANEL_LIST mouse button events;
+  wheel events (buttons 4/5) were filtered out in the mouse path because
+  they are not ACTION_SELECT, now intercepted early to scroll via
+  SCROLLBAR_VIEW_START
+
 * Sun Mar 29 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.35
 - om_render.c: fix missing braces in menu select_is_menu handler causing
   scroll wheel shiftmask bits to be set unconditionally
