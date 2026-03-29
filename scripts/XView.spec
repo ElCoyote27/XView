@@ -48,7 +48,7 @@ Patch4: xview_scroll_mouse.patch
 Patch5: xview_build.patch
 Patch6: xview_glibc28_regexp.patch
 Patch7: xview_3.2p1.4-25_amd64.diff
-Patch8: virtual_c-regexp-fix.patch 
+Patch8: virtual_c-regexp-fix.patch
 Patch9: xview-sysv-wait-and-signals.patch
 License: Distributable
 Group: X11/Libraries
@@ -70,7 +70,7 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
-* Sun Mar 22 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.35
+* Sun Mar 29 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.35
 - om_render.c: fix missing braces in menu select_is_menu handler causing
   scroll wheel shiftmask bits to be set unconditionally
 - cnvs_input.c: remove unused sb_event variable in scroll wheel handler
