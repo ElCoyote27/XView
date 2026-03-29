@@ -1,8 +1,8 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20260324
+%define BaseRelease 20260329
 Version: 3.2p1.4
-Release: 25.34%{?dist}
+Release: 25.35%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -70,6 +70,11 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sun Mar 22 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.35
+- om_render.c: fix missing braces in menu select_is_menu handler causing
+  scroll wheel shiftmask bits to be set unconditionally
+- cnvs_input.c: remove unused sb_event variable in scroll wheel handler
+
 * Tue Mar 24 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.34
 - attr.c: fix infinite recursion in copy_va_to_av overflow handler
   (xv_error re-entered copy_va_to_av with stale static arg_count)

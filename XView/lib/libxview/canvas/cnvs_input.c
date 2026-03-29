@@ -270,7 +270,6 @@ canvas_paint_event(window_public, event, arg, type)
 	    XV_KEY_DATA, (Attr_attribute)canvas_view_context_key));
 	sb = xv_get(canvas_public, OPENWIN_VERTICAL_SCROLLBAR, view);
 	if (sb) {
-	    Event	    sb_event;
 	    int offset, length, view_length, pixels_per, scroll_unit;
 
 	    pixels_per = (int) xv_get(sb, SCROLLBAR_PIXELS_PER_UNIT);
