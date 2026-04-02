@@ -75,14 +75,23 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
   after the parent textsw view has been destroyed
 - txt_event.c: guard textsw_event() entry with view magic validation;
   rejects all events delivered to destroyed views in one place
-- txt_once.c: zero view->magic early in textsw_view_cleanup; clear
+- txt_once.c: move view->magic zeroing after textsw_notify() in
+  textsw_view_cleanup so VIEW_FROM_FOLIO_OR_VIEW macro can still
+  identify the view during the DESTROY_VIEW notification; clear
   WIN_CLIENT_DATA on all File Chooser popup frames during folio
   destruction so stale view pointers are not retained
+- txt_attr.c: add TEXTSW_VIEW_NULL guard in textsw_notify() after
+  VIEW_FROM_FOLIO_OR_VIEW to prevent NULL dereference if the macro
+  fails to resolve a valid view
 - txt_popup.c: validate view magic in text_view_frm_p_itm helper
 - txt_incl.c: add NULL/magic guards to include File Chooser callbacks
 - txt_load.c: add NULL/magic guards to open/save File Chooser callbacks
 - txt_search.c: add NULL guards to search panel callbacks
 - txt_store.c: add NULL guards to store panel callbacks
+- fm_input.c: add NULL guards in frame_focus_win_event_proc() for
+  destroyed Server_image and Drawable_info pointers; prevents SIGSEGV
+  when WIN_REPAINT is delivered to a frame focus window after the
+  interface has been unloaded
 
 * Sun Mar 29 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.36
 - p_list.c: add scroll wheel support for PANEL_LIST mouse button events;
