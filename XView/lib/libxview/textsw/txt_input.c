@@ -898,6 +898,8 @@ static void
 textsw_begin_again(view)
     Textsw_view_handle view;
 {
+    if (view == TEXTSW_VIEW_NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return;
 #ifdef OW_I18N
     /*
      * Hopefully, wanted to put it right before textsw_do_again(),
@@ -914,6 +916,8 @@ textsw_end_again(view, x, y)
     Textsw_view_handle view;
     int             x, y;
 {
+    if (view == TEXTSW_VIEW_NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return;
     textsw_do_again(view, x, y);
     textsw_end_function(view, TXTSW_FUNC_AGAIN);
     /*
@@ -928,6 +932,8 @@ textsw_again(view, x, y)
     Textsw_view_handle view;
     int             x, y;
 {
+    if (view == TEXTSW_VIEW_NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return;
     textsw_begin_again(view);
     textsw_end_again(view, x, y);
 }
@@ -1013,6 +1019,8 @@ textsw_function_delete(view)
 {
     int             result;
 
+    if (view == TEXTSW_VIEW_NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return (0);
     textsw_begin_delete(view);
     result = textsw_end_delete(view);
     return (result);
@@ -1022,6 +1030,8 @@ static void
 textsw_begin_undo(view)
     Textsw_view_handle view;
 {
+    if (view == TEXTSW_VIEW_NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return;
     textsw_begin_function(view, TXTSW_FUNC_UNDO);
     textsw_flush_caches(view, TFC_SEL);
 }
@@ -1030,6 +1040,8 @@ static void
 textsw_end_undo(view)
     Textsw_view_handle view;
 {
+    if (view == TEXTSW_VIEW_NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return;
 #ifdef OW_I18N
     textsw_implicit_commit(FOLIO_FOR_VIEW(view));
 #endif
@@ -1070,11 +1082,15 @@ textsw_do_undo(view)
     Textsw_view_handle view;
 {
     Pkg_private Es_index textsw_set_insert();
-    register Textsw_folio folio = FOLIO_FOR_VIEW(view);
+    register Textsw_folio folio;
     register Ev_finger_handle saved_insert_finger;
-    register Ev_chain views = folio->views;
+    register Ev_chain views;
     Ev_mark_object  save_insert;
 
+    if (view == TEXTSW_VIEW_NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return;
+    folio = FOLIO_FOR_VIEW(view);
+    views = folio->views;
     if (!TXTSW_DO_UNDO(folio))
 	return;
     if (folio->undo[0] == es_get(views->esh, ES_UNDO_MARK)) {
@@ -1137,8 +1153,12 @@ Pkg_private void
 textsw_undo(textsw)
     Textsw_folio    textsw;
 {
-    textsw_begin_undo(textsw->first_view);
-    textsw_end_undo(textsw->first_view);
+    Textsw_view_handle fv = textsw->first_view;
+
+    if (fv == TEXTSW_VIEW_NULL || fv->magic != TEXTSW_VIEW_MAGIC)
+	return;
+    textsw_begin_undo(fv);
+    textsw_end_undo(fv);
 }
 
 static int

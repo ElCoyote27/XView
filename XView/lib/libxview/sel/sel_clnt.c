@@ -361,6 +361,11 @@ selection_inquire_all(server)
 				   (Attr_attribute)SELN_AGENT_INFO);
     int             rank;
 
+    if (agent == NULL) {
+	XV_BZERO((char *) &result, sizeof(result));
+	return (result);
+    }
+
     for (rank = 1; rank < SELN_RANKS; rank++) {
 	switch (rank) {
 

@@ -1438,6 +1438,9 @@ textsw_seln_svc_function(first_textsw_public, function)
 	textsw->func_view = first_view;
 	textsw->func_x = textsw->func_y = 0;
     }
+    if (textsw->func_view == TEXTSW_VIEW_NULL ||
+	textsw->func_view->magic != TEXTSW_VIEW_MAGIC)
+	goto Done;
     textsw->selection_func = *function;
     textsw->func_state &= ~TXTSW_FUNC_SVC_SAW_ALL;
     textsw->func_state |= (TXTSW_FUNC_EXECUTE | TXTSW_FUNC_SVC_REQUEST);

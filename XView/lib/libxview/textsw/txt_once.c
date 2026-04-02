@@ -1178,6 +1178,7 @@ contents or store the contents as a new file."),
 	    Frame popup;
 
 	    folio->state |= TXTSW_DESTROY_ALL_VIEWS;
+	    folio->func_view = TEXTSW_VIEW_NULL;
 
 	    {
 		extern int STORE_FILE_POPUP_KEY, LOAD_FILE_POPUP_KEY;
