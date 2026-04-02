@@ -2,7 +2,7 @@ Summary: XView libraries for X11
 Name: xview
 %define BaseRelease 20260329
 Version: 3.2p1.4
-Release: 25.36%{?dist}
+Release: 25.37%{?dist}
 Distribution: RHEL 8 (Ootpa)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -70,6 +70,20 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Thu Apr 02 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.37
+- textsw: fix use-after-free crashes when popup frame callbacks fire
+  after the parent textsw view has been destroyed
+- txt_event.c: guard textsw_event() entry with view magic validation;
+  rejects all events delivered to destroyed views in one place
+- txt_once.c: zero view->magic early in textsw_view_cleanup; clear
+  WIN_CLIENT_DATA on all File Chooser popup frames during folio
+  destruction so stale view pointers are not retained
+- txt_popup.c: validate view magic in text_view_frm_p_itm helper
+- txt_incl.c: add NULL/magic guards to include File Chooser callbacks
+- txt_load.c: add NULL/magic guards to open/save File Chooser callbacks
+- txt_search.c: add NULL guards to search panel callbacks
+- txt_store.c: add NULL guards to store panel callbacks
+
 * Sun Mar 29 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.36
 - p_list.c: add scroll wheel support for PANEL_LIST mouse button events;
   wheel events (buttons 4/5) were filtered out in the mouse path because

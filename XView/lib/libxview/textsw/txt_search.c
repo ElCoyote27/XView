@@ -139,6 +139,8 @@ search_event_proc(item, event)
     Textsw_view_handle view = text_view_frm_p_itm(item);
     extern Menu     direction_menu;
 
+    if (view == NULL)
+	return;
     (void) xv_set(direction_menu, XV_KEY_DATA, (Attr_attribute)DIRECTION_VIEW, view, NULL);
     if (event_action(event) == ACTION_MENU && event_is_down(event)) {
 	(void) menu_show(direction_menu, panel, event, NULL);
@@ -306,8 +308,13 @@ search_cmd_proc(item, event)
     Event          *event;
 {
     Textsw_view_handle view = text_view_frm_p_itm(item);
-    Textsw_folio    folio = FOLIO_FOR_VIEW(view);
-    int             wrapping_off = (int) panel_get(search_panel_items[(int) WRAP_ITEM], PANEL_VALUE, NULL);
+    Textsw_folio    folio;
+    int             wrapping_off;
+
+    if (view == NULL)
+	return PANEL_NONE;
+    folio = FOLIO_FOR_VIEW(view);
+    wrapping_off = (int) panel_get(search_panel_items[(int) WRAP_ITEM], PANEL_VALUE, NULL);
 
     if (item == search_panel_items[(int) FIND_ITEM]) {
 	(void) textsw_do_search_proc(view,
@@ -353,6 +360,8 @@ create_search_items(panel, view)
     Es_index       dummy;
     Pkg_private void search_event_proc();
 
+    if (view == NULL || panel == NULL)
+	return;
     if (!init_str)  {
         /*
          * FIX_ME: The current gettext/dgettext return the uniq

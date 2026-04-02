@@ -269,9 +269,9 @@ open_cmd_proc(fc, path,file,client_data)
 {
 
     Textsw_view_handle view  = (Textsw_view_handle)window_get(fc,WIN_CLIENT_DATA,NULL);
-    Textsw_folio       folio = FOLIO_FOR_VIEW(view);
+    Textsw_folio       folio;
     /*int                error;*/
-    Textsw          textsw = FOLIO_REP_TO_ABS(folio);
+    Textsw          textsw;
     CHAR           *dir_str;
     int             result;
     register int    locx, locy;
@@ -282,6 +282,10 @@ open_cmd_proc(fc, path,file,client_data)
     CHAR            curr_dir_ws[MAX_STR_LENGTH];
 #endif
 
+    if (view == NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return TRUE;
+    folio = FOLIO_FOR_VIEW(view);
+    textsw = FOLIO_REP_TO_ABS(folio);
 
     if (textsw_has_been_modified(textsw)) {
         frame = FRAME_FROM_FOLIO_OR_VIEW(folio);
@@ -454,8 +458,12 @@ save_cmd_proc(fc, path,exists)
 {
 
    Textsw_view_handle view  = (Textsw_view_handle)window_get(fc,WIN_CLIENT_DATA,NULL);
-   Textsw_folio folio = FOLIO_FROM_VIEW(view);
+   Textsw_folio folio;
    int		confirm_state_changed = 0;
+
+   if (view == NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return TRUE;
+   folio = FOLIO_FROM_VIEW(view);
 
    xv_set(fc,
           FRAME_SHOW_FOOTER, TRUE,

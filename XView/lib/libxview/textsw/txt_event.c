@@ -96,7 +96,7 @@ textsw_event(view_public, event, arg, type)
     Notify_event_type type;	/* Currently unused */
 {
     Textsw_view_handle view = VIEW_PRIVATE(view_public);
-    register Textsw_folio folio = FOLIO_FOR_VIEW(view);
+    register Textsw_folio folio;
     register int    process_status;
     Xv_Drawable_info *info;
     Xv_object       frame;
@@ -104,9 +104,14 @@ textsw_event(view_public, event, arg, type)
     Xv_Window	    nth_view;
     Xv_Window	    previous_view;
     Scrollbar	    sb;
-    Textsw	    textsw = TEXTSW_PUBLIC(folio);
+    Textsw	    textsw;
     int		    view_nbr;
     static short    read_status;
+
+    if (view == NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return (NOTIFY_DONE);
+    folio = FOLIO_FOR_VIEW(view);
+    textsw = TEXTSW_PUBLIC(folio);
 
     folio->state |= TXTSW_DOING_EVENT;
     switch (event_action(event)) {

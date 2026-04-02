@@ -230,8 +230,12 @@ old_include_cmd_proc(item, event)
     Event          *event;
 {
     Textsw_view_handle view = text_view_frm_p_itm(item);
-    Textsw_folio    folio = FOLIO_FOR_VIEW(view);
+    Textsw_folio    folio;
     int             error;
+
+    if (view == NULL)
+	return PANEL_NONE;
+    folio = FOLIO_FOR_VIEW(view);
 
     if (item == include_panel_items[(int) FILE_CMD_ITEM]) {
 	error = do_include_proc(folio, event);
@@ -249,8 +253,12 @@ include_cmd_proc_accel(item, event)
     Event          *event;
 {
     Textsw_view_handle view = text_view_frm_p_itm(item);
-    Textsw_folio    folio = FOLIO_FOR_VIEW(view);
+    Textsw_folio    folio;
     int             error;
+
+    if (view == NULL)
+	return PANEL_NONE;
+    folio = FOLIO_FOR_VIEW(view);
 
     if (item == include_panel_items[(int) FILE_STRING_ITEM]) {
 	error = do_include_proc(folio, event);
@@ -271,6 +279,8 @@ create_include_items(panel, view)
     char            current_dir_include_string[MAX_STR_LENGTH];
     Es_index        dummy;
 
+    if (view == NULL || panel == NULL)
+	return;
     include_string[0] = (CHAR)'\0';
     (void) textsw_get_selection(view, &dummy, &dummy, include_string,
 				MAX_STR_LENGTH);
@@ -349,9 +359,14 @@ include_cmd_proc(fc,path,file,client_data)
  {
 
     Textsw_view_handle view = (Textsw_view_handle)window_get(fc,WIN_CLIENT_DATA,0);
-    Textsw_folio       folio = FOLIO_FOR_VIEW(view);
+    Textsw_folio       folio;
     /*int                error;*/
-    Textsw          textsw = FOLIO_REP_TO_ABS(folio);
+    Textsw          textsw;
+
+    if (view == NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return TRUE;
+    folio = FOLIO_FOR_VIEW(view);
+    textsw = FOLIO_REP_TO_ABS(folio);
     CHAR           *dir_str;
     register int    locx, locy;
     CHAR            curr_dir[MAX_STR_LENGTH];

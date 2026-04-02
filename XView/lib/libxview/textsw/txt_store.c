@@ -211,8 +211,12 @@ store_cmd_proc(item, event)
     Event          *event;
 {
     Textsw_view_handle view = text_view_frm_p_itm(item);
-    Textsw_folio    folio = FOLIO_FOR_VIEW(view);
+    Textsw_folio    folio;
     int             error;
+
+    if (view == NULL)
+	return PANEL_NONE;
+    folio = FOLIO_FOR_VIEW(view);
 
     if (item == store_panel_items[(int) FILE_CMD_ITEM]) {
 	error = do_store_proc(folio, event);
@@ -230,8 +234,12 @@ store_cmd_proc_accel(item, event)
     Event          *event;
 {
     Textsw_view_handle view = text_view_frm_p_itm(item);
-    Textsw_folio    folio = FOLIO_FOR_VIEW(view);
+    Textsw_folio    folio;
     int             error;
+
+    if (view == NULL)
+	return PANEL_NONE;
+    folio = FOLIO_FOR_VIEW(view);
 
     if (item == store_panel_items[(int) FILE_STRING_ITEM]) {
 	error = do_store_proc(folio, event);
@@ -254,6 +262,8 @@ create_store_items(panel, view)
     char            current_dir_store_string[MAX_STR_LENGTH];
     Es_index        dummy;
 
+    if (view == NULL || panel == NULL)
+	return;
 
     store_string[0] = (CHAR)'\0';
     (void) textsw_get_selection(view, &dummy, &dummy, store_string, MAX_STR_LENGTH);

@@ -404,6 +404,8 @@ text_view_frm_p_itm(panel_item)
     Xv_Window       search_frame = (Frame)xv_get(panel, WIN_FRAME);
     Textsw_view_handle view = (Textsw_view_handle) window_get(search_frame, WIN_CLIENT_DATA, NULL);
 
+    if (view == NULL || view->magic != TEXTSW_VIEW_MAGIC)
+	return TEXTSW_VIEW_NULL;
     return (view);
 }
 Pkg_private     Xv_Window

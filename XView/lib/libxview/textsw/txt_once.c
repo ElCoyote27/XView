@@ -1066,6 +1066,7 @@ textsw_view_cleanup(view)
 {
     Textsw_folio    folio = FOLIO_FOR_VIEW(view);
 
+    view->magic = 0;
     view->state |= TXTSW_VIEW_DYING;
     /* Warn client that view is dying BEFORE killing it. */
     if (folio->notify_level & TEXTSW_NOTIFY_DESTROY_VIEW)
@@ -1174,10 +1175,36 @@ contents or store the contents as a new file."),
 	break;
       case DESTROY_CLEANUP:{
 	    Textsw_view_handle temp_view = folio->first_view, next;
+	    Frame popup;
 
 	    folio->state |= TXTSW_DESTROY_ALL_VIEWS;
 
+	    {
+		extern int STORE_FILE_POPUP_KEY, LOAD_FILE_POPUP_KEY;
+		extern int SAVE_FILE_POPUP_KEY, FILE_STUFF_POPUP_KEY;
+		extern int SEARCH_POPUP_KEY, MATCH_POPUP_KEY;
+		extern int SEL_LINE_POPUP_KEY;
+		int *keys[] = {
+		    &STORE_FILE_POPUP_KEY, &LOAD_FILE_POPUP_KEY,
+		    &SAVE_FILE_POPUP_KEY, &FILE_STUFF_POPUP_KEY,
+		    &SEARCH_POPUP_KEY, &MATCH_POPUP_KEY,
+		    &SEL_LINE_POPUP_KEY
+		};
+		int i;
+
+		frame = (Frame)xv_get(folio_public, WIN_FRAME);
+		for (i = 0; i < 7; i++) {
+		    if (*keys[i] == 0)
+			continue;
+		    popup = (Frame)xv_get(frame, XV_KEY_DATA,
+					 (Attr_attribute)*keys[i], NULL);
+		    if (popup)
+			xv_set(popup, WIN_CLIENT_DATA, NULL, NULL);
+		}
+	    }
+
 	    while (temp_view) {
+		temp_view->magic = 0;
 		next = temp_view->next;
 		notify_post_destroy(VIEW_PUBLIC(temp_view), DESTROY_CLEANUP,
 				    NOTIFY_IMMEDIATE);
