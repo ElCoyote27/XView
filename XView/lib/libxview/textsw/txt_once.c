@@ -1066,11 +1066,11 @@ textsw_view_cleanup(view)
 {
     Textsw_folio    folio = FOLIO_FOR_VIEW(view);
 
-    view->magic = 0;
     view->state |= TXTSW_VIEW_DYING;
     /* Warn client that view is dying BEFORE killing it. */
     if (folio->notify_level & TEXTSW_NOTIFY_DESTROY_VIEW)
 	textsw_notify(view, TEXTSW_ACTION_DESTROY_VIEW, NULL);
+    view->magic = 0;
 
     /* This is for the panel menu of textedit */
     if ((!(folio->state & TXTSW_DESTROY_ALL_VIEWS)) &&

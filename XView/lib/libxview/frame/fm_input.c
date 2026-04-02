@@ -272,7 +272,11 @@ frame_focus_win_event_proc(window, event, arg)
 	    width = FRAME_FOCUS_RIGHT_WIDTH;
 	    height = FRAME_FOCUS_RIGHT_HEIGHT;
 	}
+	if (!image)
+	    return;
 	DRAWABLE_INFO_MACRO(window, info);
+	if (!info)
+	    return;
 	gc = (GC) xv_get(window, XV_KEY_DATA, (Attr_attribute)FRAME_FOCUS_GC);
 	if (!gc) {
 	    /* Create the Graphics Context for the Focus Window */
@@ -283,6 +287,8 @@ frame_focus_win_event_proc(window, event, arg)
 	    xv_set(window, XV_KEY_DATA, (Attr_attribute)FRAME_FOCUS_GC, gc, NULL);
 	}
 	DRAWABLE_INFO_MACRO(image, image_info);
+	if (!image_info)
+	    return;
 	gc_values.background = xv_bg(info);
 	gc_values.foreground = xv_fg(info);
 	gc_values.stipple = xv_xid(image_info);

@@ -1633,6 +1633,8 @@ va_dcl
     view = VIEW_FROM_FOLIO_OR_VIEW(view);
     MAKE_AVLIST( args, avlist );
     va_end(args);
+    if (view == TEXTSW_VIEW_NULL)
+	return;
     folio = FOLIO_FOR_VIEW(view);
     doing_event = (folio->state & TXTSW_DOING_EVENT);
     folio->state &= ~TXTSW_DOING_EVENT;
