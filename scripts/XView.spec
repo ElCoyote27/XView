@@ -70,6 +70,16 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sat Apr 04 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.38
+- file_chooser: fix broken file sorting on glibc/UTF-8 systems;
+  strxfrm() produces opaque binary collation keys on glibc which are
+  corrupted by tolower() in the no-case comparison functions; use
+  original filenames for case-insensitive sorting instead of xfrm data
+- file_list.c: fix file_list_no_case_ascend_compare and
+  file_list_no_case_descend_compare to compare vals.string
+- file_chsr.c: fix fchsr_no_case_ascend_compare and
+  fchsr_no_case_descend_compare to compare file field
+
 * Thu Apr 02 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.37
 - textsw: fix use-after-free crashes when popup frame callbacks fire
   after the parent textsw view has been destroyed

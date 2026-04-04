@@ -1494,7 +1494,7 @@ file_list_no_case_ascend_compare( row1, row2 )
      File_list_row *row1;
      File_list_row *row2;
 {
-    return xv_strcasecmp(row1->xfrm, row2->xfrm);
+    return xv_strcasecmp(row1->vals.string, row2->vals.string);
 }
 
 Xv_public int
@@ -1502,7 +1502,7 @@ file_list_no_case_descend_compare( row1, row2 )
      File_list_row *row1;
      File_list_row *row2;
 {
-    return xv_strcasecmp(row2->xfrm, row1->xfrm);
+    return xv_strcasecmp(row2->vals.string, row1->vals.string);
 }
 
 Xv_public int

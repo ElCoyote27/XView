@@ -2445,7 +2445,7 @@ fchsr_no_case_ascend_compare( row1, row2 )
      File_chooser_row *row1;
      File_chooser_row *row2;
 {
-    return xv_strcasecmp(row1->xfrm, row2->xfrm);
+    return xv_strcasecmp(row1->file, row2->file);
 }
 
 Xv_public int
@@ -2453,7 +2453,7 @@ fchsr_no_case_descend_compare( row1, row2 )
      File_chooser_row *row1;
      File_chooser_row *row2;
 {
-    return xv_strcasecmp(row2->xfrm, row1->xfrm);
+    return xv_strcasecmp(row2->file, row1->file);
 }
 
 Xv_public int
