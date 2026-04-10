@@ -3,7 +3,7 @@ Name: xview
 %define BaseRelease 20260404
 Version: 3.2p1.4
 Release: 25.38%{?dist}
-Distribution: RHEL 8 (Ootpa)
+Distribution: RHAS 4 (Nahant) / RHAS 5 (Tikanga) / RHEL 6 (Santiago) / RHEL 7 (Maipo) / RHEL 8 (Ootpa) / RHEL 9 (Plow)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
 Source3: Xinitrc.ol
