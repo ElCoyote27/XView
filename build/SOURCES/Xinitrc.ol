@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 # $XConsortium: xinitrc.cpp,v 1.4 91/08/22 11:41:34 rws Exp $
 OPENWINHOME=/usr/openwin
 export OPENWINHOME
@@ -60,12 +60,12 @@ fi
 
 # Start ssh-agent
 if [ -x /usr/bin/ssh-agent ]; then
-	eval `/usr/bin/ssh-agent`
+	eval $(/usr/bin/ssh-agent)
 fi
 
 # GNOME Keyring for application secrets (Chrome, etc.)
 if [ -x /usr/bin/gnome-keyring-daemon ]; then
-	eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets)
+	eval $(/usr/bin/gnome-keyring-daemon --replace --components=pkcs11,secrets)
 	export GNOME_KEYRING_CONTROL
 fi
 
