@@ -80,7 +80,7 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 - scroll wheel: one line (or row) per tick for small text buffers and short
   scrolling lists (tunables in sb_impl.h; xview_scroll_wheel_step in sb_scroll.c)
 
-* Sat Apr 04 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.39
+* Sat Apr 04 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.38
 - file_chooser: fix broken file sorting on glibc/UTF-8 systems;
   strxfrm() produces opaque binary collation keys on glibc which are
   corrupted by tolower() in the no-case comparison functions; use
