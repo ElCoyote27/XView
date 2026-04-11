@@ -49,7 +49,8 @@ GETTEXT.O		=
 HDRSPUBLIC=     cms_grays.h cms_mono.h cmsrainbow.h cms_rgb.h sun.h \
                 window_hs.h expandname.h xv_c_types.h attrol.h db.h \
 		xv_c_types.h xv_i18n.h xv_version.h xview.h
-HDRSPRIVATE=    bitmask.h hashfn.h i18n_impl.h portable.h ${GETTEXT.H}
+HDRSPRIVATE=    bitmask.h hashfn.h i18n_impl.h portable.h xview_scroll_wheel.h \
+		${GETTEXT.H}
 
 DATA_OBJS =
 
@@ -71,7 +72,8 @@ TEXT_OBJS =\
 	xv_version.o\
 	xv_win_lp.o\
 	xv_icccm.o\
-	drop.o
+	drop.o\
+	xview_scroll_wheel.o
 
 SRCS =\
 	demorandom.c\
@@ -90,7 +92,8 @@ SRCS =\
 	xv_version.c\
 	xv_win_lp.c\
 	xv_icccm.c\
-	drop.c
+	drop.c\
+	xview_scroll_wheel.c
 #else
 TEXT_OBJS =\
 	demorandom.o\
@@ -110,6 +113,7 @@ TEXT_OBJS =\
 	xv_win_lp.o\
 	drop.o \
 	xv_casecmp.o \
+	xview_scroll_wheel.o \
 	${OFILES.misc.XvI18nLevel}
 
 SRCS =\
@@ -130,6 +134,7 @@ SRCS =\
 	xv_win_lp.c\
 	drop.c \
 	xv_casecmp.c \
+	xview_scroll_wheel.c \
 	${CFILES.misc.XvI18nLevel}
 #endif
 

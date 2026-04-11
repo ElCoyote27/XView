@@ -70,6 +70,16 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Sat Apr 11 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.38
+- scroll wheel: multi-line steps from visible viewport (base + floor, cap at
+  one page); new misc/xview_scroll_wheel.[ch], scrollbar_scroll_by_client_units
+  in sb_scroll.c; textsw (txt_scroll.c), scrollbar (sb_event.c), canvas
+  (cnvs_input.c), panel scrolling list (p_list.c)
+- xview_scroll_wheel: small-viewport and per-tick half-view cap so short files
+  are not jumpy; multi-line floor only when enough lines are visible
+- scroll wheel: one line (or row) per tick for small text buffers and short
+  scrolling lists (see SINGLE_LINE_* in xview_scroll_wheel.h)
+
 * Sat Apr 04 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.38
 - file_chooser: fix broken file sorting on glibc/UTF-8 systems;
   strxfrm() produces opaque binary collation keys on glibc which are

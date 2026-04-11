@@ -12,6 +12,7 @@ static char     sccsid[] = "@(#)cnvs_input.c 20.62 93/06/28";
 
 #define xview_other_rl_funcs
 #include <xview_private/cnvs_impl.h>
+#include <xview_private/xview_scroll_wheel.h>
 #include <xview/canvas.h>
 #include <xview/frame.h>
 #include <xview/openmenu.h>
@@ -270,17 +271,12 @@ canvas_paint_event(window_public, event, arg, type)
 	    XV_KEY_DATA, (Attr_attribute)canvas_view_context_key));
 	sb = xv_get(canvas_public, OPENWIN_VERTICAL_SCROLLBAR, view);
 	if (sb) {
-	    int offset, length, view_length, pixels_per, scroll_unit;
+	    int offset, length, view_length, scroll_unit;
 
-	    pixels_per = (int) xv_get(sb, SCROLLBAR_PIXELS_PER_UNIT);
-	    if (pixels_per <= 1) {
-		scroll_unit = 2;
-	    } else {
-		scroll_unit = 1;
-	    }
+	    view_length = (int) xv_get(sb, SCROLLBAR_VIEW_LENGTH);
+	    scroll_unit = xview_scroll_wheel_step(view_length);
 	    offset = (int) xv_get(sb, SCROLLBAR_VIEW_START);
 	    length = (int) xv_get(sb, SCROLLBAR_OBJECT_LENGTH);
-	    view_length = (int) xv_get(sb, SCROLLBAR_VIEW_LENGTH);
 
 	    if (event_action(event) == ACTION_SCROLL_UP) {
 		if ( offset >= scroll_unit ) {

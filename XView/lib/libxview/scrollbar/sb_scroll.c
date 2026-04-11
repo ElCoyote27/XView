@@ -34,6 +34,7 @@ Xv_public void  scrollbar_default_compute_scroll_proc();
 
 Pkg_private int scrollbar_scroll();
 Pkg_private int scrollbar_scroll_to_offset();
+Pkg_private int scrollbar_scroll_by_client_units();
 
 static int      scrollbar_offset_to_client_units();
 static unsigned long scrollbar_absolute_offset();
@@ -104,6 +105,38 @@ scrollbar_scroll_to_offset(sb, view_start)
     } else {
 	return (SCROLLBAR_POSITION_UNCHANGED);
     }
+}
+
+/*
+ * Move the scrollbar thumb by delta client units (signed). Used for scroll
+ * wheel multi-line steps; clamps to [0, object_length - view_length].
+ */
+Pkg_private int
+scrollbar_scroll_by_client_units(sb, delta)
+    Xv_scrollbar_info *sb;
+    int             delta;
+{
+    unsigned long max_start;
+    long            pos;
+
+    if (delta == 0) {
+	return SCROLLBAR_POSITION_UNCHANGED;
+    }
+
+    if (sb->view_length > sb->object_length) {
+	max_start = 0;
+    } else {
+	max_start = sb->object_length - sb->view_length;
+    }
+
+    pos = (long) sb->view_start + (long) delta;
+    if (pos < 0) {
+	pos = 0;
+    } else if ((unsigned long) pos > max_start) {
+	pos = (long) max_start;
+    }
+
+    return scrollbar_scroll_to_offset(sb, (unsigned long) pos);
 }
 
 Xv_public void

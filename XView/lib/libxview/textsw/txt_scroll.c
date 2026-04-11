@@ -19,6 +19,7 @@ static char     sccsid[] = "@(#)txt_scroll.c 20.41 93/06/28";
 #include <xview_private/txt_impl.h>
 #include <xview_private/draw_impl.h>
 #include <xview_private/ev_impl.h>
+#include <xview_private/xview_scroll_wheel.h>
 
 #define TEXTSW_FOR_SB(_sb) ((Textsw)xv_get(_sb, SCROLLBAR_NOTIFY_CLIENT))
 
@@ -195,7 +196,13 @@ textsw_mouseless_scroll_event(view, ie, arg)
 		break;
 	case ACTION_SCROLL_DOWN:
 		msg	= "ACTION_SCROLL_DOWN";
-		lines 	= 1;
+		if (obj_length <= XVIEW_SCROLL_WHEEL_SINGLE_LINE_TEXT_MAX_CHARS) {
+		    lines = 1;
+		} else {
+		    ev_view_range(view->e_view, &first, &last_plus_one);
+		    lines	= xview_scroll_wheel_step(
+			(int) (last_plus_one - first));
+		}
 		break;
 	case ACTION_SCROLL_JUMP_DOWN:
 		msg	= "ACTION_SCROLL_JUMP_DOWN";
@@ -248,7 +255,13 @@ textsw_mouseless_scroll_event(view, ie, arg)
 		break;
 	case ACTION_SCROLL_UP:
 		msg	= "ACTION_SCROLL_UP";
-		lines 	= -1;
+		if (obj_length <= XVIEW_SCROLL_WHEEL_SINGLE_LINE_TEXT_MAX_CHARS) {
+		    lines = -1;
+		} else {
+		    ev_view_range(view->e_view, &first, &last_plus_one);
+		    lines	= -xview_scroll_wheel_step(
+			(int) (last_plus_one - first));
+		}
 		break;
 	default:
 		is_scroll_event	= FALSE;

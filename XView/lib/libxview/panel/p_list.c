@@ -20,6 +20,7 @@ static char     sccsid[] = "@(#)p_list.c 1.142 93/06/28";
 #include <xview_private/draw_impl.h>
 #include <xview/font.h>
 #include <xview/scrollbar.h>
+#include <xview_private/xview_scroll_wheel.h>
 #include <xview/server.h>
 #include <xview/screen.h>
 #include <xview/openmenu.h>
@@ -1685,15 +1686,36 @@ beep:
 	if (event_is_down(event) && dp->list_sb &&
 	    (event_action(event) == ACTION_SCROLL_UP ||
 	     event_action(event) == ACTION_SCROLL_DOWN)) {
-	    int view_start = (int) xv_get(dp->list_sb,
-		SCROLLBAR_VIEW_START);
-	    if (event_action(event) == ACTION_SCROLL_UP) {
-		if (view_start > 0)
-		    view_start--;
+	    int	       step;
+	    int	       view_start;
+	    unsigned int max_view_start;
+
+	    if (dp->nrows <= XVIEW_SCROLL_WHEEL_SINGLE_LINE_LIST_MAX_ROWS) {
+		step = 1;
 	    } else {
-		if ((unsigned)view_start + dp->rows_displayed
-		    < dp->nrows)
-		    view_start++;
+		step = xview_scroll_wheel_step((int) dp->rows_displayed);
+	    }
+	    view_start = (int) xv_get(dp->list_sb, SCROLLBAR_VIEW_START);
+	    if (event_action(event) == ACTION_SCROLL_UP) {
+		if (view_start > 0) {
+		    view_start -= step;
+		    if (view_start < 0) {
+			view_start = 0;
+		    }
+		}
+	    } else {
+		if ((unsigned) view_start + dp->rows_displayed
+		    < dp->nrows) {
+		    view_start += step;
+		    if (dp->nrows > dp->rows_displayed) {
+			max_view_start = dp->nrows - dp->rows_displayed;
+		    } else {
+			max_view_start = 0;
+		    }
+		    if ((unsigned) view_start > max_view_start) {
+			view_start = (int) max_view_start;
+		    }
+		}
 	    }
 	    xv_set(dp->list_sb, SCROLLBAR_VIEW_START,
 		view_start, NULL);

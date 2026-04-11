@@ -234,6 +234,7 @@ Xv_private	int scrollbar_minimum_size();
 /* from sb_scroll.c */
 Pkg_private 	int scrollbar_scroll();
 Pkg_private 	int scrollbar_scroll_to_offset();
+Pkg_private 	int scrollbar_scroll_by_client_units();
 
 /* from sb_set.c */
 Pkg_private Xv_opaque	scrollbar_set_internal();

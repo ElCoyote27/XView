@@ -27,6 +27,7 @@ static char     sccsid[] = "@(#)sb_event.c 1.67 91/05/23";
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <xview_private/sb_impl.h>
+#include <xview_private/xview_scroll_wheel.h>
 #include <xview/canvas.h>
 #include <xview/frame.h>
 #include <xview/notify.h>
@@ -361,17 +362,30 @@ scrollbar_handle_event(sb_public, event, arg, type)
 	break;
 
       case ACTION_UP:
-      case ACTION_SCROLL_UP:	/* USE_SCROLL_WHEEL */
 	if (event_is_up(event) || !SB_VERTICAL(sb))
 	    break;
 	scrollbar_scroll(sb, 0, SCROLLBAR_LINE_BACKWARD);
 	break;
 
+	/* USE_SCROLL_WHEEL: multi-line step; keep ACTION_UP single-line */
+      case ACTION_SCROLL_UP:
+	if (event_is_up(event) || !SB_VERTICAL(sb))
+	    break;
+	(void) scrollbar_scroll_by_client_units(sb,
+	    -xview_scroll_wheel_step((int) sb->view_length));
+	break;
+
       case ACTION_DOWN:
-      case ACTION_SCROLL_DOWN:	/* USE_SCROLL_WHEEL */
 	if (event_is_up(event) || !SB_VERTICAL(sb))
 	    break;
 	scrollbar_scroll(sb, 0, SCROLLBAR_LINE_FORWARD);
+	break;
+
+      case ACTION_SCROLL_DOWN:	/* USE_SCROLL_WHEEL */
+	if (event_is_up(event) || !SB_VERTICAL(sb))
+	    break;
+	(void) scrollbar_scroll_by_client_units(sb,
+	    xview_scroll_wheel_step((int) sb->view_length));
 	break;
 
       case ACTION_LEFT:
