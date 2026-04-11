@@ -12,7 +12,7 @@ static char     sccsid[] = "@(#)cnvs_input.c 20.62 93/06/28";
 
 #define xview_other_rl_funcs
 #include <xview_private/cnvs_impl.h>
-#include <xview_private/xview_scroll_wheel.h>
+#include <xview_private/sb_impl.h>
 #include <xview/canvas.h>
 #include <xview/frame.h>
 #include <xview/openmenu.h>

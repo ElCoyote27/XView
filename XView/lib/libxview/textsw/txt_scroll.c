@@ -19,7 +19,7 @@ static char     sccsid[] = "@(#)txt_scroll.c 20.41 93/06/28";
 #include <xview_private/txt_impl.h>
 #include <xview_private/draw_impl.h>
 #include <xview_private/ev_impl.h>
-#include <xview_private/xview_scroll_wheel.h>
+#include <xview_private/sb_impl.h>
 
 #define TEXTSW_FOR_SB(_sb) ((Textsw)xv_get(_sb, SCROLLBAR_NOTIFY_CLIENT))
 

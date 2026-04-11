@@ -181,6 +181,22 @@ struct scrollbar {
 };
 
 /*
+ * Scroll wheel step sizing (USE_SCROLL_WHEEL).  All tunables are
+ * preprocessor constants; implementation is in sb_scroll.c.
+ */
+#define XVIEW_SCROLL_WHEEL_BASE_LINES 2
+#define XVIEW_SCROLL_WHEEL_FLOOR_LINES 3
+#define XVIEW_SCROLL_WHEEL_APPLY_LINE_FLOOR_MIN_VIEW_LENGTH 8
+#define XVIEW_SCROLL_WHEEL_VIEW_PORTION_NUMERATOR 1
+#define XVIEW_SCROLL_WHEEL_VIEW_PORTION_DENOMINATOR 5
+#define XVIEW_SCROLL_WHEEL_MAX_STEP_PER_TICK_NUMERATOR 1
+#define XVIEW_SCROLL_WHEEL_MAX_STEP_PER_TICK_DENOMINATOR 2
+#define XVIEW_SCROLL_WHEEL_ABSOLUTE_MIN_STEP 1
+#define XVIEW_SCROLL_WHEEL_MIN_VALID_VIEW_LENGTH 1
+#define XVIEW_SCROLL_WHEEL_SINGLE_LINE_TEXT_MAX_CHARS 12288
+#define XVIEW_SCROLL_WHEEL_SINGLE_LINE_LIST_MAX_ROWS 48
+
+/*
  * Global Variable Declarations:
  */
 extern	Attr_attribute	sb_context_key;
@@ -235,6 +251,7 @@ Xv_private	int scrollbar_minimum_size();
 Pkg_private 	int scrollbar_scroll();
 Pkg_private 	int scrollbar_scroll_to_offset();
 Pkg_private 	int scrollbar_scroll_by_client_units();
+Pkg_private	int xview_scroll_wheel_step();
 
 /* from sb_set.c */
 Pkg_private Xv_opaque	scrollbar_set_internal();

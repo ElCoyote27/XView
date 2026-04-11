@@ -1,6 +1,6 @@
 Summary: XView libraries for X11
 Name: xview
-%define BaseRelease 20260404
+%define BaseRelease 20260411
 Version: 3.2p1.4
 Release: 25.38%{?dist}
 Distribution: RHAS 4 (Nahant) / RHAS 5 (Tikanga) / RHEL 6 (Santiago) / RHEL 7 (Maipo) / RHEL 8 (Ootpa) / RHEL 9 (Plow)
@@ -72,13 +72,13 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %changelog
 * Sat Apr 11 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.38
 - scroll wheel: multi-line steps from visible viewport (base + floor, cap at
-  one page); new misc/xview_scroll_wheel.[ch], scrollbar_scroll_by_client_units
-  in sb_scroll.c; textsw (txt_scroll.c), scrollbar (sb_event.c), canvas
-  (cnvs_input.c), panel scrolling list (p_list.c)
+  one page); xview_scroll_wheel_step and tunables in sb_scroll.c / sb_impl.h,
+  scrollbar_scroll_by_client_units in sb_scroll.c; textsw (txt_scroll.c),
+  scrollbar (sb_event.c), canvas (cnvs_input.c), panel scrolling list (p_list.c)
 - xview_scroll_wheel: small-viewport and per-tick half-view cap so short files
   are not jumpy; multi-line floor only when enough lines are visible
 - scroll wheel: one line (or row) per tick for small text buffers and short
-  scrolling lists (see SINGLE_LINE_* in xview_scroll_wheel.h)
+  scrolling lists (tunables in sb_impl.h; xview_scroll_wheel_step in sb_scroll.c)
 
 * Sat Apr 04 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.38
 - file_chooser: fix broken file sorting on glibc/UTF-8 systems;

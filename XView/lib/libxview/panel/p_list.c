@@ -20,7 +20,7 @@ static char     sccsid[] = "@(#)p_list.c 1.142 93/06/28";
 #include <xview_private/draw_impl.h>
 #include <xview/font.h>
 #include <xview/scrollbar.h>
-#include <xview_private/xview_scroll_wheel.h>
+#include <xview_private/sb_impl.h>
 #include <xview/server.h>
 #include <xview/screen.h>
 #include <xview/openmenu.h>
