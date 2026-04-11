@@ -39,7 +39,17 @@ if [ ! -d ${OUT_DIR} ]; then
 	mkdir -p ${OUT_DIR}
 fi
 
+# Exclude local arch build trees (gmake output), objects, and nested build dirs.
+# Use *i386-Linux* not */i386-Linux/* — the latter misses paths with multiple
+# segments before the arch directory (e.g. .../guide/i386-Linux/).
 if [ -x /usr/bin/zip ]; then
 	cd ${BASE_DIR}
-	/usr/bin/zip -9qr ${ZIP_NAME} ${SRC_DIR} scripts -x '*.o' -x 'core' -x "${SRC_DIR}/build/*"
+	/usr/bin/zip -9qr ${ZIP_NAME} ${SRC_DIR} scripts \
+		-x '*.o' \
+		-x 'core' \
+		-x "${SRC_DIR}/build/*" \
+		-x '*i386-Linux*' \
+		-x '*x86_64-Linux*' \
+		-x '*sparc-SunOS*' \
+		-x '*i386-SunOS*'
 fi

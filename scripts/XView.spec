@@ -79,6 +79,8 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
   are not jumpy; multi-line floor only when enough lines are visible
 - scroll wheel: one line (or row) per tick for small text buffers and short
   scrolling lists (tunables in sb_impl.h; xview_scroll_wheel_step in sb_scroll.c)
+- build_zip.sh: exclude local *i386-Linux* / *x86_64-Linux* / SunOS arch output
+  trees from source zip (smaller SRPM; *.o alone misses binaries in those dirs)
 
 * Sat Apr 04 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.38
 - file_chooser: fix broken file sorting on glibc/UTF-8 systems;
