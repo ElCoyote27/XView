@@ -63,26 +63,27 @@ if [ -x /usr/bin/ssh-agent ]; then
 	eval $(/usr/bin/ssh-agent)
 fi
 
+# D-Bus session bus (must be started before gnome-keyring-daemon so that
+# the daemon can register org.freedesktop.secrets on the bus)
+if [ -x /usr/bin/dbus-launch ] && [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+	eval $(/usr/bin/dbus-launch --sh-syntax)
+	export DBUS_SESSION_BUS_ADDRESS
+fi
+
 # GNOME Keyring for application secrets (Chrome, etc.)
+# PAM (via pam_gnome_keyring.so in xrdp-sesman) unlocks the login keyring;
+# this just starts the daemon so apps can reach it over D-Bus.
 if [ -x /usr/bin/gnome-keyring-daemon ]; then
-	eval $(/usr/bin/gnome-keyring-daemon --replace --components=pkcs11,secrets)
+	eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets)
 	export GNOME_KEYRING_CONTROL
 fi
 
 # start some nice programs
 if [ -x ${HOME}/.openwin-init ]; then
-	if [ -x /usr/bin/dbus-launch ]; then
-		/usr/bin/dbus-launch --exit-with-session ${HOME}/.openwin-init
-	else
-		${HOME}/.openwin-init
-	fi
+	${HOME}/.openwin-init
 else
 	if [ -x ${OPENWINHOME}/lib/openwin-init ]; then
-		if [ -x /usr/bin/dbus-launch ]; then
-			/usr/bin/dbus-launch --exit-with-session ${OPENWINHOME}/lib/openwin-init
-		else
-			${OPENWINHOME}/lib/openwin-init
-		fi
+		${OPENWINHOME}/lib/openwin-init
 	fi
 fi
 
@@ -97,7 +98,7 @@ fi
 #ow_polkit_rule=/etc/polkit-1/rules.d/10-openwin-udisks2.rules
 #if [ ! -f ${ow_polkit_rule} ] && [ -d /etc/polkit-1/rules.d ]; then
 #	if [ -w /etc/polkit-1/rules.d ]; then
-#		cat > ${ow_polkit_rule} << 'POLKIT_EOF'
+#		cat > ${ow_polkit_rule} << POLKIT_EOF
 #polkit.addRule(function(action, subject) {
 #    if ((action.id == "org.freedesktop.udisks2.filesystem-mount" ||
 #         action.id == "org.freedesktop.udisks2.filesystem-mount-other-seat" ||

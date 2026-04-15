@@ -2,7 +2,7 @@ Summary: XView libraries for X11
 Name: xview
 %define BaseRelease 20260411
 Version: 3.2p1.4
-Release: 25.39%{?dist}
+Release: 25.40%{?dist}
 Distribution: RHAS 4 (Nahant) / RHAS 5 (Tikanga) / RHEL 6 (Santiago) / RHEL 7 (Maipo) / RHEL 8 (Ootpa) / RHEL 9 (Plow)
 Packager: Vincent S. Cojot <openlook@NOSPAM.cojot.name>
 Source0: XView-%{version}-%{BaseRelease}.zip
@@ -70,6 +70,9 @@ Requires: libXpm, libX11, libXext, libXt, ncurses, xorg-x11-server-utils, xorg-x
 %define _enable_debug_packages 1
 
 %changelog
+* Wed Apr 15 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.40
+- update Xinitrc.ol to auto-unlock gnome keyring at OWacomp login.
+
 * Sat Apr 11 2026 Vincent S. Cojot <openlook@NOSPAM.cojot.name> 3.2p1.4-25.39
 - scroll wheel: multi-line steps from visible viewport (base + floor, cap at
   one page); xview_scroll_wheel_step and tunables in sb_scroll.c / sb_impl.h,
