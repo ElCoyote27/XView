@@ -116,3 +116,7 @@ if [ -n "${SIGN_AFTER}" ] && [ -x /usr/bin/rpmsign ]; then
 		${RPM_BASE_DIR}/RPMS/i?86/xview-*${CUR_VERSION}-${RPM_RELEASE}${DIST}.i?86.rpm
 fi
 
+# Clean build tree
+if [ -d ${RPM_BUILD_DIR}/XView ]; then
+	/bin/rm -rf ${RPM_BUILD_DIR}/XView
+fi
