@@ -118,5 +118,5 @@ fi
 
 # Clean build tree
 if [ -d ${RPM_BUILD_DIR}/XView ]; then
-	/bin/rm -rf ${RPM_BUILD_DIR}/XView
+	/bin/rm -rf ${RPM_BUILD_DIR} ${RPM_TMP_PATH}
 fi
